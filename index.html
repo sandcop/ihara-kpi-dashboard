@@ -3,35 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ihara KPIs</title>
+  <title>Ihara KPIs Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Chart.js está incluido pero tu script.js actual no lo usa todavía -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+  <!-- Incluir Chart.js desde CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
   <h1>📊 Dashboard KPIs – Ihara</h1>
 
   <div class="buttons">
-    <!-- Quitamos onclick, añadimos id -->
-    <button id="btn-kpis">Ver KPIs</button> 
-    <!-- Quitamos onclick, añadimos id -->
-    <button id="btn-faltantes">Ver Faltantes</button> 
+    <!-- IDs correctos, sin onclick -->
+    <button id="btn-kpis">Ver KPIs</button>
+    <button id="btn-faltantes">Ver Faltantes</button>
   </div>
 
-  <!-- Cambiamos id a "data-content" para que coincida con getElementById en script.js -->
-  <!-- Quitamos el loader estático, script.js lo maneja -->
+  <!-- Contenedor principal para la tabla y el mensaje de carga/error -->
   <section id="data-content">
-    <!-- El contenido (loader o tabla) será insertado aquí por script.js -->
+    <!-- El contenido (loader o tabla) se insertará aquí -->
   </section>
 
-  <!-- Esta sección para el gráfico existe pero no es usada por el script.js actual -->
-  <section id="chart-container"> 
+  <!-- Contenedor para el gráfico (inicialmente oculto) -->
+  <section id="chart-container">
     <canvas id="kpiChart"></canvas>
   </section>
 
-  <!-- Añadir defer es buena práctica, aunque al final del body suele ser suficiente -->
-  <script src="script.js" defer></script> 
+  <!-- Enlazar script.js al final y con defer -->
+  <script src="script.js" defer></script>
 
 </body>
 </html>

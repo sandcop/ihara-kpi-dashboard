@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ihara KPIs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <h1>📊 Dashboard KPIs – Ihara</h1>
+
+  <div class="buttons">
+    <button onclick="mostrarKPIs()">Ver KPIs</button>
+    <button onclick="mostrarFaltantes()">Ver Faltantes</button>
+  </div>
+
+  <section id="tabla-container">
+    <div class="loader" id="loader">Cargando datos...</div>
+    <table id="tablaDatos"></table>
+  </section>
+
+  <section id="chart-container">
+    <canvas id="kpiChart"></canvas>
+  </section>
+
+  <script src="script.js"></script>
+
+</body>
+</html>

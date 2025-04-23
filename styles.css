@@ -138,37 +138,47 @@ tbody tr:hover {
   background-color: #eef2f7; /* Un azul muy claro al pasar el ratón */
 }
 
-/* --- Barra de Progreso --- */
+/* --- Barra de Progreso (NO USADA ACTUALMENTE PARA RESULTADO, PERO SE DEJA POR SI ACASO) --- */
 .progress-bar-container {
   background-color: #e9ecef;
-  border-radius: 0.25rem; /* Bordes redondeados */
+  border-radius: 0.25rem;
   height: 22px;
   overflow: hidden;
   width: 100%;
   position: relative;
 }
-
 .progress-bar {
-  background-color: #28a745; /* Verde éxito */
+  background-color: #28a745;
   height: 100%;
-  border-radius: 0.25rem; /* Redondeado */
+  border-radius: 0.25rem;
   transition: width 0.6s ease-in-out;
-  text-align: center; /* Centrar texto */
+  text-align: center;
   color: white;
   font-weight: bold;
   font-size: 0.85em;
-  line-height: 22px; /* Alinear verticalmente el texto */
-  white-space: nowrap; /* Evitar que el texto se rompa */
-  padding: 0 5px; /* Pequeño padding interno */
+  line-height: 22px;
+  white-space: nowrap;
+  padding: 0 5px;
 }
-
-/* Para asegurar que el texto sea visible si la barra es muy pequeña */
 .progress-bar::before {
-    content: attr(data-value); /* Mostrar el valor si se añade como atributo data-* */
+    content: attr(data-value);
     position: absolute;
     left: 5px;
-    color: #333; /* Color oscuro para contraste sobre fondo claro */
+    color: #333;
 }
+
+/* --- Estilo para Resultados de KPI Atrasados --- */
+td.kpi-atrasado {
+  background-color: #fddfe2 !important; /* Fondo rojo pálido, !important para asegurar prioridad sobre :nth-child */
+  color: #8c1c27 !important; /* Texto rojo oscuro */
+  font-weight: bold !important; /* Hacerlo resaltar */
+}
+
+/* Opcional: Mantener el resaltado al pasar el ratón sobre la fila */
+tbody tr:hover td.kpi-atrasado {
+    background-color: #f8c7ce !important; /* Rojo pálido un poco más oscuro al hacer hover */
+}
+
 
 /* Contenedor del Gráfico */
 #chart-container {

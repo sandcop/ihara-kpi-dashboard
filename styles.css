@@ -1,74 +1,147 @@
+/* Estilos generales (ejemplos, ajústalos a tu gusto) */
 body {
+  font-family: sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #0f172a;
-  color: #f1f5f9;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
+  padding: 20px;
 }
 
 h1 {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  animation: fadeIn 1s ease-in-out;
+  color: #005a7a; /* Un color corporativo ejemplo */
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 .buttons {
-  margin-bottom: 2rem;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 button {
-  background: #1e40af;
+  background-color: #007bff; /* Azul primario */
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  margin: 0 0.5rem;
-  border-radius: 10px;
-  font-size: 1rem;
+  padding: 12px 25px;
+  border-radius: 5px;
+  font-size: 1em;
   cursor: pointer;
-  transition: background 0.3s ease;
+  margin: 0 10px;
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones suaves */
 }
 
+/* Efectos al interactuar con botones */
 button:hover {
-  background: #2563eb;
+  background-color: #0056b3; /* Azul más oscuro */
+  transform: translateY(-2px); /* Levantar ligeramente */
 }
 
+button:active {
+  transform: translateY(1px); /* Simular presión */
+}
+
+/* Contenedor de datos y tabla */
+#data-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-height: 100px; /* Para que el spinner se vea bien */
+  position: relative; /* Necesario para posicionar el spinner */
+  overflow-x: auto; /* Para tablas anchas en móviles */
+}
+
+/* --- Animación de Carga (Spinner) --- */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px; /* Asegura espacio para el spinner */
+  font-size: 1.1em;
+  color: #555;
+}
+
+.loading::after { /* El spinner visual */
+  content: '';
+  display: block;
+  width: 30px;
+  height: 30px;
+  margin-left: 15px;
+  border: 4px solid #f3f3f3; /* Gris claro */
+  border-top: 4px solid #007bff; /* Azul */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* --- Estilos de la Tabla --- */
 table {
   width: 100%;
-  max-width: 900px;
   border-collapse: collapse;
-  margin-top: 1rem;
-  background: #1e293b;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  margin-top: 20px;
+  opacity: 0; /* Inicialmente invisible para animación */
+  transform: translateY(20px); /* Ligeramente abajo para animación */
+  animation: fadeInTable 0.5s ease-out forwards; /* Animación de entrada */
+}
+
+/* Animación para que la tabla aparezca suavemente */
+@keyframes fadeInTable {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 th, td {
-  padding: 1rem;
-  border-bottom: 1px solid #334155;
-}
-
-th {
-  background: #1e3a8a;
-  color: #bae6fd;
+  border: 1px solid #ddd;
+  padding: 10px 12px;
   text-align: left;
 }
 
-tr:hover {
-  background: #334155;
+th {
+  background-color: #e9ecef;
+  color: #495057;
+  font-weight: bold;
 }
 
-.loader {
+tbody tr:nth-child(even) {
+  background-color: #f8f9fa; /* Filas alternas */
+}
+
+tbody tr:hover {
+  background-color: #e2e6ea; /* Resaltar fila al pasar el ratón */
+}
+
+/* --- Barra de Progreso (Ejemplo para una columna) --- */
+.progress-bar-container {
+  background-color: #e9ecef;
+  border-radius: 5px;
+  height: 20px;
+  overflow: hidden;
+  width: 100%; /* O un ancho fijo si prefieres */
+  position: relative; /* Para texto superpuesto si quieres */
+}
+
+.progress-bar {
+  background-color: #28a745; /* Verde para progreso positivo */
+  height: 100%;
+  border-radius: 5px 0 0 5px; /* Redondear solo lado izquierdo si no está lleno */
+  transition: width 0.5s ease-in-out;
   text-align: center;
-  padding: 2rem;
-  color: #94a3b8;
+  color: white;
+  line-height: 20px; /* Centrar texto verticalmente */
+  font-size: 0.8em;
+  font-weight: bold;
 }
 
-#chart-container {
-  margin-top: 3rem;
-  width: 100%;
-  max-width: 900px;
+/* Opcional: para mostrar el valor numérico junto a la barra */
+.progress-value {
+    display: block; /* O inline-block si quieres al lado */
+    margin-top: 4px; /* Espacio entre barra y número */
+    font-size: 0.9em;
+    text-align: center; /* O left si prefieres */
 }

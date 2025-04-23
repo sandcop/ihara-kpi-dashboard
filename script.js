@@ -1,4 +1,5 @@
 const apiUrl = "https://script.google.com/macros/s/AKfycby9UyKr-UcWOCvrMGCsgvc38_-HmKZpXjlj9THbGLNK0lhLJ7B-_RSVpxFpP76eWjeP/exec";
+
 const btnKPIs = document.getElementById("btn-kpis");
 const btnFaltantes = document.getElementById("btn-faltantes");
 const content = document.getElementById("data-content");

@@ -1,81 +1,56 @@
-let chart;
+const apiUrl = "https://script.google.com/macros/s/AKfycby9UyKr-UcWOCvrMGCsgvc38_-HmKZpXjlj9THbGLNK0lhLJ7B-_RSVpxFpP76eWjeP/exec";
 
-function mostrarKPIs() {
-  document.getElementById('loader').style.display = 'block';
-  document.getElementById('tablaDatos').innerHTML = '';
-  if (chart) chart.destroy();
+const btnKPIs = document.getElementById("btn-kpis");
+const btnFaltantes = document.getElementById("btn-faltantes");
+const content = document.getElementById("data-content");
 
-  google.script.run.withSuccessHandler(data => {
-    document.getElementById('loader').style.display = 'none';
-    const tabla = document.getElementById('tablaDatos');
-    let html = `<tr>
-      <th>KPI</th><th>100%</th><th>125%</th><th>70%</th>
-      <th>Resultado</th><th>Arrastre</th><th>Total</th>
-    </tr>`;
+btnKPIs.addEventListener("click", () => {
+  cargarDatos("kpi");
+});
 
-    const labels = [];
-    const dataset = [];
+btnFaltantes.addEventListener("click", () => {
+  cargarDatos("faltantes");
+});
 
-    data.forEach(d => {
-      html += `<tr>
-        <td>${d.kpi}</td><td>${d.valor100}</td><td>${d.valor125}</td>
-        <td>${d.valor70}</td><td>${d.resultado}</td><td>${d.arrastre}</td><td>${d.total}</td>
-      </tr>`;
-      labels.push(d.kpi);
-      dataset.push(Number(d.total));
+function cargarDatos(tipo) {
+  content.innerHTML = "<p class='loading'>Cargando datos...</p>";
+  
+  fetch(`${apiUrl}?tipo=${tipo}`)
+    .then(res => res.json())
+    .then(data => {
+      mostrarDatos(data.datos, tipo);
+    })
+    .catch(err => {
+      console.error(err);
+      content.innerHTML = "<p class='error'>Error al cargar datos</p>";
     });
-
-    tabla.innerHTML = html;
-    renderChart(labels, dataset, 'Totales por KPI');
-  }).getKPIData();
 }
 
-function mostrarFaltantes() {
-  document.getElementById('loader').style.display = 'block';
-  document.getElementById('tablaDatos').innerHTML = '';
-  if (chart) chart.destroy();
+function mostrarDatos(datos, tipo) {
+  if (!Array.isArray(datos)) {
+    content.innerHTML = "<p class='error'>Datos no disponibles</p>";
+    return;
+  }
 
-  google.script.run.withSuccessHandler(data => {
-    document.getElementById('loader').style.display = 'none';
-    const tabla = document.getElementById('tablaDatos');
-    let html = `<tr>
-      <th>KPI</th><th>Faltante 100%</th><th>Faltante 150%</th><th>Faltante 250%</th>
-    </tr>`;
+  let html = "<table>";
+  html += "<thead><tr>";
 
-    const labels = [];
-    const dataset = [];
+  if (tipo === "kpi") {
+    html += "<th>KPI</th><th>100%</th><th>125%</th><th>70%</th><th>Resultado</th><th>Arrastre</th><th>Total</th>";
+  } else {
+    html += "<th>KPI</th><th>Faltante 100%</th><th>Faltante 150%</th><th>Faltante 250%</th>";
+  }
 
-    data.forEach(d => {
-      html += `<tr>
-        <td>${d.kpi}</td><td>${d.faltante100}</td><td>${d.faltante150}</td><td>${d.faltante250}</td>
-      </tr>`;
-      labels.push(d.kpi);
-      dataset.push(Number(d.faltante100));
-    });
+  html += "</tr></thead><tbody>";
 
-    tabla.innerHTML = html;
-    renderChart(labels, dataset, 'Faltante 100% por KPI');
-  }).getFaltantesData();
-}
-
-function renderChart(labels, data, label) {
-  const ctx = document.getElementById('kpiChart').getContext('2d');
-  chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label,
-        data,
-        backgroundColor: '#3b82f6',
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: { beginAtZero: true }
-      }
+  datos.forEach(fila => {
+    html += "<tr>";
+    for (const valor of Object.values(fila)) {
+      html += `<td>${valor}</td>`;
     }
+    html += "</tr>";
   });
+
+  html += "</tbody></table>";
+  content.innerHTML = html;
 }

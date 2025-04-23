@@ -5,27 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ihara KPIs</title>
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Chart.js está incluido pero tu script.js actual no lo usa todavía -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 </head>
 <body>
 
   <h1>📊 Dashboard KPIs – Ihara</h1>
 
   <div class="buttons">
-    <button onclick="mostrarKPIs()">Ver KPIs</button>
-    <button onclick="mostrarFaltantes()">Ver Faltantes</button>
+    <!-- Quitamos onclick, añadimos id -->
+    <button id="btn-kpis">Ver KPIs</button> 
+    <!-- Quitamos onclick, añadimos id -->
+    <button id="btn-faltantes">Ver Faltantes</button> 
   </div>
 
-  <section id="tabla-container">
-    <div class="loader" id="loader">Cargando datos...</div>
-    <table id="tablaDatos"></table>
+  <!-- Cambiamos id a "data-content" para que coincida con getElementById en script.js -->
+  <!-- Quitamos el loader estático, script.js lo maneja -->
+  <section id="data-content">
+    <!-- El contenido (loader o tabla) será insertado aquí por script.js -->
   </section>
 
-  <section id="chart-container">
+  <!-- Esta sección para el gráfico existe pero no es usada por el script.js actual -->
+  <section id="chart-container"> 
     <canvas id="kpiChart"></canvas>
   </section>
 
-  <script src="script.js"></script>
+  <!-- Añadir defer es buena práctica, aunque al final del body suele ser suficiente -->
+  <script src="script.js" defer></script> 
 
 </body>
 </html>

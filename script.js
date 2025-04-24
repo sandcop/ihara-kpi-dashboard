@@ -3,253 +3,256 @@
 // --- URL de tu Web App Desplegada ---
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9UyKr-UcWOCvrMGCsgvc38_-HmKZpXjlj9THbGLNK0lhLJ7B-_RSVpxFpP76eWjeP/exec';
 
-// Referencias a elementos del DOM
-const tablaContainer = document.getElementById('tabla-container');
-const chartContainer = document.getElementById('chart-container');
-const loader = document.getElementById('loader');
-const tablaDatos = document.getElementById('tablaDatos');
-const kpiChartCanvas = document.getElementById('kpiChart');
+// --- Referencias a elementos del DOM (Obtenidas después de que el DOM cargue) ---
+let tablaContainer, chartContainer, loader, tablaDatos, kpiChartCanvas, errorContainer;
+let miGrafico = null; // Variable para guardar la instancia del gráfico globalmente
 
-let miGrafico = null; // Variable para guardar la instancia del gráfico
-
-// Espera a que el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-    inicializarGrafico(); // Prepara el gráfico
-    // Opcional: Cargar KPIs por defecto al iniciar
-    // mostrarKPIs();
-});
-
-// --- Funciones llamadas por los botones ---
+// --- FUNCIONES LLAMADAS POR LOS BOTONES (DEFINIDAS GLOBALMENTE) ---
 
 function mostrarKPIs() {
-    console.log("Solicitando KPIs desde Apps Script:", APPS_SCRIPT_URL);
+    console.log("Función mostrarKPIs() llamada."); // Log para confirmar que la función se llama
+    if (!loader) { // Asegurarse que las refs DOM estén listas
+        console.error("DOM aún no cargado completamente para mostrarKPIs.");
+        return;
+    }
     limpiarContenido();
     loader.style.display = 'block'; // Muestra el loader
 
-    // Llama a la Web App usando fetch para obtener KPIs
     fetch(`${APPS_SCRIPT_URL}?action=kpis`)
         .then(response => {
             if (!response.ok) {
-                // Intenta obtener más detalles del error si es posible
                 return response.text().then(text => {
-                   throw new Error(`Error ${response.status}: ${response.statusText}. Respuesta: ${text}`);
-                });
-            }
-            return response.json(); // Convierte la respuesta a JSON
-        })
-        .then(data => {
-            // Verifica si Apps Script devolvió un error en la estructura JSON esperada
-            if (data && data.error) {
-                throw new Error(`Error desde Apps Script: ${data.error}`);
-            }
-            console.log("Datos KPIs recibidos:", data);
-            loader.style.display = 'none'; // Oculta el loader
-            tablaContainer.style.display = 'block';
-            tablaDatos.style.display = 'table';
-            chartContainer.style.display = 'block';
-            popularTablaKPIs(data); // Pasa los datos reales
-            actualizarGraficoKPIs(data); // Pasa los datos reales
-        })
-        .catch(error => {
-            console.error("Error al obtener KPIs:", error);
-            mostrarError(`Error al cargar KPIs: ${error.message}`); // Muestra error al usuario
-        });
-}
-
-function mostrarFaltantes() {
-    console.log("Solicitando Faltantes desde Apps Script:", APPS_SCRIPT_URL);
-    limpiarContenido();
-    loader.style.display = 'block'; // Muestra el loader
-
-     // Llama a la Web App usando fetch para obtener Faltantes
-    fetch(`${APPS_SCRIPT_URL}?action=faltantes`)
-        .then(response => {
-             if (!response.ok) {
-                // Intenta obtener más detalles del error si es posible
-                return response.text().then(text => {
-                   throw new Error(`Error ${response.status}: ${response.statusText}. Respuesta: ${text}`);
+                   // Intenta parsear el texto como JSON por si GAS devolvió un error JSON
+                   try {
+                       const errData = JSON.parse(text);
+                       if (errData && errData.error) {
+                           throw new Error(`Error desde Apps Script: ${errData.error} (Status: ${response.status})`);
+                       }
+                   } catch (e) { /* No era JSON, usar el texto plano */ }
+                   throw new Error(`Error HTTP ${response.status}: ${response.statusText}. Respuesta: ${text}`);
                 });
             }
             return response.json();
         })
         .then(data => {
-             if (data && data.error) {
-                throw new Error(`Error desde Apps Script: ${data.error}`);
+            if (data && data.error) { // Verificar error JSON incluso en respuesta OK
+                throw new Error(`Error reportado por Apps Script: ${data.error}`);
             }
-            console.log("Datos Faltantes recibidos:", data);
-            loader.style.display = 'none'; // Oculta el loader
+            console.log("Datos KPIs recibidos:", data);
+            loader.style.display = 'none';
             tablaContainer.style.display = 'block';
             tablaDatos.style.display = 'table';
-            popularTablaFaltantes(data); // Pasa los datos reales
+            chartContainer.style.display = 'block'; // Muestra el contenedor del gráfico
+            kpiChartCanvas.style.display = 'block'; // Muestra el canvas en sí
+            popularTablaKPIs(data);
+            actualizarGraficoKPIs(data);
+        })
+        .catch(error => {
+            console.error("Error al obtener KPIs:", error);
+            mostrarError(`Error al cargar KPIs: ${error.message}`);
+        });
+}
+
+function mostrarFaltantes() {
+    console.log("Función mostrarFaltantes() llamada."); // Log para confirmar
+     if (!loader) {
+        console.error("DOM aún no cargado completamente para mostrarFaltantes.");
+        return;
+    }
+    limpiarContenido();
+    loader.style.display = 'block';
+
+    fetch(`${APPS_SCRIPT_URL}?action=faltantes`)
+        .then(response => {
+            if (!response.ok) {
+                 return response.text().then(text => {
+                   try {
+                       const errData = JSON.parse(text);
+                       if (errData && errData.error) {
+                           throw new Error(`Error desde Apps Script: ${errData.error} (Status: ${response.status})`);
+                       }
+                   } catch (e) { /* No era JSON */ }
+                   throw new Error(`Error HTTP ${response.status}: ${response.statusText}. Respuesta: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.error) {
+                throw new Error(`Error reportado por Apps Script: ${data.error}`);
+            }
+            console.log("Datos Faltantes recibidos:", data);
+            loader.style.display = 'none';
+            tablaContainer.style.display = 'block';
+            tablaDatos.style.display = 'table';
+            popularTablaFaltantes(data);
         })
         .catch(error => {
             console.error("Error al obtener Faltantes:", error);
-            mostrarError(`Error al cargar Faltantes: ${error.message}`); // Muestra error al usuario
+            mostrarError(`Error al cargar Faltantes: ${error.message}`);
         });
 }
 
-// --- Funciones Auxiliares ---
+// --- FUNCIONES AUXILIARES ---
 
 function limpiarContenido() {
-    tablaDatos.innerHTML = ''; // Limpia el contenido de la tabla
-    tablaDatos.style.display = 'none'; // Oculta la tabla
-    chartContainer.style.display = 'none'; // Oculta el gráfico
-    loader.style.display = 'none'; // Oculta el loader por si acaso
-    tablaContainer.style.display = 'none'; // Oculta el contenedor de tabla
-    // Limpiar mensaje de error si lo hubiera
-    const errorDiv = document.getElementById('error-message');
-    if(errorDiv) {
-        errorDiv.remove();
-    }
+    if (tablaDatos) tablaDatos.innerHTML = '';
+    if (tablaDatos) tablaDatos.style.display = 'none';
+    if (chartContainer) chartContainer.style.display = 'none'; // Ocultar contenedor del gráfico
+    if (kpiChartCanvas) kpiChartCanvas.style.display = 'none'; // Ocultar el canvas
+    if (loader) loader.style.display = 'none';
+    if (tablaContainer) tablaContainer.style.display = 'none'; // Ocultar contenedor principal de tabla
+    if (errorContainer) errorContainer.innerHTML = ''; // Limpiar errores previos
 }
 
 function mostrarError(mensaje) {
-    loader.style.display = 'none'; // Asegúrate que el loader esté oculto
-    tablaContainer.style.display = 'block'; // Muestra el contenedor para poner el error
-    tablaDatos.style.display = 'none'; // Oculta la tabla
-    chartContainer.style.display = 'none'; // Oculta el gráfico
+    console.error("Mostrando Error:", mensaje); // Loguear el error también
+    if (loader) loader.style.display = 'none';
+    if (tablaContainer) tablaContainer.style.display = 'block'; // Mostrar contenedor para el error
+    if (tablaDatos) tablaDatos.style.display = 'none';
+    if (chartContainer) chartContainer.style.display = 'none';
 
-    // Crear y mostrar el mensaje de error (si no existe ya uno)
-    if(!document.getElementById('error-message')) {
-        const errorDiv = document.createElement('div');
-        errorDiv.id = 'error-message';
-        errorDiv.style.color = 'red';
-        errorDiv.style.backgroundColor = '#ffebee'; // Fondo rojo claro
-        errorDiv.style.border = '1px solid red';
-        errorDiv.style.padding = '15px';
-        errorDiv.style.marginTop = '10px';
-        errorDiv.style.borderRadius = '5px';
-        errorDiv.style.fontWeight = 'bold';
-        errorDiv.textContent = mensaje;
-        // Insertar el mensaje de error dentro del contenedor de la tabla, antes de la tabla (o loader)
-        tablaContainer.insertBefore(errorDiv, tablaContainer.firstChild);
+    if (errorContainer) {
+        errorContainer.innerHTML = `<div style="color: red; background-color: #ffebee; border: 1px solid red; padding: 15px; margin-top: 10px; border-radius: 5px; font-weight: bold;">${mensaje}</div>`;
+    } else {
+        // Fallback si errorContainer no está listo (poco probable con DOMContentLoaded)
+        alert("Error: " + mensaje);
     }
-}
-
-
-function inicializarGrafico() {
-    // (Sin cambios)
-    if (miGrafico) {
-        miGrafico.destroy();
-    }
-    const ctx = kpiChartCanvas.getContext('2d');
-    miGrafico = new Chart(ctx, {
-        type: 'bar',
-        data: { labels: [], datasets: [{ label: 'Valor KPI', data: [], backgroundColor: 'rgba(54, 162, 235, 0.6)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 1 }] },
-        options: { scales: { y: { beginAtZero: true } }, responsive: true, maintainAspectRatio: false }
-    });
 }
 
 function popularTablaKPIs(datosKPI) {
-    // --- ¡¡IMPORTANTE!! ---
-    // Esta función ASUME que 'datosKPI' es un ARRAY DE OBJETOS,
-    // y que cada objeto tiene propiedades llamadas 'indicador', 'valor', 'meta', 'estado'.
-    // SI TU APPS SCRIPT DEVUELVE UNA ESTRUCTURA DIFERENTE (p.ej., un array 2D o nombres diferentes),
-    // NECESITAS AJUSTAR EL CÓDIGO DENTRO DEL BUCLE forEach.
-    //-----------------------
-
-    let tablaHTML = `
-        <thead>
-            <tr>
-                <th>Indicador</th>
-                <th>Valor</th>
-                <th>Meta</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>`;
-
+    if (!tablaDatos) return;
+    // ASUME que datosKPI es un array de objetos con {indicador, valor, meta, estado}
+    let tablaHTML = `<thead><tr><th>Indicador</th><th>Valor</th><th>Meta</th><th>Estado</th></tr></thead><tbody>`;
     if (Array.isArray(datosKPI) && datosKPI.length > 0) {
         datosKPI.forEach(kpi => {
-            // Accede a las propiedades del objeto kpi. Ajusta los nombres si es necesario.
             tablaHTML += `
                 <tr>
-                    <td>${kpi.indicador || 'N/A'}</td>
-                    <td>${kpi.valor || 'N/A'}</td>
-                    <td>${kpi.meta || 'N/A'}</td>
-                    <td>${kpi.estado || 'N/A'}</td>
+                    <td>${kpi.indicador ?? 'N/A'}</td>
+                    <td>${kpi.valor ?? 'N/A'}</td>
+                    <td>${kpi.meta ?? 'N/A'}</td>
+                    <td>${kpi.estado ?? 'N/A'}</td>
                 </tr>`;
         });
     } else {
-        tablaHTML += '<tr><td colspan="4">No se encontraron datos de KPIs o el formato es incorrecto.</td></tr>';
+        tablaHTML += '<tr><td colspan="4">No se encontraron datos de KPIs válidos.</td></tr>';
     }
-
     tablaHTML += `</tbody>`;
     tablaDatos.innerHTML = tablaHTML;
 }
 
 function popularTablaFaltantes(datosFaltantes) {
-     // --- ¡¡IMPORTANTE!! ---
-    // Esta función ASUME que 'datosFaltantes' es un ARRAY DE OBJETOS,
-    // y que cada objeto tiene propiedades: 'item', 'codigo', 'cantidad', 'proveedor', 'fechaEstimada'.
-    // SI TU APPS SCRIPT DEVUELVE UNA ESTRUCTURA DIFERENTE, AJUSTA EL CÓDIGO.
-    //-----------------------
-
-     let tablaHTML = `
-        <thead>
-            <tr>
-                <th>Ítem</th>
-                <th>Código</th>
-                <th>Cantidad Faltante</th>
-                <th>Proveedor</th>
-                <th>Fecha Estimada</th>
-            </tr>
-        </thead>
-        <tbody>`;
-
+    if (!tablaDatos) return;
+    // ASUME que datosFaltantes es array de objetos con {item, codigo, cantidad, proveedor, fechaEstimada}
+     let tablaHTML = `<thead><tr><th>Ítem</th><th>Código</th><th>Cantidad Faltante</th><th>Proveedor</th><th>Fecha Estimada</th></tr></thead><tbody>`;
     if (Array.isArray(datosFaltantes) && datosFaltantes.length > 0) {
         datosFaltantes.forEach(item => {
-            // Accede a las propiedades del objeto item. Ajusta los nombres si es necesario.
             tablaHTML += `
                 <tr>
-                    <td>${item.item || 'N/A'}</td>
-                    <td>${item.codigo || 'N/A'}</td>
-                    <td>${item.cantidad || 'N/A'}</td>
-                    <td>${item.proveedor || 'N/A'}</td>
-                    <td>${item.fechaEstimada || 'N/A'}</td>
+                    <td>${item.item ?? 'N/A'}</td>
+                    <td>${item.codigo ?? 'N/A'}</td>
+                    <td>${item.cantidad ?? 'N/A'}</td>
+                    <td>${item.proveedor ?? 'N/A'}</td>
+                    <td>${item.fechaEstimada ?? 'N/A'}</td>
                 </tr>`;
         });
     } else {
-         tablaHTML += '<tr><td colspan="5">No se encontraron datos de Faltantes o el formato es incorrecto.</td></tr>';
+         tablaHTML += '<tr><td colspan="5">No se encontraron datos de Faltantes válidos.</td></tr>';
     }
-
     tablaHTML += `</tbody>`;
     tablaDatos.innerHTML = tablaHTML;
 }
 
 function actualizarGraficoKPIs(datosKPI) {
-    // --- ¡¡IMPORTANTE!! ---
-    // Esta función ASUME que 'datosKPI' es un ARRAY DE OBJETOS,
-    // que 'kpi.indicador' se usará como etiqueta y 'kpi.valor' como dato numérico.
-    // LA LÓGICA PARA CONVERTIR 'kpi.valor' A NÚMERO PUEDE NECESITAR AJUSTES
-    // dependiendo de cómo estén formateados los valores en tu hoja (p.ej., "$", "%", ",").
-    //-----------------------
-
     if (!miGrafico || !Array.isArray(datosKPI) || datosKPI.length === 0) {
-        miGrafico.data.labels = [];
-        miGrafico.data.datasets[0].data = [];
-        miGrafico.update();
-        console.log("Gráfico limpiado o no actualizado por falta de datos.");
-        return;
+       if(miGrafico) {
+           miGrafico.data.labels = [];
+           miGrafico.data.datasets[0].data = [];
+           miGrafico.update();
+       }
+       console.log("Gráfico no actualizado por falta de datos válidos.");
+       return;
     }
-
-    const labels = datosKPI.map(kpi => kpi.indicador || 'Sin Etiqueta');
+    // ASUME que kpi.indicador es la etiqueta y kpi.valor necesita ser convertido a número
+    const labels = datosKPI.map(kpi => kpi.indicador ?? 'Sin Etiqueta');
     const data = datosKPI.map(kpi => {
-        // Intenta convertir el valor a número (Lógica de ejemplo, ajustar si es necesario)
         let rawValue = kpi.valor;
-        let num = 0;
+        let num = NaN; // Empezar como NaN
         if (typeof rawValue === 'string') {
-            // Quitar símbolos comunes ($, %) y comas de miles, luego convertir a float
+            // Limpiar símbolos ($, %), comas de miles, y convertir a número de punto flotante
+            // Manejar potencialmente diferentes formatos de miles/decimales si es necesario
             num = parseFloat(rawValue.replace(/[$,%]/g, '').replace(/,/g, ''));
         } else if (typeof rawValue === 'number') {
             num = rawValue;
         }
-        return isNaN(num) ? 0 : num; // Si no es número válido, usa 0
+        return isNaN(num) ? 0 : num; // Si no es número válido, usar 0
     });
 
     miGrafico.data.labels = labels;
     miGrafico.data.datasets[0].data = data;
     miGrafico.data.datasets[0].label = 'Valor Actual KPI';
-    miGrafico.update(); // Redibuja el gráfico
+    miGrafico.update();
     console.log("Gráfico actualizado con datos KPI.");
 }
+
+function inicializarGrafico() {
+    if (!kpiChartCanvas) return; // No intentar si el canvas no existe
+    const ctx = kpiChartCanvas.getContext('2d');
+    if (miGrafico) {
+        miGrafico.destroy(); // Destruir instancia previa si existe
+    }
+    miGrafico = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Valor KPI',
+                data: [],
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true } },
+            responsive: true,
+            maintainAspectRatio: false, // Importante para ajustar al contenedor
+             plugins: {
+                title: {
+                    display: true,
+                    text: 'Resumen Gráfico KPIs'
+                }
+            }
+        }
+    });
+    console.log("Gráfico inicializado.");
+    // Ocultar el contenedor y el canvas al inicio hasta que haya datos
+    if (chartContainer) chartContainer.style.display = 'none';
+    if (kpiChartCanvas) kpiChartCanvas.style.display = 'none';
+}
+
+// --- INICIALIZACIÓN CUANDO EL DOM ESTÁ LISTO ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM completamente cargado y parseado.");
+
+    // Obtener referencias a los elementos ahora que existen
+    tablaContainer = document.getElementById('tabla-container');
+    chartContainer = document.getElementById('chart-container');
+    loader = document.getElementById('loader');
+    tablaDatos = document.getElementById('tablaDatos');
+    kpiChartCanvas = document.getElementById('kpiChart');
+    errorContainer = document.getElementById('error-container'); // Obtener ref al contenedor de errores
+
+    // Ocultar elementos inicialmente
+    if(loader) loader.style.display = 'none';
+    if(tablaContainer) tablaContainer.style.display = 'none'; // Ocultar al inicio
+    if(chartContainer) chartContainer.style.display = 'none'; // Ocultar al inicio
+
+    // Inicializar el gráfico una vez que el canvas existe
+    inicializarGrafico();
+
+    // Opcional: Cargar KPIs por defecto al inicio descomentando la siguiente línea
+    // mostrarKPIs();
+});
+
+console.log("script.js cargado y parseado (definiciones globales listas).");

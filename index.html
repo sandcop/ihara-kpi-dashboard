@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Indicadores Ejecutivo</title> <!-- Título de pestaña actualizado -->
-  <!-- Enlaza Font Awesome para iconos -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- Enlaza tu hoja de estilos -->
+  <title>Indicadores Ejecutivo</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Incluye Chart.js -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 
@@ -18,95 +17,98 @@
     <div class="navbar-brand">
       <h1>📊 Indicadores de Ejecutivo</h1>
     </div>
-    <!-- Botón Hamburguesa para móvil -->
     <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle menu" aria-expanded="false">
       <i class="fas fa-bars"></i>
     </button>
-    <!-- Lista de enlaces de navegación -->
     <ul class="nav-links" id="nav-links">
-      <li><a href="#" onclick="mostrarKPIs(); closeMobileMenu();">KPIs</a></li>
-      <li><a href="#" onclick="mostrarFaltantes(); closeMobileMenu();">Faltantes</a></li>
+      <!-- Enlaces llaman a funciones JS y cierran menú móvil. return false evita que la página salte por href="#" -->
+      <li><a href="#" onclick="mostrarKPIs(); closeMobileMenu(); return false;">KPIs</a></li>
+      <li><a href="#" onclick="mostrarFaltantes(); closeMobileMenu(); return false;">Faltantes</a></li>
       <li class="dropdown">
-        <!-- Enlace principal del dropdown (puede o no hacer algo por sí mismo) -->
+        <!-- El enlace principal del dropdown no necesita onclick si solo abre el submenú -->
         <a href="#">Ofertas del Mes <i class="fas fa-chevron-down fa-xs"></i></a>
         <ul class="dropdown-menu">
-          <!-- Enlace dentro del dropdown que llama a la función JS -->
-          <li><a href="#ofertas-flash" onclick="mostrarOfertasFlash(); closeMobileMenu();">Ofertas Flash</a></li>
-          <!-- Puedes añadir más elementos al dropdown aquí si es necesario -->
+           <!-- Este enlace SÍ necesita onclick si debe mostrar una sección -->
+          <li><a href="#ofertas-flash" onclick="mostrarOfertasFlash(); closeMobileMenu(); return false;">Ofertas Flash</a></li>
         </ul>
       </li>
-      <li><a href="#enlaces-externos" onclick="mostrarEnlacesExternos(); closeMobileMenu();">Enlaces Externos</a></li>
-      <li><a href="#tabla-remuneracion" onclick="mostrarTablaRemuneracion(); closeMobileMenu();">Tabla Remuneración</a></li>
-      <li><a href="#politicas-ventas" onclick="mostrarPoliticasVentas(); closeMobileMenu();">Políticas de Ventas</a></li>
+      <li><a href="#enlaces-externos" onclick="mostrarEnlacesExternos(); closeMobileMenu(); return false;">Enlaces Externos</a></li>
+      <li><a href="#tabla-remuneracion" onclick="mostrarTablaRemuneracion(); closeMobileMenu(); return false;">Tabla Remuneración</a></li>
+      <li><a href="#politicas-ventas" onclick="mostrarPoliticasVentas(); closeMobileMenu(); return false;">Políticas de Ventas</a></li>
     </ul>
   </nav>
 
   <!-- ===== Saludo al Usuario ===== -->
   <div class="user-greeting">
-    <p><i class="fas fa-user"></i> Usuario: Manuel Rojas</p> <!-- Nombre de usuario hardcodeado -->
+    <p><i class="fas fa-user"></i> Usuario: Manuel Rojas</p>
   </div>
 
   <!-- ===== Contenido Principal ===== -->
   <main class="main-content">
 
-    <!-- Contenedor para KPIs, Faltantes, Tabla, Gráfico, Loader y Errores -->
-    <!-- Esta sección se mostrará/ocultará como un todo para KPIs/Faltantes -->
+    <!-- Sección para KPIs y Faltantes (Contenedor Principal) -->
+    <!-- Se mostrará/ocultará por JS -->
     <section id="kpi-content" style="display: none;">
-      <!-- Contenedor interno para tabla, loader y error -->
+      <h2>KPIs / Faltantes</h2> <!-- Título opcional para la sección -->
+      <!-- Contenedor interno para la tabla/loader/error -->
       <section id="tabla-container">
         <div class="loader" id="loader">Cargando datos...</div>
         <table id="tablaDatos"></table>
-        <div id="error-container"></div>
+        <div id="error-container"></div> <!-- Para mostrar errores de carga -->
       </section>
-      <!-- Contenedor interno para el gráfico -->
+      <!-- Contenedor interno para el gráfico (solo para KPIs) -->
       <section id="chart-container" style="height: 400px; width: 80%; margin: 20px auto;">
         <canvas id="kpiChart"></canvas>
       </section>
     </section>
 
-    <!-- Otras secciones de contenido, inicialmente ocultas -->
+    <!-- Otras Secciones (Ocultas por defecto) -->
     <section id="ofertas-flash" style="display: none;">
-      <h2><i class="fas fa-bolt"></i> Ofertas Flash</h2>
-      <!-- Aquí va el contenido real de las ofertas -->
-      <p>¡Consulta las últimas ofertas disponibles por tiempo limitado!</p>
-      <ul>
-        <li>Producto A - 20% Descuento</li>
-        <li>Producto B - Compra 2 lleva 3</li>
-      </ul>
+      <h2>Ofertas Flash</h2>
+      <p>Aquí va el contenido detallado de las ofertas flash...</p>
+      <!-- Puedes añadir imágenes, tablas, etc. -->
     </section>
 
     <section id="enlaces-externos" style="display: none;">
-      <h2><i class="fas fa-link"></i> Enlaces Externos</h2>
-      <!-- Aquí va el contenido real de los enlaces -->
+      <h2>Enlaces Externos</h2>
        <ul>
-         <li><a href="https://www.google.com" target="_blank">Enlace Ejemplo 1</a></li>
-         <li><a href="https://www.wikipedia.org" target="_blank">Enlace Ejemplo 2</a></li>
+         <li><a href="https://www.ejemplo.com" target="_blank">Enlace Ejemplo 1</a></li>
+         <li><a href="https://www.otroejemplo.org" target="_blank">Enlace Ejemplo 2</a></li>
+         <!-- Añade más enlaces -->
        </ul>
     </section>
 
      <section id="tabla-remuneracion" style="display: none;">
-       <h2><i class="fas fa-table"></i> Tabla de Remuneración</h2>
-       <!-- Aquí va el contenido real de la tabla o su descripción -->
-       <p>Detalles sobre la estructura de remuneración variable...</p>
-       <!-- Podrías poner una tabla HTML aquí o una imagen -->
+      <h2>Tabla de Remuneración</h2>
+       <p>Aquí puedes insertar una tabla HTML con la información o una descripción.</p>
+       <!-- Ejemplo de tabla simple: -->
+       <table>
+         <thead><tr><th>Nivel</th><th>Salario Base</th><th>Comisión</th></tr></thead>
+         <tbody><tr><td>Junior</td><td>$XXX</td><td>Y%</td></tr></tbody>
+       </table>
     </section>
 
      <section id="politicas-ventas" style="display: none;">
-       <h2><i class="fas fa-file-alt"></i> Políticas de Ventas</h2>
-       <!-- Aquí va el contenido real de las políticas -->
-       <p>Documento resumen de las políticas de ventas vigentes...</p>
-       <!-- Podrías poner texto, un iframe a un PDF, etc. -->
+      <h2>Políticas de Ventas</h2>
+       <p>Detalles de las políticas de ventas vigentes...</p>
+       <p>Puedes incluir:</p>
+       <ul>
+         <li>Condiciones de crédito</li>
+         <li>Políticas de devolución</li>
+         <li>Proceso de aprobación de descuentos</li>
+       </ul>
     </section>
 
   </main> <!-- Fin del main-content wrapper -->
 
   <!-- ===== Botón Flotante de WhatsApp ===== -->
-  <!-- ¡¡RECUERDA CAMBIAR EL NÚMERO!! -->
+  <!-- Reemplaza TUNUMERODEWHATSAPPCONCODIGOPAIS con tu número real, ej: 569XXXXXXXX -->
   <a href="https://wa.me/TUNUMERODEWHATSAPPCONCODIGOPAIS" class="whatsapp-button" target="_blank" aria-label="Contactar por WhatsApp">
     <i class="fab fa-whatsapp"></i>
   </a>
 
-  <!-- Enlaza el archivo JavaScript principal -->
+  <!-- Enlace al script JavaScript (justo antes de cerrar body) -->
+  <!-- Asegúrate de que 'script.js' esté en la misma carpeta -->
   <script src="script.js"></script>
 
 </body>

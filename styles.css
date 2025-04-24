@@ -1,21 +1,32 @@
 /* styles.css */
 
-/* ... tus estilos existentes ... */
+/* ===== Estilos Generales (Del segundo CSS) ===== */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  margin: 0;
+  /* padding: 20px; */ /* Eliminado para que la navbar ocupe todo el ancho */
+  line-height: 1.6;
+}
 
-/* Estilos para la barra de navegación */
+/* ===== Barra de Navegación (Del segundo CSS) ===== */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f8f9fa; /* O tu color deseado */
+  background-color: #f8f9fa;
   padding: 10px 20px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: sticky; /* Opcional: hacerla fija arriba */
+  top: 0;
+  z-index: 1000;
 }
 
 .navbar-brand h1 {
   margin: 0;
-  font-size: 1.5em; /* Ajusta según necesites */
-  color: #0056b3; /* Heredado o tu color */
+  font-size: 1.5em;
+  color: #0056b3;
 }
 
 .nav-links {
@@ -26,35 +37,35 @@
 }
 
 .nav-links li {
-  margin-left: 20px; /* Espacio entre elementos */
+  margin-left: 20px;
 }
 
 .nav-links a {
   text-decoration: none;
-  color: #333; /* Color de enlace */
+  color: #333;
   padding: 5px 0;
-  position: relative; /* Para submenús o efectos */
+  position: relative;
 }
 .nav-links a:hover {
-  color: #007bff; /* Color al pasar el ratón */
+  color: #007bff;
 }
 
-/* --- Estilos Menú Hamburguesa y Móvil --- */
+/* --- Menú Hamburguesa y Móvil (Del segundo CSS) --- */
 .hamburger-btn {
-  display: none; /* Oculto en escritorio */
+  display: none;
   background: none;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
 }
 
-/* Estilos para submenús (Dropdown) */
+/* --- Submenús (Dropdown) (Del segundo CSS) --- */
 .dropdown {
   position: relative;
 }
 
 .dropdown-menu {
-  display: none; /* Oculto por defecto */
+  display: none;
   position: absolute;
   top: 100%;
   left: 0;
@@ -63,12 +74,12 @@
   list-style: none;
   padding: 10px 0;
   margin: 0;
-  min-width: 160px; /* Ancho mínimo */
-  z-index: 1000; /* Asegurar que esté por encima */
+  min-width: 160px;
+  z-index: 1001; /* Encima de la navbar si es sticky */
 }
 
 .dropdown:hover .dropdown-menu,
-.dropdown:focus-within .dropdown-menu { /* Mostrar al hacer hover o tener foco */
+.dropdown:focus-within .dropdown-menu {
   display: block;
 }
 
@@ -80,14 +91,13 @@
   display: block;
   padding: 8px 15px;
   color: #333;
-  white-space: nowrap; /* Evitar que el texto se divida */
+  white-space: nowrap;
 }
 
 .dropdown-menu a:hover {
   background-color: #f1f1f1;
 }
 
-/* Estilos para el icono de flecha del dropdown */
 .dropdown > a i {
     margin-left: 5px;
     transition: transform 0.2s ease-in-out;
@@ -96,16 +106,15 @@
     transform: rotate(180deg);
 }
 
-
-/* --- Responsive para Móvil --- */
-@media (max-width: 768px) { /* Ajusta este breakpoint si es necesario */
+/* --- Responsive para Móvil (Del segundo CSS) --- */
+@media (max-width: 768px) {
   .nav-links {
-    display: none; /* Ocultar menú normal */
+    display: none;
     position: absolute;
     top: 60px; /* Ajusta según la altura de tu navbar */
     left: 0;
     width: 100%;
-    background-color: #f8f9fa; /* O el color que desees */
+    background-color: #f8f9fa;
     flex-direction: column;
     align-items: center;
     padding: 10px 0;
@@ -114,53 +123,188 @@
   }
 
   .nav-links.active {
-    display: flex; /* Mostrar menú cuando está activo */
+    display: flex;
   }
 
   .nav-links li {
-    margin: 10px 0; /* Espacio vertical */
+    margin: 10px 0;
     width: 100%;
     text-align: center;
   }
-   /* Estilos para submenús en móvil (pueden necesitar ajustes) */
    .dropdown-menu {
-      position: static; /* Quitar posicionamiento absoluto */
+      position: static;
       box-shadow: none;
       background-color: transparent;
-      padding-left: 20px; /* Indentar un poco */
+      padding-left: 20px;
    }
-   .dropdown:hover .dropdown-menu { /* Desactivar hover en móvil */
+   .dropdown:hover .dropdown-menu {
       display: none;
    }
-   .dropdown.open .dropdown-menu { /* Mostrar si se añade una clase 'open' con JS (opcional) */
+   .dropdown.open .dropdown-menu {
        display: block;
    }
-
-
   .hamburger-btn {
-    display: block; /* Mostrar botón hamburguesa */
+    display: block;
   }
 }
 
-/* ... resto de tus estilos ... */
+/* ===== Saludo Usuario y Contenido Principal (Del segundo CSS) ===== */
+.user-greeting {
+    background-color: #e9ecef;
+    padding: 10px 20px;
+    text-align: right;
+    font-size: 0.9em;
+    color: #495057;
+}
+.user-greeting i { margin-right: 5px; }
 
-/* Clase para mensajes de error (ya incluida en el CSS anterior) */
-.error-message {
-    color: #721c24;
+.main-content {
+    padding: 20px; /* Añade padding al contenedor principal */
+}
+
+/* Estilos para las SECCIONES (ocultas por defecto, JS las muestra) */
+main section {
+    background-color: #fff;
+    padding: 25px;
+    margin-bottom: 30px; /* Espacio entre secciones si se muestran varias */
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Contenedor de Datos Tabla/Loader/Error (Adaptado del primero) ===== */
+/* Usaremos #tabla-container como el contenedor principal dentro de #kpi-content */
+#tabla-container {
+  /* background-color: #fff; */ /* El fondo ya está en la sección padre */
+  /* padding: 25px; */ /* El padding ya está en la sección padre */
+  /* border-radius: 8px; */ /* El borde ya está en la sección padre */
+  /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); */ /* La sombra ya está en la sección padre */
+  min-height: 150px; /* Espacio para el spinner */
+  position: relative;
+  overflow-x: auto; /* Scroll horizontal para tablas anchas */
+  /* margin-bottom: 30px; */ /* Quitado, la sección #kpi-content tiene margen */
+}
+
+/* --- Animación de Carga (Adaptada del primero) --- */
+/* Aplicado al div #loader */
+#loader {
+  display: flex; /* Cambiado a flex para centrar */
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  font-size: 1.1em;
+  color: #555;
+  font-weight: 500;
+  /* Inicialmente oculto por JS, no aquí */
+}
+
+/* Spinner visual para #loader */
+#loader::after {
+  content: '';
+  display: block;
+  width: 30px;
+  height: 30px;
+  margin-left: 15px;
+  border: 4px solid #f0f0f0;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mensajes de error o información (dentro de #error-container) */
+#error-container .error-message, /* Estilo para errores */
+#tabla-container .info-message { /* Estilo para mensajes de "no hay datos" */
+    color: #721c24; /* Rojo oscuro para error */
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
     padding: 15px;
     margin-top: 10px;
     border-radius: 5px;
     font-weight: bold;
+    text-align: center;
+}
+#tabla-container .info-message { /* Sobrescribir para info */
+    color: #0c5460; /* Azul oscuro para info */
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
 }
 
-/* Estilos Botón Flotante WhatsApp */
+
+/* --- Estilos de la Tabla (Tomados del primero, aplicados a #tablaDatos) --- */
+#tablaDatos {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px; /* Espacio sobre la tabla */
+  opacity: 0;
+  transform: translateY(15px);
+  animation: fadeInTable 0.6s ease-out forwards;
+   /* display: none; */ /* JS controlará la visibilidad */
+}
+
+@keyframes fadeInTable {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#tablaDatos th, #tablaDatos td {
+  border: 1px solid #dee2e6;
+  padding: 12px 15px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+#tablaDatos th {
+  background-color: #e9ecef;
+  color: #495057;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+#tablaDatos tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+#tablaDatos tbody tr:hover {
+  background-color: #eef2f7;
+}
+
+/* --- Estilo para Resultados de KPI Atrasados (¡IMPORTANTE! Del primer CSS) --- */
+#tablaDatos td.kpi-atrasado {
+  background-color: #fddfe2 !important; /* Fondo rojo pálido */
+  color: #8c1c27 !important; /* Texto rojo oscuro */
+  font-weight: bold !important; /* Hacerlo resaltar */
+}
+#tablaDatos tbody tr:hover td.kpi-atrasado {
+    background-color: #f8c7ce !important; /* Rojo más oscuro al hover */
+}
+
+/* Contenedor del Gráfico (Del primero, aplicado a #chart-container) */
+#chart-container {
+  margin-top: 30px; /* Espacio después de la tabla */
+  /* background-color: #fff; */ /* El fondo ya está en la sección padre */
+  /* padding: 20px; */ /* El padding ya está en la sección padre */
+  /* border-radius: 8px; */ /* El borde ya está en la sección padre */
+  /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); */ /* La sombra ya está en la sección padre */
+  height: 450px; /* Altura del gráfico */
+  display: none; /* Oculto hasta que se carguen datos KPI */
+}
+#kpiChart { /* Asegura que el canvas use el espacio disponible */
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Estilos Botón Flotante WhatsApp (Del segundo CSS) */
 .whatsapp-button {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #25D366; /* Color oficial de WhatsApp */
+  background-color: #25D366;
   color: white;
   border-radius: 50%;
   width: 60px;
@@ -168,13 +312,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2rem; /* Tamaño del ícono */
+  font-size: 2rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   text-decoration: none;
-  z-index: 1000; /* Asegurar que esté por encima */
+  z-index: 1000;
   transition: transform 0.3s ease;
 }
 
 .whatsapp-button:hover {
-  transform: scale(1.1); /* Efecto al pasar el ratón */
+  transform: scale(1.1);
 }

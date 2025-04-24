@@ -3,40 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ihara KPIs</title>
-  <!-- Enlaza la hoja de estilos -->
+  <title>Ihara KPIs Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Incluye Chart.js -->
+  <!-- Incluir Chart.js desde CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <h1>📊 Dashboard KPIs – Ihara</h1>
+  <h1>Indicadores de ventas Manu</h1>
 
   <div class="buttons">
-    <!-- Los botones llaman a las funciones JS globales -->
-    <button onclick="mostrarKPIs()">Ver KPIs</button>
-    <button onclick="mostrarFaltantes()">Ver Faltantes</button>
+    <!-- IDs correctos, sin onclick -->
+    <button id="btn-kpis">Ver KPIs</button>
+    <button id="btn-faltantes">Ver Faltantes</button>
   </div>
 
-  <!-- Contenedor para la tabla y el loader -->
-  <section id="tabla-container">
-    <!-- Loader (inicialmente oculto por CSS o JS) -->
-    <div class="loader" id="loader">Cargando datos...</div>
-    <!-- Tabla donde se mostrarán los datos -->
-    <table id="tablaDatos"></table>
-    <!-- Contenedor para mensajes de error -->
-    <div id="error-container"></div>
+  <!-- Contenedor principal para la tabla y el mensaje de carga/error -->
+  <section id="data-content">
+    <!-- El contenido (loader o tabla) se insertará aquí -->
   </section>
 
-  <!-- Contenedor para el gráfico -->
-  <section id="chart-container" style="height: 400px; width: 80%; margin: 20px auto;">
+  <!-- Contenedor para el gráfico (inicialmente oculto) -->
+  <section id="chart-container">
     <canvas id="kpiChart"></canvas>
   </section>
 
-  <!-- Enlaza el archivo JavaScript AL FINAL, antes de cerrar body -->
-  <!-- Asegúrate de que la ruta sea correcta (aquí asume misma carpeta) -->
-  <script src="script.js"></script>
+  <!-- Enlazar script.js al final y con defer -->
+  <script src="script.js" defer></script>
 
 </body>
 </html>

@@ -33,14 +33,15 @@ button:hover {
   background-color: #0056b3;
 }
 
+/* Contenedor principal para tabla, loader y errores */
 #tabla-container {
   margin-top: 20px;
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  /* Inicialmente oculto si se controla sólo por JS */
-   /* display: none;  */
+  /* Controlado por JS para mostrar/ocultar */
+  /* display: none; */
 }
 
 /* Estilo básico para la tabla */
@@ -48,6 +49,8 @@ button:hover {
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
+  /* Controlado por JS */
+  /* display: none; */
 }
 
 #tablaDatos th,
@@ -55,6 +58,7 @@ button:hover {
   border: 1px solid #ddd;
   padding: 10px;
   text-align: left;
+  vertical-align: top; /* Alinea arriba si el contenido es largo */
 }
 
 #tablaDatos th {
@@ -75,7 +79,7 @@ button:hover {
   height: 40px;
   animation: spin 1s linear infinite;
   margin: 20px auto; /* Centrado */
-  /* display: none;  Se controla con JS */
+  display: none; /* Oculto por defecto, controlado por JS */
 }
 
 @keyframes spin {
@@ -90,21 +94,31 @@ button:hover {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     margin-top: 20px;
-   /* Inicialmente oculto si se controla sólo por JS */
-   /* display: none; */
+    /* Controlado por JS */
+    /* display: none; */
 }
+
+/* Contenedor de mensajes de error */
+#error-container {
+    margin-top: 15px;
+}
+
 
 /* Media query para pantallas pequeñas */
 @media (max-width: 600px) {
     h1 {
         font-size: 1.5em;
     }
+    .buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
     button {
         font-size: 14px;
         padding: 8px 15px;
-        display: block; /* Botones uno debajo del otro */
-        margin: 10px auto; /* Centrado */
-        width: 80%;
+        margin: 5px 0; /* Espacio vertical entre botones */
+        width: 80%; /* Ancho para que se apilen bien */
     }
     #chart-container {
         width: 95%;

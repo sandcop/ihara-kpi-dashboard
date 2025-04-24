@@ -1,143 +1,77 @@
-// script.js
-// ... (Todo tu código anterior: URL, refs globales, código menú hamburguesa, closeMobileMenu, etc.) ...
+/* styles.css */
 
-// --- Función Opcional para mostrar secciones (AJUSTADA) ---
-function mostrarSeccion(idSeccion) {
-    console.log("Mostrando sección:", idSeccion);
-    // Ocultar todas las secciones principales directamente dentro de main
-    const secciones = document.querySelectorAll('.main-content > section[id]');
-    secciones.forEach(sec => {
-        sec.style.display = 'none';
-    });
+/* --- Reset Básico y Body --- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: sans-serif; background-color: #f4f7f6; color: #333; padding-top: 60px; /* Ajusta según altura navbar */ }
 
-    // Mostrar la sección solicitada
-    const seccionActiva = document.getElementById(idSeccion);
-    if (seccionActiva) {
-        seccionActiva.style.display = 'block';
-        console.log("Sección", idSeccion, "mostrada.");
-         // Si la sección es la de KPIs, asegúrate que sus sub-contenedores sean visibles si es necesario
-         if(idSeccion === 'kpi-content') {
-             if(tablaContainer) tablaContainer.style.display = 'block'; // O como se muestre normalmente
-             // Decide si quieres mostrar el gráfico por defecto aquí o solo con mostrarKPIs()
-             // if(chartContainer) chartContainer.style.display = 'block';
-         }
-    } else {
-        console.warn("No se encontró la sección con ID:", idSeccion);
-        // Volver a KPIs si la sección no existe
-        mostrarKPIs();
+/* --- Estilos de la Barra de Navegación --- */
+.navbar { background-color: #0056b3; color: white; padding: 0 20px; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; align-items: center; height: 60px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.navbar-brand h1 { color: white; font-size: 1.3em; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: calc(100% - 50px); }
+
+/* --- Estilos de los Enlaces de Navegación --- */
+.nav-links { list-style: none; display: flex; margin: 0; padding: 0; }
+.nav-links li { margin-left: 15px; position: relative; }
+.nav-links a { color: white; text-decoration: none; padding: 10px 15px; display: block; transition: background-color 0.3s ease; white-space: nowrap; }
+.nav-links a:hover, .nav-links li:hover > a { background-color: #007bff; border-radius: 4px; }
+.nav-links a .fa-chevron-down { margin-left: 5px; }
+
+/* --- Estilos del Dropdown (Desktop) --- */
+li.dropdown .dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.15); border-radius: 4px; padding: 5px 0; min-width: 180px; z-index: 1001; }
+li.dropdown:hover .dropdown-menu, li.dropdown:focus-within .dropdown-menu { display: block; }
+.dropdown-menu li { margin-left: 0; width: 100%; }
+.dropdown-menu a { color: #333; padding: 10px 20px; border-radius: 0; }
+.dropdown-menu a:hover { background-color: #e9ecef; color: #0056b3; }
+
+/* --- Botón Hamburguesa --- */
+.hamburger-btn { display: none; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+
+/* --- Estilos Saludo Usuario --- */
+.user-greeting { padding: 10px 20px; background-color: #f8f9fa; border-bottom: 1px solid #dee2e6; text-align: right; }
+.user-greeting p { margin: 0; font-size: 0.9em; color: #495057; font-weight: 500; }
+.user-greeting p i { margin-right: 5px; color: #6c757d; }
+
+/* --- Contenido Principal --- */
+.main-content { padding: 20px; }
+
+/* --- Media Query para Móviles --- */
+@media (max-width: 992px) {
+  .hamburger-btn { display: block; }
+  .nav-links { display: none; flex-direction: column; width: 100%; position: absolute; top: 60px; left: 0; background-color: #004a9a; padding: 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+  .nav-links.show-menu { display: flex; }
+  .nav-links li { margin-left: 0; width: 100%; text-align: left; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+  .nav-links li:first-child { border-top: none; }
+  .nav-links a { padding: 15px 20px; border-radius: 0; }
+  .nav-links a .fa-chevron-down { float: right; margin-top: 4px; }
+  li.dropdown .dropdown-menu { position: static; display: block; background-color: rgba(0, 0, 0, 0.1); box-shadow: none; border-radius: 0; padding: 0; min-width: unset; width: 100%; }
+  .dropdown-menu li { border-top: 1px solid rgba(255, 255, 255, 0.05); }
+  .dropdown-menu a { padding-left: 40px; color: #eee; }
+  .dropdown-menu a:hover { background-color: rgba(0, 0, 0, 0.2); color: white; }
+  .navbar-brand h1 { font-size: 1.1em; max-width: calc(100% - 60px); }
+  .user-greeting { text-align: center; padding: 8px 15px; }
+  .user-greeting p { font-size: 0.85em; }
+  #chart-container { width: 95%; height: 300px; }
+  #tablaDatos th, #tablaDatos td { padding: 6px; font-size: 0.9em; }
+}
+
+/* --- Botón Flotante de WhatsApp --- */
+.whatsapp-button { position: fixed; bottom: 20px; right: 20px; background-color: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1050; transition: transform 0.2s ease-in-out, background-color 0.2s; }
+.whatsapp-button:hover { background-color: #128C7E; transform: scale(1.1); }
+
+/* --- Otros estilos (Loader, Tabla, Errores, Chart, etc.) --- */
+.loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+#error-container { margin-top: 15px; }
+.error-message { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; margin-top: 10px; border-radius: 5px; font-weight: bold; }
+#kpi-content { /* Estilos si agrupaste kpis/tabla/gráfico */ }
+#tabla-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+#chart-container { width: 80%; margin: 0 auto 20px auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.main-content > section[id]:not(#kpi-content) { background-color: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+/* Ajuste final responsivo si es necesario */
+@media (max-width: 992px) {
+  #chart-container { width: 95%; } /* Ya estaba, confirmar */
+  #tablaDatos th, #tablaDatos td { /* Ya estaba, confirmar */
+        padding: 6px;
+        font-size: 0.9em;
     }
-    closeMobileMenu();
 }
-
-// --- Modifica tu listener DOMContentLoaded ---
-document.addEventListener('DOMContentLoaded', () => {
-    // ... (Obtener todas las referencias DOM, incluyendo kpiContent si existe) ...
-    let kpiContent = document.getElementById('kpi-content'); // Obtener referencia a la nueva sección contenedora
-
-     // ... (Verificar todas las referencias) ...
-
-    // ... (Inicializar gráfico, listener hamburguesa) ...
-
-    // --- Añadir listeners a los enlaces de sección (AJUSTADO) ---
-    const enlacesSeccion = document.querySelectorAll('.nav-links a[href^="#"]');
-    enlacesSeccion.forEach(enlace => {
-        // Excluir los que llaman explícitamente a mostrarKPIs/mostrarFaltantes
-        const onclickAttr = enlace.getAttribute('onclick');
-        if (!onclickAttr || (!onclickAttr.includes('mostrarKPIs') && !onclickAttr.includes('mostrarFaltantes'))) {
-             const href = enlace.getAttribute('href');
-             if (href && href.length > 1) {
-                 const idSeccion = href.substring(1);
-                 if (document.getElementById(idSeccion)) {
-                     enlace.addEventListener('click', (event) => {
-                         event.preventDefault();
-                         mostrarSeccion(idSeccion);
-                     });
-                     console.log("Listener añadido para mostrar sección:", idSeccion);
-                 } else {
-                      console.warn("El elemento para el enlace", href, "no existe.");
-                 }
-             }
-        }
-    });
-
-    // ... (Resto de la inicialización) ...
-     // Ocultar todas las secciones específicas al inicio, excepto quizás #kpi-content si es la default
-    document.querySelectorAll('.main-content > section[id]').forEach(sec => {
-        // Puedes decidir mostrar kpi-content por defecto o llamar a mostrarKPIs()
-         if(sec.id !== 'kpi-content') { // Oculta todas menos la de kpis/faltantes
-            sec.style.display = 'none';
-         } else {
-            sec.style.display = 'none'; // Ocultar kpi-content también inicialmente
-         }
-    });
-     // Llamar a mostrarKPIs() para la vista inicial
-     mostrarKPIs();
-
-});
-
-// --- Modifica tus funciones mostrarKPIs y mostrarFaltantes (AJUSTADAS) ---
-function mostrarKPIs() {
-    console.log("Función mostrarKPIs() llamada.");
-    if (!loader) return;
-
-    // Ocultar todas las secciones EXCEPTO el contenedor kpi-content
-    document.querySelectorAll('.main-content > section[id]').forEach(sec => {
-        if (sec.id !== 'kpi-content') {
-            sec.style.display = 'none';
-        } else {
-            sec.style.display = 'block'; // Mostrar el contenedor padre
-        }
-    });
-    if (errorContainer) errorContainer.innerHTML = '';
-    if (loader) loader.style.display = 'block'; // Mostrar loader dentro de su contenedor
-    if (tablaDatos) tablaDatos.style.display = 'none'; // Ocultar tabla mientras carga
-    if (chartContainer) chartContainer.style.display = 'none'; // Ocultar gráfico mientras carga
-
-    // ... (Fetch y procesamiento como antes) ...
-    fetch(`${APPS_SCRIPT_URL}?action=kpis`)
-        .then(response => { /* ... */ return response.json(); })
-        .then(data => {
-            // ... (procesar data) ...
-            if (loader) loader.style.display = 'none';
-            if (tablaContainer) tablaContainer.style.display = 'block'; // Mostrar sub-contenedor
-            if (tablaDatos) tablaDatos.style.display = 'table';
-            if (chartContainer) chartContainer.style.display = 'block'; // Mostrar sub-contenedor
-            if (kpiChartCanvas) kpiChartCanvas.style.display = 'block';
-            popularTablaKPIs(data);
-            actualizarGraficoKPIs(data);
-        })
-        .catch(error => { /* ... */ mostrarError(`Error al cargar KPIs: ${error.message}`); });
-}
-
-function mostrarFaltantes() {
-    console.log("Función mostrarFaltantes() llamada.");
-    if (!loader) return;
-
-    // Ocultar todas las secciones EXCEPTO el contenedor kpi-content
-     document.querySelectorAll('.main-content > section[id]').forEach(sec => {
-        if (sec.id !== 'kpi-content') {
-            sec.style.display = 'none';
-        } else {
-             sec.style.display = 'block'; // Mostrar el contenedor padre
-        }
-    });
-    // Ocultar específicamente el gráfico dentro de kpi-content
-    if (chartContainer) chartContainer.style.display = 'none';
-    if (errorContainer) errorContainer.innerHTML = '';
-    if (loader) loader.style.display = 'block';
-    if (tablaDatos) tablaDatos.style.display = 'none';
-
-    // ... (Fetch y procesamiento como antes) ...
-     fetch(`${APPS_SCRIPT_URL}?action=faltantes`)
-        .then(response => { /* ... */ return response.json(); })
-        .then(data => {
-            // ... (procesar data) ...
-             if (loader) loader.style.display = 'none';
-             if (tablaContainer) tablaContainer.style.display = 'block'; // Mostrar sub-contenedor
-             if (tablaDatos) tablaDatos.style.display = 'table';
-             popularTablaFaltantes(data);
-        })
-        .catch(error => { /* ... */ mostrarError(`Error al cargar Faltantes: ${error.message}`); });
-}
-
-// ... (El resto de tu código JS sin cambios: closeMobileMenu, limpiarContenido, mostrarError, popularTablas, actualizarGrafico, inicializarGrafico) ...

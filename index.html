@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Ihara KPIs</title>
+  <!-- Enlaza la hoja de estilos -->
   <link rel="stylesheet" href="styles.css" />
+  <!-- Incluye Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -12,19 +14,25 @@
   <h1>📊 Dashboard KPIs – Ihara</h1>
 
   <div class="buttons">
+    <!-- Los botones llaman a las funciones JS -->
     <button onclick="mostrarKPIs()">Ver KPIs</button>
     <button onclick="mostrarFaltantes()">Ver Faltantes</button>
   </div>
 
+  <!-- Contenedor para la tabla y el loader -->
   <section id="tabla-container">
-    <div class="loader" id="loader">Cargando datos...</div>
+    <!-- Loader (inicialmente visible o controlado por JS/CSS) -->
+    <div class="loader" id="loader" style="display: none;">Cargando datos...</div>
+    <!-- Tabla donde se mostrarán los datos -->
     <table id="tablaDatos"></table>
   </section>
 
-  <section id="chart-container">
+  <!-- Contenedor para el gráfico -->
+  <section id="chart-container" style="display: none; height: 400px; width: 80%; margin: 20px auto;">
     <canvas id="kpiChart"></canvas>
   </section>
 
+  <!-- Enlaza el archivo JavaScript -->
   <script src="script.js"></script>
 
 </body>

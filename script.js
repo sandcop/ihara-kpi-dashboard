@@ -1,258 +1,253 @@
-// script.js
+// URL de tu Web App de Google Apps Script (¡Asegúrate que sea la correcta!)
+const apiUrl = "https://script.google.com/macros/s/AKfycby9UyKr-UcWOCvrMGCsgvc38_-HmKZpXjlj9THbGLNK0lhLJ7B-_RSVpxFpP76eWjeP/exec";
 
-// --- URL de tu Web App Desplegada ---
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9UyKr-UcWOCvrMGCsgvc38_-HmKZpXjlj9THbGLNK0lhLJ7B-_RSVpxFpP76eWjeP/exec';
+// Referencias a elementos del DOM
+const btnKPIs = document.getElementById("btn-kpis");
+const btnFaltantes = document.getElementById("btn-faltantes");
+const content = document.getElementById("data-content");
+const chartContainer = document.getElementById('chart-container');
+const kpiChartCanvas = document.getElementById('kpiChart'); // Solo el elemento canvas
 
-// --- Referencias a elementos del DOM (Obtenidas después de que el DOM cargue) ---
-let tablaContainer, chartContainer, loader, tablaDatos, kpiChartCanvas, errorContainer;
-let miGrafico = null; // Variable para guardar la instancia del gráfico globalmente
+// Variable para almacenar la instancia del gráfico actual y poder destruirla
+let currentChart = null;
 
-// --- FUNCIONES LLAMADAS POR LOS BOTONES (DEFINIDAS GLOBALMENTE) ---
-
-function mostrarKPIs() {
-    console.log("Función mostrarKPIs() llamada."); // Log para confirmar que la función se llama
-    if (!loader) { // Asegurarse que las refs DOM estén listas
-        console.error("DOM aún no cargado completamente para mostrarKPIs.");
-        return;
-    }
-    limpiarContenido();
-    loader.style.display = 'block'; // Muestra el loader
-
-    fetch(`${APPS_SCRIPT_URL}?action=kpis`)
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                   // Intenta parsear el texto como JSON por si GAS devolvió un error JSON
-                   try {
-                       const errData = JSON.parse(text);
-                       if (errData && errData.error) {
-                           throw new Error(`Error desde Apps Script: ${errData.error} (Status: ${response.status})`);
-                       }
-                   } catch (e) { /* No era JSON, usar el texto plano */ }
-                   throw new Error(`Error HTTP ${response.status}: ${response.statusText}. Respuesta: ${text}`);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data && data.error) { // Verificar error JSON incluso en respuesta OK
-                throw new Error(`Error reportado por Apps Script: ${data.error}`);
-            }
-            console.log("Datos KPIs recibidos:", data);
-            loader.style.display = 'none';
-            tablaContainer.style.display = 'block';
-            tablaDatos.style.display = 'table';
-            chartContainer.style.display = 'block'; // Muestra el contenedor del gráfico
-            kpiChartCanvas.style.display = 'block'; // Muestra el canvas en sí
-            popularTablaKPIs(data);
-            actualizarGraficoKPIs(data);
-        })
-        .catch(error => {
-            console.error("Error al obtener KPIs:", error);
-            mostrarError(`Error al cargar KPIs: ${error.message}`);
-        });
-}
-
-function mostrarFaltantes() {
-    console.log("Función mostrarFaltantes() llamada."); // Log para confirmar
-     if (!loader) {
-        console.error("DOM aún no cargado completamente para mostrarFaltantes.");
-        return;
-    }
-    limpiarContenido();
-    loader.style.display = 'block';
-
-    fetch(`${APPS_SCRIPT_URL}?action=faltantes`)
-        .then(response => {
-            if (!response.ok) {
-                 return response.text().then(text => {
-                   try {
-                       const errData = JSON.parse(text);
-                       if (errData && errData.error) {
-                           throw new Error(`Error desde Apps Script: ${errData.error} (Status: ${response.status})`);
-                       }
-                   } catch (e) { /* No era JSON */ }
-                   throw new Error(`Error HTTP ${response.status}: ${response.statusText}. Respuesta: ${text}`);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data && data.error) {
-                throw new Error(`Error reportado por Apps Script: ${data.error}`);
-            }
-            console.log("Datos Faltantes recibidos:", data);
-            loader.style.display = 'none';
-            tablaContainer.style.display = 'block';
-            tablaDatos.style.display = 'table';
-            popularTablaFaltantes(data);
-        })
-        .catch(error => {
-            console.error("Error al obtener Faltantes:", error);
-            mostrarError(`Error al cargar Faltantes: ${error.message}`);
-        });
-}
-
-// --- FUNCIONES AUXILIARES ---
-
-function limpiarContenido() {
-    if (tablaDatos) tablaDatos.innerHTML = '';
-    if (tablaDatos) tablaDatos.style.display = 'none';
-    if (chartContainer) chartContainer.style.display = 'none'; // Ocultar contenedor del gráfico
-    if (kpiChartCanvas) kpiChartCanvas.style.display = 'none'; // Ocultar el canvas
-    if (loader) loader.style.display = 'none';
-    if (tablaContainer) tablaContainer.style.display = 'none'; // Ocultar contenedor principal de tabla
-    if (errorContainer) errorContainer.innerHTML = ''; // Limpiar errores previos
-}
-
-function mostrarError(mensaje) {
-    console.error("Mostrando Error:", mensaje); // Loguear el error también
-    if (loader) loader.style.display = 'none';
-    if (tablaContainer) tablaContainer.style.display = 'block'; // Mostrar contenedor para el error
-    if (tablaDatos) tablaDatos.style.display = 'none';
-    if (chartContainer) chartContainer.style.display = 'none';
-
-    if (errorContainer) {
-        errorContainer.innerHTML = `<div style="color: red; background-color: #ffebee; border: 1px solid red; padding: 15px; margin-top: 10px; border-radius: 5px; font-weight: bold;">${mensaje}</div>`;
-    } else {
-        // Fallback si errorContainer no está listo (poco probable con DOMContentLoaded)
-        alert("Error: " + mensaje);
-    }
-}
-
-function popularTablaKPIs(datosKPI) {
-    if (!tablaDatos) return;
-    // ASUME que datosKPI es un array de objetos con {indicador, valor, meta, estado}
-    let tablaHTML = `<thead><tr><th>Indicador</th><th>Valor</th><th>Meta</th><th>Estado</th></tr></thead><tbody>`;
-    if (Array.isArray(datosKPI) && datosKPI.length > 0) {
-        datosKPI.forEach(kpi => {
-            tablaHTML += `
-                <tr>
-                    <td>${kpi.indicador ?? 'N/A'}</td>
-                    <td>${kpi.valor ?? 'N/A'}</td>
-                    <td>${kpi.meta ?? 'N/A'}</td>
-                    <td>${kpi.estado ?? 'N/A'}</td>
-                </tr>`;
-        });
-    } else {
-        tablaHTML += '<tr><td colspan="4">No se encontraron datos de KPIs válidos.</td></tr>';
-    }
-    tablaHTML += `</tbody>`;
-    tablaDatos.innerHTML = tablaHTML;
-}
-
-function popularTablaFaltantes(datosFaltantes) {
-    if (!tablaDatos) return;
-    // ASUME que datosFaltantes es array de objetos con {item, codigo, cantidad, proveedor, fechaEstimada}
-     let tablaHTML = `<thead><tr><th>Ítem</th><th>Código</th><th>Cantidad Faltante</th><th>Proveedor</th><th>Fecha Estimada</th></tr></thead><tbody>`;
-    if (Array.isArray(datosFaltantes) && datosFaltantes.length > 0) {
-        datosFaltantes.forEach(item => {
-            tablaHTML += `
-                <tr>
-                    <td>${item.item ?? 'N/A'}</td>
-                    <td>${item.codigo ?? 'N/A'}</td>
-                    <td>${item.cantidad ?? 'N/A'}</td>
-                    <td>${item.proveedor ?? 'N/A'}</td>
-                    <td>${item.fechaEstimada ?? 'N/A'}</td>
-                </tr>`;
-        });
-    } else {
-         tablaHTML += '<tr><td colspan="5">No se encontraron datos de Faltantes válidos.</td></tr>';
-    }
-    tablaHTML += `</tbody>`;
-    tablaDatos.innerHTML = tablaHTML;
-}
-
-function actualizarGraficoKPIs(datosKPI) {
-    if (!miGrafico || !Array.isArray(datosKPI) || datosKPI.length === 0) {
-       if(miGrafico) {
-           miGrafico.data.labels = [];
-           miGrafico.data.datasets[0].data = [];
-           miGrafico.update();
-       }
-       console.log("Gráfico no actualizado por falta de datos válidos.");
-       return;
-    }
-    // ASUME que kpi.indicador es la etiqueta y kpi.valor necesita ser convertido a número
-    const labels = datosKPI.map(kpi => kpi.indicador ?? 'Sin Etiqueta');
-    const data = datosKPI.map(kpi => {
-        let rawValue = kpi.valor;
-        let num = NaN; // Empezar como NaN
-        if (typeof rawValue === 'string') {
-            // Limpiar símbolos ($, %), comas de miles, y convertir a número de punto flotante
-            // Manejar potencialmente diferentes formatos de miles/decimales si es necesario
-            num = parseFloat(rawValue.replace(/[$,%]/g, '').replace(/,/g, ''));
-        } else if (typeof rawValue === 'number') {
-            num = rawValue;
-        }
-        return isNaN(num) ? 0 : num; // Si no es número válido, usar 0
+// --- Event Listeners para los botones ---
+if (btnKPIs) {
+    btnKPIs.addEventListener("click", () => {
+      cargarDatos("kpi");
     });
-
-    miGrafico.data.labels = labels;
-    miGrafico.data.datasets[0].data = data;
-    miGrafico.data.datasets[0].label = 'Valor Actual KPI';
-    miGrafico.update();
-    console.log("Gráfico actualizado con datos KPI.");
 }
 
-function inicializarGrafico() {
-    if (!kpiChartCanvas) return; // No intentar si el canvas no existe
-    const ctx = kpiChartCanvas.getContext('2d');
-    if (miGrafico) {
-        miGrafico.destroy(); // Destruir instancia previa si existe
+if (btnFaltantes) {
+    btnFaltantes.addEventListener("click", () => {
+      cargarDatos("faltantes");
+    });
+}
+
+// --- Función principal para cargar datos ---
+function cargarDatos(tipo) {
+  // Mostrar animación de carga
+  content.innerHTML = "<p class='loading'>Cargando datos...</p>";
+  // Ocultar contenedor del gráfico y destruir gráfico anterior
+  chartContainer.style.display = 'none';
+  if (currentChart) {
+    currentChart.destroy();
+    currentChart = null;
+  }
+
+  // Realizar la llamada fetch a la API de Apps Script
+  fetch(`${apiUrl}?tipo=${tipo}`)
+    .then(res => {
+      if (!res.ok) {
+        // Si la respuesta HTTP no es exitosa, lanzar un error
+        throw new Error(`Error HTTP: ${res.status} ${res.statusText}`);
+      }
+      return res.json(); // Convertir la respuesta a JSON
+    })
+    .then(data => {
+      if (data.error) {
+        // Si la API devuelve un error en el JSON, lanzarlo
+        throw new Error(`Error desde API: ${data.error}`);
+      }
+      // Mostrar los datos en la tabla (¡aquí se aplica la lógica de resaltado!)
+      mostrarDatos(data.datos, tipo);
+
+      // Si los datos son de tipo 'kpi' y existen, mostrar el gráfico
+      if (tipo === 'kpi' && data.datos && data.datos.length > 0) {
+         mostrarGraficoKPI(data.datos);
+      }
+    })
+    .catch(err => {
+      // Manejar cualquier error ocurrido durante el fetch o procesamiento
+      console.error("Error detallado:", err);
+      content.innerHTML = `<p class='error'>❌ Error al cargar datos: ${err.message}</p>`;
+      chartContainer.style.display = 'none'; // Asegurarse que el gráfico esté oculto en caso de error
+    });
+}
+
+// --- Función para mostrar los datos en la tabla ---
+function mostrarDatos(datos, tipo) {
+  // Si no hay datos o no es un array, mostrar mensaje informativo
+  if (!Array.isArray(datos) || datos.length === 0) {
+    content.innerHTML = "<p class='info'>ℹ️ No hay datos disponibles para mostrar.</p>";
+    return;
+  }
+
+  // --- Inicio: Calcular proporción del mes transcurrido ---
+  const hoy = new Date();
+  const diaActual = hoy.getDate(); // Día del mes (1-31)
+  const mesActual = hoy.getMonth(); // Mes (0-11)
+  const anioActual = hoy.getFullYear();
+  // Calcular el último día del mes actual (truco: día 0 del mes siguiente)
+  const diasTotalesMes = new Date(anioActual, mesActual + 1, 0).getDate();
+  // Proporción del mes que debería haberse cumplido hoy (evitar división por cero si hay error)
+  const proporcionMes = diasTotalesMes > 0 ? diaActual / diasTotalesMes : 0;
+  // --- Fin: Calcular proporción del mes ---
+
+  // Construir el HTML de la tabla
+  let html = "<table><thead><tr>";
+
+  // Definir las cabeceras de la tabla según el tipo de datos
+  if (tipo === "kpi") {
+    // Ajustamos títulos para mayor claridad
+    html += "<th>KPI</th><th>Meta (100%)</th><th>125%</th><th>70%</th><th>Resultado Actual</th><th>Arrastre</th><th>Total</th>";
+  } else { // tipo === "faltantes"
+    html += "<th>KPI</th><th>Faltante 100%</th><th>Faltante 150%</th><th>Faltante 250%</th>";
+  }
+  html += "</tr></thead><tbody>";
+
+  // Llenar las filas de la tabla con los datos
+  datos.forEach(fila => {
+    html += "<tr>";
+    if (tipo === "kpi") {
+      // --- Lógica para KPIs ---
+      html += `<td>${fila.kpi || '-'}</td>`;
+      html += `<td>${formatNumber(fila.valor100)}</td>`; // Celda de Meta
+      html += `<td>${formatNumber(fila.valor125)}</td>`;
+      html += `<td>${formatNumber(fila.valor70)}</td>`;
+
+      // --- Celda de Resultado con posible resaltado ---
+      const metaKPI = parseFloat(fila.valor100); // La meta es el 100%
+      const resultadoActual = parseFloat(fila.resultado);
+      let claseExtraResultado = ''; // Clase CSS adicional, vacía por defecto
+
+      // Solo aplicar lógica si tenemos números válidos para meta y resultado, y la meta es > 0
+      if (!isNaN(metaKPI) && metaKPI > 0 && !isNaN(resultadoActual)) {
+        const resultadoEsperadoHoy = metaKPI * proporcionMes;
+
+        // Comprobar si el resultado actual es menor que lo esperado para hoy
+        // Añadimos una pequeña tolerancia (ej. 0.001) si no queremos marcar algo que está casi igual
+        // if (resultadoActual < (resultadoEsperadoHoy - 0.001)) {
+        if (resultadoActual < resultadoEsperadoHoy) { // Sin tolerancia por ahora
+          claseExtraResultado = 'kpi-atrasado'; // Añadir la clase si está por debajo
+        }
+      }
+
+      // Generar el HTML de la celda de resultado con la clase extra si aplica
+      html += `<td class="${claseExtraResultado}">${formatNumber(fila.resultado)}</td>`;
+      // --- Fin Celda Resultado ---
+
+      html += `<td>${formatNumber(fila.arrastre)}</td>`;
+      html += `<td>${formatNumber(fila.total)}</td>`;
+
+    } else { // tipo === "faltantes"
+      // --- Lógica para Faltantes (sin cambios) ---
+      html += `<td>${fila.kpi || '-'}</td>`;
+      html += `<td>${formatNumber(fila.faltante100)}</td>`;
+      html += `<td>${formatNumber(fila.faltante150)}</td>`;
+      html += `<td>${formatNumber(fila.faltante250)}</td>`;
     }
-    miGrafico = new Chart(ctx, {
-        type: 'bar',
+    html += "</tr>";
+  });
+
+  html += "</tbody></table>";
+  // Insertar la tabla construida en el contenedor
+  content.innerHTML = html;
+}
+
+// --- Función auxiliar para formatear números ---
+function formatNumber(value) {
+  // Si es null o undefined, devuelve un guion
+  if (value === null || typeof value === 'undefined') {
+    return '-';
+  }
+  // Si es número, formatea con separadores de miles y decimales si los tiene
+  if (typeof value === 'number') {
+    return value.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  }
+  // Devuelve el valor original si es string u otro tipo
+  return value;
+}
+
+// --- Función para mostrar el gráfico de KPIs usando Chart.js ---
+function mostrarGraficoKPI(datosKPI) {
+    // Obtener el contexto 2D del canvas (necesario para Chart.js)
+    const ctx = kpiChartCanvas.getContext('2d');
+    if (!ctx) {
+        console.error("No se pudo obtener el contexto del canvas para el gráfico.");
+        return;
+    }
+
+    // Preparar los datos para el gráfico
+    const labels = datosKPI.map(item => item.kpi || 'Sin nombre');
+    const dataResultados = datosKPI.map(item => parseFloat(item.resultado) || 0);
+    const dataTotales = datosKPI.map(item => parseFloat(item.total) || 0);
+
+    // Mostrar el contenedor del gráfico
+    chartContainer.style.display = 'block';
+
+    // Crear la instancia del gráfico (o actualizar si ya existe)
+    currentChart = new Chart(ctx, {
+        type: 'bar', // Tipo de gráfico
         data: {
-            labels: [],
-            datasets: [{
-                label: 'Valor KPI',
-                data: [],
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
+            labels: labels, // Etiquetas del eje X
+            datasets: [
+              {
+                label: 'Resultado Actual', // Leyenda actualizada
+                data: dataResultados, // Datos de resultados
+                backgroundColor: 'rgba(40, 167, 69, 0.6)', // Verde semitransparente
+                borderColor: 'rgba(40, 167, 69, 1)',       // Borde verde opaco
+                borderWidth: 1,
+                yAxisID: 'yValuesPrimary' // Asociar con el eje Y primario (antes yPercentage)
+              },
+              {
+                  label: 'Total', // Leyenda para la segunda serie
+                  data: dataTotales, // Datos totales
+                  backgroundColor: 'rgba(0, 123, 255, 0.6)', // Azul semitransparente
+                  borderColor: 'rgba(0, 123, 255, 1)',      // Borde azul opaco
+                  borderWidth: 1,
+                  yAxisID: 'yValuesSecondary' // Asociar con el eje Y secundario (antes yValues)
+              }
+          ]
         },
         options: {
-            scales: { y: { beginAtZero: true } },
-            responsive: true,
-            maintainAspectRatio: false, // Importante para ajustar al contenedor
-             plugins: {
-                title: {
-                    display: true,
-                    text: 'Resumen Gráfico KPIs'
+            responsive: true, // Hacer que el gráfico se ajuste al contenedor
+            maintainAspectRatio: false, // No mantener una relación de aspecto fija
+            scales: {
+                 x: { // Configuración del eje X
+                    ticks: {
+                        autoSkip: false, // Intentar mostrar todas las etiquetas
+                        maxRotation: 45, // Rotar etiquetas si son largas
+                        minRotation: 30
+                    }
+                },
+                // Configuración del eje Y izquierdo (Resultados)
+                yValuesPrimary: { // Cambiado de yPercentage a yValuesPrimary
+                    type: 'linear',
+                    position: 'left',
+                    beginAtZero: true, // Empezar en 0
+                    // No ponemos max: 100 aquí ya que resultado no es necesariamente %
+                    title: {
+                        display: true,
+                        text: 'Resultado Actual' // Título del eje actualizado
+                    },
+                    grid: {
+                        drawOnChartArea: true // Mostrar rejilla para este eje
+                    }
+                },
+                // Configuración del eje Y derecho (Valores Totales)
+                yValuesSecondary: { // Cambiado de yValues a yValuesSecondary
+                    type: 'linear',
+                    position: 'right',
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total'
+                    },
+                    grid: {
+                       drawOnChartArea: false, // No dibujar rejilla para este eje (evita sobrecarga visual)
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom', // Mover leyenda abajo
+                },
+                tooltip: { // Configuración de las "cajitas" de información al pasar el ratón
+                    mode: 'index', // Mostrar tooltip para todos los datasets en ese índice X
+                    intersect: false, // Mostrar aunque no se esté exactamente sobre la barra
                 }
             }
         }
     });
-    console.log("Gráfico inicializado.");
-    // Ocultar el contenedor y el canvas al inicio hasta que haya datos
-    if (chartContainer) chartContainer.style.display = 'none';
-    if (kpiChartCanvas) kpiChartCanvas.style.display = 'none';
 }
-
-// --- INICIALIZACIÓN CUANDO EL DOM ESTÁ LISTO ---
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM completamente cargado y parseado.");
-
-    // Obtener referencias a los elementos ahora que existen
-    tablaContainer = document.getElementById('tabla-container');
-    chartContainer = document.getElementById('chart-container');
-    loader = document.getElementById('loader');
-    tablaDatos = document.getElementById('tablaDatos');
-    kpiChartCanvas = document.getElementById('kpiChart');
-    errorContainer = document.getElementById('error-container'); // Obtener ref al contenedor de errores
-
-    // Ocultar elementos inicialmente
-    if(loader) loader.style.display = 'none';
-    if(tablaContainer) tablaContainer.style.display = 'none'; // Ocultar al inicio
-    if(chartContainer) chartContainer.style.display = 'none'; // Ocultar al inicio
-
-    // Inicializar el gráfico una vez que el canvas existe
-    inicializarGrafico();
-
-    // Opcional: Cargar KPIs por defecto al inicio descomentando la siguiente línea
-    // mostrarKPIs();
-});
-
-console.log("script.js cargado y parseado (definiciones globales listas).");

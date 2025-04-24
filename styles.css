@@ -1,192 +1,143 @@
-/* Estilos generales */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #f4f7f6;
-  color: #333;
-  margin: 0;
-  padding: 20px;
-  line-height: 1.6;
+// script.js
+// ... (Todo tu código anterior: URL, refs globales, código menú hamburguesa, closeMobileMenu, etc.) ...
+
+// --- Función Opcional para mostrar secciones (AJUSTADA) ---
+function mostrarSeccion(idSeccion) {
+    console.log("Mostrando sección:", idSeccion);
+    // Ocultar todas las secciones principales directamente dentro de main
+    const secciones = document.querySelectorAll('.main-content > section[id]');
+    secciones.forEach(sec => {
+        sec.style.display = 'none';
+    });
+
+    // Mostrar la sección solicitada
+    const seccionActiva = document.getElementById(idSeccion);
+    if (seccionActiva) {
+        seccionActiva.style.display = 'block';
+        console.log("Sección", idSeccion, "mostrada.");
+         // Si la sección es la de KPIs, asegúrate que sus sub-contenedores sean visibles si es necesario
+         if(idSeccion === 'kpi-content') {
+             if(tablaContainer) tablaContainer.style.display = 'block'; // O como se muestre normalmente
+             // Decide si quieres mostrar el gráfico por defecto aquí o solo con mostrarKPIs()
+             // if(chartContainer) chartContainer.style.display = 'block';
+         }
+    } else {
+        console.warn("No se encontró la sección con ID:", idSeccion);
+        // Volver a KPIs si la sección no existe
+        mostrarKPIs();
+    }
+    closeMobileMenu();
 }
 
-h1 {
-  color: #005a7a; /* Color corporativo ejemplo */
-  text-align: center;
-  margin-bottom: 30px;
+// --- Modifica tu listener DOMContentLoaded ---
+document.addEventListener('DOMContentLoaded', () => {
+    // ... (Obtener todas las referencias DOM, incluyendo kpiContent si existe) ...
+    let kpiContent = document.getElementById('kpi-content'); // Obtener referencia a la nueva sección contenedora
+
+     // ... (Verificar todas las referencias) ...
+
+    // ... (Inicializar gráfico, listener hamburguesa) ...
+
+    // --- Añadir listeners a los enlaces de sección (AJUSTADO) ---
+    const enlacesSeccion = document.querySelectorAll('.nav-links a[href^="#"]');
+    enlacesSeccion.forEach(enlace => {
+        // Excluir los que llaman explícitamente a mostrarKPIs/mostrarFaltantes
+        const onclickAttr = enlace.getAttribute('onclick');
+        if (!onclickAttr || (!onclickAttr.includes('mostrarKPIs') && !onclickAttr.includes('mostrarFaltantes'))) {
+             const href = enlace.getAttribute('href');
+             if (href && href.length > 1) {
+                 const idSeccion = href.substring(1);
+                 if (document.getElementById(idSeccion)) {
+                     enlace.addEventListener('click', (event) => {
+                         event.preventDefault();
+                         mostrarSeccion(idSeccion);
+                     });
+                     console.log("Listener añadido para mostrar sección:", idSeccion);
+                 } else {
+                      console.warn("El elemento para el enlace", href, "no existe.");
+                 }
+             }
+        }
+    });
+
+    // ... (Resto de la inicialización) ...
+     // Ocultar todas las secciones específicas al inicio, excepto quizás #kpi-content si es la default
+    document.querySelectorAll('.main-content > section[id]').forEach(sec => {
+        // Puedes decidir mostrar kpi-content por defecto o llamar a mostrarKPIs()
+         if(sec.id !== 'kpi-content') { // Oculta todas menos la de kpis/faltantes
+            sec.style.display = 'none';
+         } else {
+            sec.style.display = 'none'; // Ocultar kpi-content también inicialmente
+         }
+    });
+     // Llamar a mostrarKPIs() para la vista inicial
+     mostrarKPIs();
+
+});
+
+// --- Modifica tus funciones mostrarKPIs y mostrarFaltantes (AJUSTADAS) ---
+function mostrarKPIs() {
+    console.log("Función mostrarKPIs() llamada.");
+    if (!loader) return;
+
+    // Ocultar todas las secciones EXCEPTO el contenedor kpi-content
+    document.querySelectorAll('.main-content > section[id]').forEach(sec => {
+        if (sec.id !== 'kpi-content') {
+            sec.style.display = 'none';
+        } else {
+            sec.style.display = 'block'; // Mostrar el contenedor padre
+        }
+    });
+    if (errorContainer) errorContainer.innerHTML = '';
+    if (loader) loader.style.display = 'block'; // Mostrar loader dentro de su contenedor
+    if (tablaDatos) tablaDatos.style.display = 'none'; // Ocultar tabla mientras carga
+    if (chartContainer) chartContainer.style.display = 'none'; // Ocultar gráfico mientras carga
+
+    // ... (Fetch y procesamiento como antes) ...
+    fetch(`${APPS_SCRIPT_URL}?action=kpis`)
+        .then(response => { /* ... */ return response.json(); })
+        .then(data => {
+            // ... (procesar data) ...
+            if (loader) loader.style.display = 'none';
+            if (tablaContainer) tablaContainer.style.display = 'block'; // Mostrar sub-contenedor
+            if (tablaDatos) tablaDatos.style.display = 'table';
+            if (chartContainer) chartContainer.style.display = 'block'; // Mostrar sub-contenedor
+            if (kpiChartCanvas) kpiChartCanvas.style.display = 'block';
+            popularTablaKPIs(data);
+            actualizarGraficoKPIs(data);
+        })
+        .catch(error => { /* ... */ mostrarError(`Error al cargar KPIs: ${error.message}`); });
 }
 
-/* Contenedor de botones */
-.buttons {
-  text-align: center;
-  margin-bottom: 30px;
+function mostrarFaltantes() {
+    console.log("Función mostrarFaltantes() llamada.");
+    if (!loader) return;
+
+    // Ocultar todas las secciones EXCEPTO el contenedor kpi-content
+     document.querySelectorAll('.main-content > section[id]').forEach(sec => {
+        if (sec.id !== 'kpi-content') {
+            sec.style.display = 'none';
+        } else {
+             sec.style.display = 'block'; // Mostrar el contenedor padre
+        }
+    });
+    // Ocultar específicamente el gráfico dentro de kpi-content
+    if (chartContainer) chartContainer.style.display = 'none';
+    if (errorContainer) errorContainer.innerHTML = '';
+    if (loader) loader.style.display = 'block';
+    if (tablaDatos) tablaDatos.style.display = 'none';
+
+    // ... (Fetch y procesamiento como antes) ...
+     fetch(`${APPS_SCRIPT_URL}?action=faltantes`)
+        .then(response => { /* ... */ return response.json(); })
+        .then(data => {
+            // ... (procesar data) ...
+             if (loader) loader.style.display = 'none';
+             if (tablaContainer) tablaContainer.style.display = 'block'; // Mostrar sub-contenedor
+             if (tablaDatos) tablaDatos.style.display = 'table';
+             popularTablaFaltantes(data);
+        })
+        .catch(error => { /* ... */ mostrarError(`Error al cargar Faltantes: ${error.message}`); });
 }
 
-/* Estilo de botones */
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 5px;
-  font-size: 1em;
-  font-weight: 500;
-  cursor: pointer;
-  margin: 5px 10px;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-button:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-button:active {
-  transform: translateY(0px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-/* Contenedor de datos (tabla/loader/error) */
-#data-content {
-  background-color: #fff;
-  padding: 25px;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  min-height: 150px; /* Espacio para el spinner */
-  position: relative; /* Para posicionar elementos internos si es necesario */
-  overflow-x: auto; /* Scroll horizontal para tablas anchas en móviles */
-  margin-bottom: 30px;
-}
-
-/* --- Animación de Carga (Spinner) --- */
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100px; /* Igual a min-height de #data-content o ajustado */
-  font-size: 1.1em;
-  color: #555;
-  font-weight: 500;
-}
-
-.loading::after { /* El spinner visual */
-  content: '';
-  display: block;
-  width: 30px;
-  height: 30px;
-  margin-left: 15px;
-  border: 4px solid #f0f0f0; /* Gris muy claro */
-  border-top: 4px solid #007bff; /* Azul */
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Mensajes de error o información */
-.error {
-  color: #dc3545; /* Rojo */
-  font-weight: bold;
-  text-align: center;
-  padding: 20px;
-}
-.info {
-  color: #6c757d; /* Gris */
-  text-align: center;
-  padding: 20px;
-}
-
-/* --- Estilos de la Tabla --- */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 0; /* Quitamos margen superior, el padding del contenedor es suficiente */
-  opacity: 0;
-  transform: translateY(15px);
-  animation: fadeInTable 0.6s ease-out forwards;
-}
-
-@keyframes fadeInTable {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-th, td {
-  border: 1px solid #dee2e6; /* Gris más suave */
-  padding: 12px 15px;
-  text-align: left;
-  vertical-align: middle; /* Alinear contenido verticalmente */
-}
-
-th {
-  background-color: #e9ecef;
-  color: #495057;
-  font-weight: 600; /* Un poco más de peso */
-  white-space: nowrap; /* Evitar que los títulos se rompan */
-}
-
-tbody tr:nth-child(even) {
-  background-color: #f8f9fa;
-}
-
-tbody tr:hover {
-  background-color: #eef2f7; /* Un azul muy claro al pasar el ratón */
-}
-
-/* --- Barra de Progreso (NO USADA ACTUALMENTE PARA RESULTADO, PERO SE DEJA POR SI ACASO) --- */
-.progress-bar-container {
-  background-color: #e9ecef;
-  border-radius: 0.25rem;
-  height: 22px;
-  overflow: hidden;
-  width: 100%;
-  position: relative;
-}
-.progress-bar {
-  background-color: #28a745;
-  height: 100%;
-  border-radius: 0.25rem;
-  transition: width 0.6s ease-in-out;
-  text-align: center;
-  color: white;
-  font-weight: bold;
-  font-size: 0.85em;
-  line-height: 22px;
-  white-space: nowrap;
-  padding: 0 5px;
-}
-.progress-bar::before {
-    content: attr(data-value);
-    position: absolute;
-    left: 5px;
-    color: #333;
-}
-
-/* --- Estilo para Resultados de KPI Atrasados --- */
-td.kpi-atrasado {
-  background-color: #fddfe2 !important; /* Fondo rojo pálido, !important para asegurar prioridad sobre :nth-child */
-  color: #8c1c27 !important; /* Texto rojo oscuro */
-  font-weight: bold !important; /* Hacerlo resaltar */
-}
-
-/* Opcional: Mantener el resaltado al pasar el ratón sobre la fila */
-tbody tr:hover td.kpi-atrasado {
-    background-color: #f8c7ce !important; /* Rojo pálido un poco más oscuro al hacer hover */
-}
-
-
-/* Contenedor del Gráfico */
-#chart-container {
-  margin-top: 30px;
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  height: 450px; /* Altura del gráfico */
-  display: none; /* Oculto hasta que se carguen datos KPI */
-}
+// ... (El resto de tu código JS sin cambios: closeMobileMenu, limpiarContenido, mostrarError, popularTablas, actualizarGrafico, inicializarGrafico) ...

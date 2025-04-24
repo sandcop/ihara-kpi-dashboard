@@ -1,105 +1,259 @@
-/* styles.css */
+// script.js
+console.log("script.js: Empezando a ejecutar.");
 
-/* --- Reset Básico y Body --- */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: sans-serif; background-color: #f4f7f6; color: #333; padding-top: 60px; /* Ajusta según altura navbar */ }
+// --- URL de Google Apps Script ---
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9UyKr-UcWOCvrMGCsgvc38_-HmKZpXjlj9THbGLNK0lhLJ7B-_RSVpxFpP76eWjeP/exec';
 
-/* --- Estilos de la Barra de Navegación --- */
-.navbar { background-color: #0056b3; color: white; padding: 0 20px; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; align-items: center; height: 60px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-.navbar-brand h1 { color: white; font-size: 1.3em; /* Puede necesitar ajuste */ margin: 0; white-space: nowrap; /* Evitar que se parta */ overflow: hidden; text-overflow: ellipsis; /* Puntos suspensivos si no cabe */ max-width: calc(100% - 50px); /* Evitar que choque con hamburguesa */ }
+// --- Referencias a elementos DOM (se asignan en DOMContentLoaded) ---
+let navLinks, hamburgerBtn;
+let kpiContentSection, ofertasFlashSection, enlacesExternosSection, tablaRemuneracionSection, politicasVentasSection;
+let tablaContainer, chartContainer, loader, tablaDatos, kpiChartCanvas, errorContainer;
+let miGrafico = null;
 
-/* --- Estilos de los Enlaces de Navegación (sin cambios) --- */
-.nav-links { list-style: none; display: flex; margin: 0; padding: 0; }
-.nav-links li { margin-left: 15px; position: relative; }
-.nav-links a { color: white; text-decoration: none; padding: 10px 15px; display: block; transition: background-color 0.3s ease; white-space: nowrap; }
-.nav-links a:hover, .nav-links li:hover > a { background-color: #007bff; border-radius: 4px; }
-.nav-links a .fa-chevron-down { margin-left: 5px; }
-li.dropdown .dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.15); border-radius: 4px; padding: 5px 0; min-width: 180px; z-index: 1001; }
-li.dropdown:hover .dropdown-menu, li.dropdown:focus-within .dropdown-menu { display: block; }
-.dropdown-menu li { margin-left: 0; width: 100%; }
-.dropdown-menu a { color: #333; padding: 10px 20px; border-radius: 0; }
-.dropdown-menu a:hover { background-color: #e9ecef; color: #0056b3; }
+// --- CLASE CSS PARA MENÚ MÓVIL ACTIVO ---
+const NAV_ACTIVE_CLASS = 'active'; // Clase que se añadirá a nav-links
 
-/* --- Botón Hamburguesa (sin cambios) --- */
-.hamburger-btn { display: none; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+// --- FUNCIONES GLOBALES PARA onclick ---
 
-/* --- NUEVO: Estilos Saludo Usuario --- */
-.user-greeting {
-  padding: 10px 20px;
-  background-color: #f8f9fa; /* Fondo gris muy claro */
-  border-bottom: 1px solid #dee2e6; /* Línea separadora sutil */
-  text-align: right; /* Alineado a la derecha */
+function mostrarKPIs() {
+    console.log("script.js: mostrarKPIs() llamada.");
+    showSection('kpi-content'); // Muestra la sección correcta
+    // Verificar si los elementos DOM están listos
+    if (!loader || !tablaContainer || !errorContainer) {
+        console.error("script.js: Elementos DOM para KPIs no listos.");
+        return;
+    }
+    limpiarContenidoKPIs(); // Limpia solo la tabla/gráfico/error de KPIs
+    loader.style.display = 'block'; // Muestra loader DENTRO de kpi-content
+
+    fetch(`${APPS_SCRIPT_URL}?action=kpis`)
+        .then(response => {
+            console.log("script.js: Fetch KPIs - Status:", response.status);
+            if (!response.ok) return response.text().then(text => { throw new Error(`Error HTTP ${response.status}: ${response.statusText}. ${text}`); });
+            return response.json();
+        })
+        .then(data => {
+            console.log("script.js: Datos KPIs JSON:", data);
+            if (data && data.error) throw new Error(`Error Apps Script: ${data.error}`);
+            loader.style.display = 'none';
+            // Asegurar que los contenedores internos son visibles si hay datos
+            tablaContainer.style.display = 'block';
+            chartContainer.style.display = 'block';
+            kpiChartCanvas.style.display = 'block';
+            tablaDatos.style.display = 'table';
+
+            popularTablaKPIs(data);
+            actualizarGraficoKPIs(data);
+        })
+        .catch(error => {
+            console.error("script.js: Catch KPIs:", error);
+            loader.style.display = 'none'; // Ocultar loader en caso de error
+            mostrarErrorKPIs(`Error al cargar KPIs: ${error.message}`); // Mostrar error DENTRO de kpi-content
+        });
 }
 
-.user-greeting p {
-  margin: 0;
-  font-size: 0.9em;
-  color: #495057; /* Gris oscuro */
-  font-weight: 500; /* Un poco más de peso */
-}
-.user-greeting p i { /* Estilo para el ícono */
-  margin-right: 5px;
-  color: #6c757d; /* Gris medio */
-}
+function mostrarFaltantes() {
+    console.log("script.js: mostrarFaltantes() llamada.");
+    showSection('kpi-content'); // Muestra la sección correcta
+     // Verificar si los elementos DOM están listos
+    if (!loader || !tablaContainer || !errorContainer) {
+        console.error("script.js: Elementos DOM para Faltantes no listos.");
+        return;
+    }
+    limpiarContenidoKPIs(); // Limpia la tabla/gráfico/error de KPIs
+    loader.style.display = 'block'; // Muestra loader DENTRO de kpi-content
+    chartContainer.style.display = 'none'; // Ocultar gráfico para faltantes
 
-
-/* --- Contenido Principal --- */
-.main-content { padding: 20px; }
-
-/* --- Media Query para Móviles --- */
-@media (max-width: 992px) {
-  .hamburger-btn { display: block; }
-  .nav-links { display: none; flex-direction: column; width: 100%; position: absolute; top: 60px; left: 0; background-color: #004a9a; padding: 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-  .nav-links.show-menu { display: flex; }
-  .nav-links li { margin-left: 0; width: 100%; text-align: left; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-  .nav-links li:first-child { border-top: none; }
-  .nav-links a { padding: 15px 20px; border-radius: 0; }
-  .nav-links a .fa-chevron-down { float: right; margin-top: 4px; }
-  li.dropdown .dropdown-menu { position: static; display: block; background-color: rgba(0, 0, 0, 0.1); box-shadow: none; border-radius: 0; padding: 0; min-width: unset; width: 100%; }
-  .dropdown-menu li { border-top: 1px solid rgba(255, 255, 255, 0.05); }
-  .dropdown-menu a { padding-left: 40px; color: #eee; }
-  .dropdown-menu a:hover { background-color: rgba(0, 0, 0, 0.2); color: white; }
-
-  /* Ajuste del título de la navbar en móvil si es necesario */
-  .navbar-brand h1 {
-      font-size: 1.1em; /* Más pequeño en móvil */
-      max-width: calc(100% - 60px); /* Asegurar espacio para hamburguesa */
-  }
-
-  /* Ajuste Saludo Usuario en móvil */
-  .user-greeting {
-      text-align: center; /* Centrado en móvil */
-      padding: 8px 15px;
-  }
-   .user-greeting p {
-      font-size: 0.85em;
-   }
+    fetch(`${APPS_SCRIPT_URL}?action=faltantes`)
+       .then(response => {
+            console.log("script.js: Fetch Faltantes - Status:", response.status);
+            if (!response.ok) return response.text().then(text => { throw new Error(`Error HTTP ${response.status}: ${response.statusText}. ${text}`); });
+            return response.json();
+        })
+        .then(data => {
+            console.log("script.js: Datos Faltantes JSON:", data);
+            if (data && data.error) throw new Error(`Error Apps Script: ${data.error}`);
+            loader.style.display = 'none';
+            tablaContainer.style.display = 'block'; // Mostrar contenedor tabla
+            tablaDatos.style.display = 'table';   // Mostrar tabla
+            popularTablaFaltantes(data);
+        })
+        .catch(error => {
+             console.error("script.js: Catch Faltantes:", error);
+             loader.style.display = 'none'; // Ocultar loader en caso de error
+             mostrarErrorKPIs(`Error al cargar Faltantes: ${error.message}`); // Mostrar error DENTRO de kpi-content
+        });
 }
 
-/* --- Botón Flotante de WhatsApp (sin cambios) --- */
-.whatsapp-button { position: fixed; bottom: 20px; right: 20px; background-color: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1050; transition: transform 0.2s ease-in-out, background-color 0.2s; }
-.whatsapp-button:hover { background-color: #128C7E; transform: scale(1.1); }
-
-/* --- Otros estilos (Loader, Tabla, Errores, Chart, etc.) --- */
-/* ... (Mantén tus estilos previos aquí) ... */
-.loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-#error-container { margin-top: 15px; }
-.error-message { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; margin-top: 10px; border-radius: 5px; font-weight: bold; }
-#kpi-content { /* Estilos para el contenedor si es necesario */ }
-#tabla-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; /* Espacio antes del gráfico */ }
-#chart-container { width: 80%; margin: 0 auto 20px auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-
-@media (max-width: 992px) {
-  #chart-container { width: 95%; height: 300px; }
-  #tablaDatos th, #tablaDatos td { padding: 6px; font-size: 0.9em; }
+// Funciones simples para mostrar las otras secciones
+function mostrarOfertasFlash() {
+    console.log("script.js: mostrarOfertasFlash() llamada.");
+    showSection('ofertas-flash');
+}
+function mostrarEnlacesExternos() {
+    console.log("script.js: mostrarEnlacesExternos() llamada.");
+    showSection('enlaces-externos');
+}
+function mostrarTablaRemuneracion() {
+    console.log("script.js: mostrarTablaRemuneracion() llamada.");
+    showSection('tabla-remuneracion');
+}
+function mostrarPoliticasVentas() {
+     console.log("script.js: mostrarPoliticasVentas() llamada.");
+    showSection('politicas-ventas');
 }
 
-/* Estilos básicos para las secciones ocultas (mejora si las usas) */
-.main-content > section[id]:not(#kpi-content) {
-    background-color: #fff;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+// Función para cerrar el menú móvil (llamada desde onclick)
+function closeMobileMenu() {
+    if (navLinks && navLinks.classList.contains(NAV_ACTIVE_CLASS)) {
+        console.log("script.js: closeMobileMenu() llamada.");
+        navLinks.classList.remove(NAV_ACTIVE_CLASS);
+        // Opcional: Cambiar aria-expanded en el botón hamburguesa
+        if(hamburgerBtn) hamburgerBtn.setAttribute('aria-expanded', 'false');
+    }
 }
+
+// --- FUNCIONES AUXILIARES ---
+
+// Muestra una sección principal y oculta las demás
+function showSection(sectionIdToShow) {
+    console.log(`script.js: showSection llamada para '${sectionIdToShow}'`);
+    const sections = [
+        kpiContentSection, ofertasFlashSection, enlacesExternosSection,
+        tablaRemuneracionSection, politicasVentasSection
+    ];
+    let sectionFound = false;
+    sections.forEach(section => {
+        if (section) { // Comprobar que la referencia existe
+            if (section.id === sectionIdToShow) {
+                section.style.display = 'block';
+                sectionFound = true;
+                console.log(`script.js: Mostrando sección '${section.id}'`);
+            } else {
+                section.style.display = 'none';
+            }
+        } else {
+             console.warn(`script.js: Referencia a sección no encontrada en showSection.`);
+        }
+    });
+     if (!sectionFound) {
+         console.error(`script.js: No se encontró la sección con ID '${sectionIdToShow}' para mostrar.`);
+     }
+}
+
+
+// Limpia específicamente el contenido dentro de #kpi-content
+function limpiarContenidoKPIs() {
+    console.log("script.js: limpiarContenidoKPIs() llamada.");
+    if (tablaDatos) tablaDatos.innerHTML = '';
+    if (errorContainer) errorContainer.innerHTML = '';
+    if (loader) loader.style.display = 'none'; // Ocultar loader por defecto
+    if (kpiChartCanvas && miGrafico) { // Opcional: Limpiar gráfico
+        miGrafico.data.labels = [];
+        miGrafico.data.datasets[0].data = [];
+        miGrafico.update();
+    }
+     // No ocultar tablaContainer o chartContainer aquí, showSection lo maneja
+}
+
+// Muestra errores dentro del #error-container de la sección KPIs
+function mostrarErrorKPIs(mensaje) {
+    console.error("script.js: mostrarErrorKPIs() llamada:", mensaje);
+    if (errorContainer) {
+        errorContainer.innerHTML = `<div class="error-message">${mensaje}</div>`;
+    } else {
+        console.error("script.js: errorContainer no encontrado para mostrar el error.");
+        alert("Error: " + mensaje); // Fallback
+    }
+    // Asegurarse que el contenedor de la tabla esté visible para mostrar el error
+    if(tablaContainer) tablaContainer.style.display = 'block';
+    if(loader) loader.style.display = 'none'; // Ocultar loader si había error
+    if(chartContainer) chartContainer.style.display = 'none'; // Ocultar gráfico si había error
+}
+
+
+// --- Funciones para popular tablas y gráfico (sin cambios mayores) ---
+function popularTablaKPIs(datosKPI) { /* ... como antes, con logs ... */
+     console.log("script.js: popularTablaKPIs() con datos:", datosKPI);
+     if (!tablaDatos) return;
+     // ... resto del código ...
+}
+function popularTablaFaltantes(datosFaltantes) { /* ... como antes, con logs ... */
+    console.log("script.js: popularTablaFaltantes() con datos:", datosFaltantes);
+     if (!tablaDatos) return;
+    // ... resto del código ...
+}
+function actualizarGraficoKPIs(datosKPI) { /* ... como antes, con logs ... */
+    console.log("script.js: actualizarGraficoKPIs() con datos:", datosKPI);
+    if (!miGrafico) { console.warn("Gráfico no listo."); return; }
+    // ... resto del código ...
+}
+function inicializarGrafico() { /* ... como antes, con logs ... */
+    console.log("script.js: inicializarGrafico() llamada.");
+     if (!kpiChartCanvas) { console.error("Canvas no listo."); return; }
+    // ... resto del código ...
+     if (chartContainer) chartContainer.style.display = 'none'; // Ocultar al inicio
+     if (kpiChartCanvas) kpiChartCanvas.style.display = 'none';
+}
+
+// --- INICIALIZACIÓN POST-DOM ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("script.js: DOMContentLoaded evento disparado.");
+
+    // --- Asignar referencias DOM ---
+    navLinks = document.getElementById('nav-links');
+    hamburgerBtn = document.getElementById('hamburger-btn');
+
+    kpiContentSection = document.getElementById('kpi-content');
+    ofertasFlashSection = document.getElementById('ofertas-flash');
+    enlacesExternosSection = document.getElementById('enlaces-externos');
+    tablaRemuneracionSection = document.getElementById('tabla-remuneracion');
+    politicasVentasSection = document.getElementById('politicas-ventas');
+
+    // Elementos dentro de kpi-content
+    tablaContainer = document.getElementById('tabla-container'); // Contenedor de tabla/loader/error
+    chartContainer = document.getElementById('chart-container');
+    loader = document.getElementById('loader');
+    tablaDatos = document.getElementById('tablaDatos');
+    kpiChartCanvas = document.getElementById('kpiChart');
+    errorContainer = document.getElementById('error-container');
+
+    // --- Verificar referencias esenciales ---
+    if (!navLinks || !hamburgerBtn || !kpiContentSection || !tablaContainer || !chartContainer || !loader || !tablaDatos || !kpiChartCanvas || !errorContainer) {
+         console.error("script.js: ¡Error crítico! Uno o más elementos DOM esenciales (navbar, kpi-content, tabla, gráfico, loader, error) no se encontraron por ID.");
+         alert("Error crítico: No se pudieron encontrar elementos esenciales en la página.");
+         return; // Detener si falta algo crucial
+    }
+     console.log("script.js: Referencias DOM obtenidas.");
+
+    // --- Configurar Event Listeners ---
+    // Listener para el botón hamburguesa
+    hamburgerBtn.addEventListener('click', () => {
+        console.log("script.js: Botón hamburguesa clickeado.");
+        navLinks.classList.toggle(NAV_ACTIVE_CLASS);
+        // Actualizar aria-expanded
+        const isExpanded = navLinks.classList.contains(NAV_ACTIVE_CLASS);
+        hamburgerBtn.setAttribute('aria-expanded', isExpanded);
+    });
+
+    // Añadir onclicks a los enlaces que faltan (si prefieres JS sobre HTML onclick)
+    // O puedes añadirlos directamente en el HTML como tienes ahora para KPIs/Faltantes.
+    // Ejemplo si quisieras añadirlos aquí:
+    const ofertasLink = document.querySelector('a[href="#ofertas-flash"]');
+    if(ofertasLink) ofertasLink.addEventListener('click', (e) => {
+        // e.preventDefault(); // Prevenir salto de ancla si no se desea
+        mostrarOfertasFlash();
+        closeMobileMenu();
+    });
+    // Repetir para otros enlaces... (Enlaces Externos, Tabla Remuneracion, Políticas)
+
+    // --- Estado Inicial ---
+    inicializarGrafico();
+    console.log("script.js: Mostrando KPIs por defecto al cargar.");
+    mostrarKPIs(); // Mostrar KPIs por defecto al cargar la página
+
+    console.log("script.js: Inicialización post-DOM completa.");
+});
+
+console.log("script.js: Fin del archivo alcanzado.");

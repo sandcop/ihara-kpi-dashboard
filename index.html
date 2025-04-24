@@ -14,25 +14,28 @@
   <h1>📊 Dashboard KPIs – Ihara</h1>
 
   <div class="buttons">
-    <!-- Los botones llaman a las funciones JS -->
+    <!-- Los botones llaman a las funciones JS globales -->
     <button onclick="mostrarKPIs()">Ver KPIs</button>
     <button onclick="mostrarFaltantes()">Ver Faltantes</button>
   </div>
 
   <!-- Contenedor para la tabla y el loader -->
   <section id="tabla-container">
-    <!-- Loader (inicialmente visible o controlado por JS/CSS) -->
-    <div class="loader" id="loader" style="display: none;">Cargando datos...</div>
+    <!-- Loader (inicialmente oculto por CSS o JS) -->
+    <div class="loader" id="loader">Cargando datos...</div>
     <!-- Tabla donde se mostrarán los datos -->
     <table id="tablaDatos"></table>
+    <!-- Contenedor para mensajes de error -->
+    <div id="error-container"></div>
   </section>
 
   <!-- Contenedor para el gráfico -->
-  <section id="chart-container" style="display: none; height: 400px; width: 80%; margin: 20px auto;">
+  <section id="chart-container" style="height: 400px; width: 80%; margin: 20px auto;">
     <canvas id="kpiChart"></canvas>
   </section>
 
-  <!-- Enlaza el archivo JavaScript -->
+  <!-- Enlaza el archivo JavaScript AL FINAL, antes de cerrar body -->
+  <!-- Asegúrate de que la ruta sea correcta (aquí asume misma carpeta) -->
   <script src="script.js"></script>
 
 </body>

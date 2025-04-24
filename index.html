@@ -1,135 +1,31 @@
-<!-- === En tu <head> (Asegúrate de tener estos o equivalentes) === -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.x/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- Ajusta versión si es necesario -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.x.x/css/all.min.css"> <!-- O tu kit de Font Awesome -->
-<link rel="stylesheet" href="styles.css">
-<!-- === Fin de <head> === -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ihara KPIs</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
 
+  <h1>📊 Dashboard KPIs – Ihara</h1>
 
-<!-- === Dentro de tu <nav class="navbar ..."> o <header> === -->
+  <div class="buttons">
+    <button onclick="mostrarKPIs()">Ver KPIs</button>
+    <button onclick="mostrarFaltantes()">Ver Faltantes</button>
+  </div>
 
-<!-- Botón para mostrar/ocultar Sidebar en pantallas pequeñas -->
-<button class="btn btn-outline-primary d-lg-none me-2" type="button" id="sidebarToggle">
-    <i class="fas fa-bars"></i>
-</button>
+  <section id="tabla-container">
+    <div class="loader" id="loader">Cargando datos...</div>
+    <table id="tablaDatos"></table>
+  </section>
 
-<!-- Contenedor para elementos a la derecha (WhatsApp, etc.) -->
-<div class="ms-auto d-flex align-items-center">
-    <!-- Icono de WhatsApp Web -->
-    <a href="https://web.whatsapp.com/" target="_blank" class="nav-link p-2 me-2" title="Abrir WhatsApp Web">
-        <i class="fab fa-whatsapp fa-lg text-success"></i>
-    </a>
+  <section id="chart-container">
+    <canvas id="kpiChart"></canvas>
+  </section>
 
-    <!-- Aquí pueden ir otros elementos de tu navbar derecha (buscador, perfil, etc.) -->
+  <script src="script.js"></script>
 
-</div>
-<!-- === Fin de sección en <nav> o <header> === -->
-
-
-<!-- === Justo después de tu <header> o al inicio del <body> === -->
-<div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <h5 class="text-white">Menú</h5>
-        <button class="btn btn-outline-light d-lg-none" type="button" id="sidebarClose">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">
-                <i class="far fa-chart-bar fa-fw me-2"></i> <!-- Icono Outline -->
-                Dashboard Principal
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                 <i class="far fa-file-alt fa-fw me-2"></i> <!-- Icono Outline -->
-                Reportes
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#avancesVentas"> <!-- Enlace a la nueva sección -->
-                <i class="fas fa-chart-line fa-fw me-2"></i> <!-- Usamos fas para este icono específico -->
-                📈 Avances de Ventas
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="far fa-user-circle fa-fw me-2"></i> <!-- Icono Outline -->
-                Mi Perfil
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="far fa-question-circle fa-fw me-2"></i> <!-- Icono Outline -->
-                Ayuda
-            </a>
-        </li>
-    </ul>
-</div>
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
-<!-- === Fin de Sidebar y Overlay === -->
-
-
-<!-- === Dentro de tu <main> o <div class="container/container-fluid"> principal === -->
-<section id="avancesVentas" class="mt-4 mb-5">
-    <h2>📈 Avances de Ventas</h2>
-    <hr>
-    <div class="row g-4">
-
-        <!-- KPIs -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card text-center h-100">
-                <div class="card-header">KPIs Clave</div>
-                <div class="card-body">
-                    <h5 class="card-title">Ventas Mes Actual</h5>
-                    <p class="card-text display-6" id="kpiVentasActuales">$1,250,800</p> <!-- Placeholder -->
-                    <h6 class="card-subtitle mb-2 text-muted">Objetivo Mensual</h6>
-                    <p class="card-text fs-5" id="kpiObjetivoMes">$1,500,000</p> <!-- Placeholder -->
-                </div>
-                <div class="card-footer text-muted">
-                    % Cumplimiento: <strong id="kpiCumplimiento">83.39%</strong> <!-- Placeholder -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Faltantes -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card text-center h-100">
-                <div class="card-header">Faltante y Proyección</div>
-                <div class="card-body">
-                    <h5 class="card-title">Ventas Faltantes</h5>
-                    <p class="card-text display-6 text-danger" id="kpiFaltante">$249,200</p> <!-- Placeholder -->
-                     <h6 class="card-subtitle mb-2 text-muted">Días Restantes</h6>
-                    <p class="card-text fs-5" id="kpiDiasRestantes">10</p> <!-- Placeholder -->
-                </div>
-                 <div class="card-footer text-muted">
-                    Venta Diaria Requerida: <strong id="kpiVentaDiariaReq">$24,920</strong> <!-- Placeholder -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Gráfico Opcional -->
-        <div class="col-lg-4">
-             <div class="card h-100">
-                <div class="card-header">Progreso Visual</div>
-                <div class="card-body d-flex justify-content-center align-items-center">
-                     <div style="position: relative; height:200px; width:200px"> <!-- Contenedor para tamaño -->
-                        <canvas id="progresoVentasChart"></canvas>
-                     </div>
-                </div>
-                <div class="card-footer text-center text-muted small">
-                    Gráfico de Progreso
-                </div>
-            </div>
-        </div>
-
-    </div> <!-- Fin .row -->
-</section>
-<!-- === Fin de Sección Avances de Ventas === -->
-
-
-<!-- === Al final del <body>, antes de tus scripts === -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.x/dist/js/bootstrap.bundle.min.js"></script> <!-- O solo Popper y Bootstrap JS si prefieres -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Añade Chart.js si usarás el gráfico -->
-<script src="script.js"></script>
-<!-- === Fin de Scripts === -->
+</body>
+</html>

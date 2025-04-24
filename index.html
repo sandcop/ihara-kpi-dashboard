@@ -3,33 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ihara KPIs Dashboard</title>
+  <title>Indicadores Ejecutivo</title> <!-- Título de pestaña actualizado -->
   <link rel="stylesheet" href="styles.css" />
-  <!-- Incluir Chart.js desde CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 
-  <h1>Indicadores de ventas Manu</h1>
+  <!-- ===== Barra de Navegación ===== -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <!-- Título Cambiado -->
+      <h1>📊 Indicadores de Ejecutivo</h1>
+    </div>
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle menu" aria-expanded="false">
+      <i class="fas fa-bars"></i>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#" onclick="mostrarKPIs(); closeMobileMenu();">KPIs</a></li>
+      <li><a href="#" onclick="mostrarFaltantes(); closeMobileMenu();">Faltantes</a></li>
+      <li class="dropdown">
+        <a href="#">Ofertas del Mes <i class="fas fa-chevron-down fa-xs"></i></a>
+        <ul class="dropdown-menu">
+          <li><a href="#ofertas-flash" onclick="closeMobileMenu()">Ofertas Flash</a></li>
+        </ul>
+      </li>
+      <li><a href="#enlaces-externos" onclick="closeMobileMenu()">Enlaces Externos</a></li>
+      <li><a href="#tabla-remuneracion" onclick="closeMobileMenu()">Tabla Remuneración</a></li>
+      <li><a href="#politicas-ventas" onclick="closeMobileMenu()">Políticas de Ventas</a></li>
+    </ul>
+  </nav>
 
-  <div class="buttons">
-    <!-- IDs correctos, sin onclick -->
-    <button id="btn-kpis">Ver KPIs</button>
-    <button id="btn-faltantes">Ver Faltantes</button>
+  <!-- ===== Saludo al Usuario ===== -->
+  <div class="user-greeting">
+    <p><i class="fas fa-user"></i> Usuario: Manuel Rojas</p> <!-- Añadido ícono opcional -->
   </div>
 
-  <!-- Contenedor principal para la tabla y el mensaje de carga/error -->
-  <section id="data-content">
-    <!-- El contenido (loader o tabla) se insertará aquí -->
-  </section>
+  <!-- ===== Contenido Principal ===== -->
+  <main class="main-content">
 
-  <!-- Contenedor para el gráfico (inicialmente oculto) -->
-  <section id="chart-container">
-    <canvas id="kpiChart"></canvas>
-  </section>
+    <!-- Secciones de contenido (puedes añadir títulos aquí si lo deseas) -->
+    <section id="kpi-content" style="display: none;"> <!-- Contenedor para KPIs/Faltantes -->
+      <section id="tabla-container">
+        <div class="loader" id="loader">Cargando datos...</div>
+        <table id="tablaDatos"></table>
+        <div id="error-container"></div>
+      </section>
+      <section id="chart-container" style="height: 400px; width: 80%; margin: 20px auto;">
+        <canvas id="kpiChart"></canvas>
+      </section>
+    </section>
 
-  <!-- Enlazar script.js al final y con defer -->
-  <script src="script.js" defer></script>
+    <section id="ofertas-flash" style="display: none;">
+      <h2>Ofertas Flash</h2>
+      <p>Contenido de las ofertas flash...</p>
+    </section>
+    <section id="enlaces-externos" style="display: none;">
+      <h2>Enlaces Externos</h2>
+       <p>Lista de enlaces...</p>
+    </section>
+     <section id="tabla-remuneracion" style="display: none;">
+      <h2>Tabla de Remuneración</h2>
+       <p>Contenido de la tabla...</p>
+    </section>
+     <section id="politicas-ventas" style="display: none;">
+      <h2>Políticas de Ventas</h2>
+       <p>Contenido de las políticas...</p>
+    </section>
+
+  </main> <!-- Fin del main-content wrapper -->
+
+  <!-- ===== Botón Flotante de WhatsApp ===== -->
+  <a href="https://wa.me/TUNUMERODEWHATSAPPCONCODIGOPAIS" class="whatsapp-button" target="_blank" aria-label="Contactar por WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <script src="script.js"></script>
 
 </body>
 </html>

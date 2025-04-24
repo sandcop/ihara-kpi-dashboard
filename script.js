@@ -1,253 +1,105 @@
-// URL de tu Web App de Google Apps Script (¡Asegúrate que sea la correcta!)
-const apiUrl = "https://script.google.com/macros/s/AKfycby9UyKr-UcWOCvrMGCsgvc38_-HmKZpXjlj9THbGLNK0lhLJ7B-_RSVpxFpP76eWjeP/exec";
+/* styles.css */
 
-// Referencias a elementos del DOM
-const btnKPIs = document.getElementById("btn-kpis");
-const btnFaltantes = document.getElementById("btn-faltantes");
-const content = document.getElementById("data-content");
-const chartContainer = document.getElementById('chart-container');
-const kpiChartCanvas = document.getElementById('kpiChart'); // Solo el elemento canvas
+/* --- Reset Básico y Body --- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: sans-serif; background-color: #f4f7f6; color: #333; padding-top: 60px; /* Ajusta según altura navbar */ }
 
-// Variable para almacenar la instancia del gráfico actual y poder destruirla
-let currentChart = null;
+/* --- Estilos de la Barra de Navegación --- */
+.navbar { background-color: #0056b3; color: white; padding: 0 20px; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; display: flex; justify-content: space-between; align-items: center; height: 60px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.navbar-brand h1 { color: white; font-size: 1.3em; /* Puede necesitar ajuste */ margin: 0; white-space: nowrap; /* Evitar que se parta */ overflow: hidden; text-overflow: ellipsis; /* Puntos suspensivos si no cabe */ max-width: calc(100% - 50px); /* Evitar que choque con hamburguesa */ }
 
-// --- Event Listeners para los botones ---
-if (btnKPIs) {
-    btnKPIs.addEventListener("click", () => {
-      cargarDatos("kpi");
-    });
+/* --- Estilos de los Enlaces de Navegación (sin cambios) --- */
+.nav-links { list-style: none; display: flex; margin: 0; padding: 0; }
+.nav-links li { margin-left: 15px; position: relative; }
+.nav-links a { color: white; text-decoration: none; padding: 10px 15px; display: block; transition: background-color 0.3s ease; white-space: nowrap; }
+.nav-links a:hover, .nav-links li:hover > a { background-color: #007bff; border-radius: 4px; }
+.nav-links a .fa-chevron-down { margin-left: 5px; }
+li.dropdown .dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background-color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.15); border-radius: 4px; padding: 5px 0; min-width: 180px; z-index: 1001; }
+li.dropdown:hover .dropdown-menu, li.dropdown:focus-within .dropdown-menu { display: block; }
+.dropdown-menu li { margin-left: 0; width: 100%; }
+.dropdown-menu a { color: #333; padding: 10px 20px; border-radius: 0; }
+.dropdown-menu a:hover { background-color: #e9ecef; color: #0056b3; }
+
+/* --- Botón Hamburguesa (sin cambios) --- */
+.hamburger-btn { display: none; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+
+/* --- NUEVO: Estilos Saludo Usuario --- */
+.user-greeting {
+  padding: 10px 20px;
+  background-color: #f8f9fa; /* Fondo gris muy claro */
+  border-bottom: 1px solid #dee2e6; /* Línea separadora sutil */
+  text-align: right; /* Alineado a la derecha */
 }
 
-if (btnFaltantes) {
-    btnFaltantes.addEventListener("click", () => {
-      cargarDatos("faltantes");
-    });
+.user-greeting p {
+  margin: 0;
+  font-size: 0.9em;
+  color: #495057; /* Gris oscuro */
+  font-weight: 500; /* Un poco más de peso */
+}
+.user-greeting p i { /* Estilo para el ícono */
+  margin-right: 5px;
+  color: #6c757d; /* Gris medio */
 }
 
-// --- Función principal para cargar datos ---
-function cargarDatos(tipo) {
-  // Mostrar animación de carga
-  content.innerHTML = "<p class='loading'>Cargando datos...</p>";
-  // Ocultar contenedor del gráfico y destruir gráfico anterior
-  chartContainer.style.display = 'none';
-  if (currentChart) {
-    currentChart.destroy();
-    currentChart = null;
+
+/* --- Contenido Principal --- */
+.main-content { padding: 20px; }
+
+/* --- Media Query para Móviles --- */
+@media (max-width: 992px) {
+  .hamburger-btn { display: block; }
+  .nav-links { display: none; flex-direction: column; width: 100%; position: absolute; top: 60px; left: 0; background-color: #004a9a; padding: 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+  .nav-links.show-menu { display: flex; }
+  .nav-links li { margin-left: 0; width: 100%; text-align: left; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+  .nav-links li:first-child { border-top: none; }
+  .nav-links a { padding: 15px 20px; border-radius: 0; }
+  .nav-links a .fa-chevron-down { float: right; margin-top: 4px; }
+  li.dropdown .dropdown-menu { position: static; display: block; background-color: rgba(0, 0, 0, 0.1); box-shadow: none; border-radius: 0; padding: 0; min-width: unset; width: 100%; }
+  .dropdown-menu li { border-top: 1px solid rgba(255, 255, 255, 0.05); }
+  .dropdown-menu a { padding-left: 40px; color: #eee; }
+  .dropdown-menu a:hover { background-color: rgba(0, 0, 0, 0.2); color: white; }
+
+  /* Ajuste del título de la navbar en móvil si es necesario */
+  .navbar-brand h1 {
+      font-size: 1.1em; /* Más pequeño en móvil */
+      max-width: calc(100% - 60px); /* Asegurar espacio para hamburguesa */
   }
 
-  // Realizar la llamada fetch a la API de Apps Script
-  fetch(`${apiUrl}?tipo=${tipo}`)
-    .then(res => {
-      if (!res.ok) {
-        // Si la respuesta HTTP no es exitosa, lanzar un error
-        throw new Error(`Error HTTP: ${res.status} ${res.statusText}`);
-      }
-      return res.json(); // Convertir la respuesta a JSON
-    })
-    .then(data => {
-      if (data.error) {
-        // Si la API devuelve un error en el JSON, lanzarlo
-        throw new Error(`Error desde API: ${data.error}`);
-      }
-      // Mostrar los datos en la tabla (¡aquí se aplica la lógica de resaltado!)
-      mostrarDatos(data.datos, tipo);
-
-      // Si los datos son de tipo 'kpi' y existen, mostrar el gráfico
-      if (tipo === 'kpi' && data.datos && data.datos.length > 0) {
-         mostrarGraficoKPI(data.datos);
-      }
-    })
-    .catch(err => {
-      // Manejar cualquier error ocurrido durante el fetch o procesamiento
-      console.error("Error detallado:", err);
-      content.innerHTML = `<p class='error'>❌ Error al cargar datos: ${err.message}</p>`;
-      chartContainer.style.display = 'none'; // Asegurarse que el gráfico esté oculto en caso de error
-    });
+  /* Ajuste Saludo Usuario en móvil */
+  .user-greeting {
+      text-align: center; /* Centrado en móvil */
+      padding: 8px 15px;
+  }
+   .user-greeting p {
+      font-size: 0.85em;
+   }
 }
 
-// --- Función para mostrar los datos en la tabla ---
-function mostrarDatos(datos, tipo) {
-  // Si no hay datos o no es un array, mostrar mensaje informativo
-  if (!Array.isArray(datos) || datos.length === 0) {
-    content.innerHTML = "<p class='info'>ℹ️ No hay datos disponibles para mostrar.</p>";
-    return;
-  }
+/* --- Botón Flotante de WhatsApp (sin cambios) --- */
+.whatsapp-button { position: fixed; bottom: 20px; right: 20px; background-color: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1050; transition: transform 0.2s ease-in-out, background-color 0.2s; }
+.whatsapp-button:hover { background-color: #128C7E; transform: scale(1.1); }
 
-  // --- Inicio: Calcular proporción del mes transcurrido ---
-  const hoy = new Date();
-  const diaActual = hoy.getDate(); // Día del mes (1-31)
-  const mesActual = hoy.getMonth(); // Mes (0-11)
-  const anioActual = hoy.getFullYear();
-  // Calcular el último día del mes actual (truco: día 0 del mes siguiente)
-  const diasTotalesMes = new Date(anioActual, mesActual + 1, 0).getDate();
-  // Proporción del mes que debería haberse cumplido hoy (evitar división por cero si hay error)
-  const proporcionMes = diasTotalesMes > 0 ? diaActual / diasTotalesMes : 0;
-  // --- Fin: Calcular proporción del mes ---
+/* --- Otros estilos (Loader, Tabla, Errores, Chart, etc.) --- */
+/* ... (Mantén tus estilos previos aquí) ... */
+.loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; display: none; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+#error-container { margin-top: 15px; }
+.error-message { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; margin-top: 10px; border-radius: 5px; font-weight: bold; }
+#kpi-content { /* Estilos para el contenedor si es necesario */ }
+#tabla-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; /* Espacio antes del gráfico */ }
+#chart-container { width: 80%; margin: 0 auto 20px auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-  // Construir el HTML de la tabla
-  let html = "<table><thead><tr>";
-
-  // Definir las cabeceras de la tabla según el tipo de datos
-  if (tipo === "kpi") {
-    // Ajustamos títulos para mayor claridad
-    html += "<th>KPI</th><th>Meta (100%)</th><th>125%</th><th>70%</th><th>Resultado Actual</th><th>Arrastre</th><th>Total</th>";
-  } else { // tipo === "faltantes"
-    html += "<th>KPI</th><th>Faltante 100%</th><th>Faltante 150%</th><th>Faltante 250%</th>";
-  }
-  html += "</tr></thead><tbody>";
-
-  // Llenar las filas de la tabla con los datos
-  datos.forEach(fila => {
-    html += "<tr>";
-    if (tipo === "kpi") {
-      // --- Lógica para KPIs ---
-      html += `<td>${fila.kpi || '-'}</td>`;
-      html += `<td>${formatNumber(fila.valor100)}</td>`; // Celda de Meta
-      html += `<td>${formatNumber(fila.valor125)}</td>`;
-      html += `<td>${formatNumber(fila.valor70)}</td>`;
-
-      // --- Celda de Resultado con posible resaltado ---
-      const metaKPI = parseFloat(fila.valor100); // La meta es el 100%
-      const resultadoActual = parseFloat(fila.resultado);
-      let claseExtraResultado = ''; // Clase CSS adicional, vacía por defecto
-
-      // Solo aplicar lógica si tenemos números válidos para meta y resultado, y la meta es > 0
-      if (!isNaN(metaKPI) && metaKPI > 0 && !isNaN(resultadoActual)) {
-        const resultadoEsperadoHoy = metaKPI * proporcionMes;
-
-        // Comprobar si el resultado actual es menor que lo esperado para hoy
-        // Añadimos una pequeña tolerancia (ej. 0.001) si no queremos marcar algo que está casi igual
-        // if (resultadoActual < (resultadoEsperadoHoy - 0.001)) {
-        if (resultadoActual < resultadoEsperadoHoy) { // Sin tolerancia por ahora
-          claseExtraResultado = 'kpi-atrasado'; // Añadir la clase si está por debajo
-        }
-      }
-
-      // Generar el HTML de la celda de resultado con la clase extra si aplica
-      html += `<td class="${claseExtraResultado}">${formatNumber(fila.resultado)}</td>`;
-      // --- Fin Celda Resultado ---
-
-      html += `<td>${formatNumber(fila.arrastre)}</td>`;
-      html += `<td>${formatNumber(fila.total)}</td>`;
-
-    } else { // tipo === "faltantes"
-      // --- Lógica para Faltantes (sin cambios) ---
-      html += `<td>${fila.kpi || '-'}</td>`;
-      html += `<td>${formatNumber(fila.faltante100)}</td>`;
-      html += `<td>${formatNumber(fila.faltante150)}</td>`;
-      html += `<td>${formatNumber(fila.faltante250)}</td>`;
-    }
-    html += "</tr>";
-  });
-
-  html += "</tbody></table>";
-  // Insertar la tabla construida en el contenedor
-  content.innerHTML = html;
+@media (max-width: 992px) {
+  #chart-container { width: 95%; height: 300px; }
+  #tablaDatos th, #tablaDatos td { padding: 6px; font-size: 0.9em; }
 }
 
-// --- Función auxiliar para formatear números ---
-function formatNumber(value) {
-  // Si es null o undefined, devuelve un guion
-  if (value === null || typeof value === 'undefined') {
-    return '-';
-  }
-  // Si es número, formatea con separadores de miles y decimales si los tiene
-  if (typeof value === 'number') {
-    return value.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  }
-  // Devuelve el valor original si es string u otro tipo
-  return value;
-}
-
-// --- Función para mostrar el gráfico de KPIs usando Chart.js ---
-function mostrarGraficoKPI(datosKPI) {
-    // Obtener el contexto 2D del canvas (necesario para Chart.js)
-    const ctx = kpiChartCanvas.getContext('2d');
-    if (!ctx) {
-        console.error("No se pudo obtener el contexto del canvas para el gráfico.");
-        return;
-    }
-
-    // Preparar los datos para el gráfico
-    const labels = datosKPI.map(item => item.kpi || 'Sin nombre');
-    const dataResultados = datosKPI.map(item => parseFloat(item.resultado) || 0);
-    const dataTotales = datosKPI.map(item => parseFloat(item.total) || 0);
-
-    // Mostrar el contenedor del gráfico
-    chartContainer.style.display = 'block';
-
-    // Crear la instancia del gráfico (o actualizar si ya existe)
-    currentChart = new Chart(ctx, {
-        type: 'bar', // Tipo de gráfico
-        data: {
-            labels: labels, // Etiquetas del eje X
-            datasets: [
-              {
-                label: 'Resultado Actual', // Leyenda actualizada
-                data: dataResultados, // Datos de resultados
-                backgroundColor: 'rgba(40, 167, 69, 0.6)', // Verde semitransparente
-                borderColor: 'rgba(40, 167, 69, 1)',       // Borde verde opaco
-                borderWidth: 1,
-                yAxisID: 'yValuesPrimary' // Asociar con el eje Y primario (antes yPercentage)
-              },
-              {
-                  label: 'Total', // Leyenda para la segunda serie
-                  data: dataTotales, // Datos totales
-                  backgroundColor: 'rgba(0, 123, 255, 0.6)', // Azul semitransparente
-                  borderColor: 'rgba(0, 123, 255, 1)',      // Borde azul opaco
-                  borderWidth: 1,
-                  yAxisID: 'yValuesSecondary' // Asociar con el eje Y secundario (antes yValues)
-              }
-          ]
-        },
-        options: {
-            responsive: true, // Hacer que el gráfico se ajuste al contenedor
-            maintainAspectRatio: false, // No mantener una relación de aspecto fija
-            scales: {
-                 x: { // Configuración del eje X
-                    ticks: {
-                        autoSkip: false, // Intentar mostrar todas las etiquetas
-                        maxRotation: 45, // Rotar etiquetas si son largas
-                        minRotation: 30
-                    }
-                },
-                // Configuración del eje Y izquierdo (Resultados)
-                yValuesPrimary: { // Cambiado de yPercentage a yValuesPrimary
-                    type: 'linear',
-                    position: 'left',
-                    beginAtZero: true, // Empezar en 0
-                    // No ponemos max: 100 aquí ya que resultado no es necesariamente %
-                    title: {
-                        display: true,
-                        text: 'Resultado Actual' // Título del eje actualizado
-                    },
-                    grid: {
-                        drawOnChartArea: true // Mostrar rejilla para este eje
-                    }
-                },
-                // Configuración del eje Y derecho (Valores Totales)
-                yValuesSecondary: { // Cambiado de yValues a yValuesSecondary
-                    type: 'linear',
-                    position: 'right',
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Total'
-                    },
-                    grid: {
-                       drawOnChartArea: false, // No dibujar rejilla para este eje (evita sobrecarga visual)
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    position: 'bottom', // Mover leyenda abajo
-                },
-                tooltip: { // Configuración de las "cajitas" de información al pasar el ratón
-                    mode: 'index', // Mostrar tooltip para todos los datasets en ese índice X
-                    intersect: false, // Mostrar aunque no se esté exactamente sobre la barra
-                }
-            }
-        }
-    });
+/* Estilos básicos para las secciones ocultas (mejora si las usas) */
+.main-content > section[id]:not(#kpi-content) {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }

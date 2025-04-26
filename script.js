@@ -350,26 +350,79 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.log("script.js: Referencias DOM esenciales obtenidas.");
     }
+// --- INICIALIZACIÓN CUANDO EL DOM ESTÁ LISTO (Adaptado del segundo script) ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("script.js: DOMContentLoaded evento disparado.");
 
-    // Configurar listener para hamburguesa
+    // Asignar referencias DOM (IDs del segundo HTML) - (Líneas ~318-332 de tu código)
+    navLinks = document.getElementById('nav-links');
+    hamburgerBtn = document.getElementById('hamburger-btn');
+    kpiContentSection = document.getElementById('kpi-content');
+    ofertasFlashSection = document.getElementById('ofertas-flash');
+    enlacesExternosSection = document.getElementById('enlaces-externos');
+    tablaRemuneracionSection = document.getElementById('tabla-remuneracion');
+    politicasVentasSection = document.getElementById('politicas-ventas');
+    // Elementos dentro de kpi-content
+    tablaContainer = document.getElementById('tabla-container');
+    loader = document.getElementById('loader');
+    tablaDatos = document.getElementById('tablaDatos');
+    errorContainer = document.getElementById('error-container');
+    chartContainer = document.getElementById('chart-container');
+    kpiChartCanvas = document.getElementById('kpiChart');
+
+    // Verificar referencias esenciales - (Líneas ~334-352 de tu código)
+    const elementsToCheck = {
+        navLinks, hamburgerBtn, kpiContentSection, tablaContainer, loader, tablaDatos, errorContainer, chartContainer, kpiChartCanvas
+        // No incluimos las otras secciones como 'críticas' aquí
+    };
+    let criticalElementsFound = true;
+    for (const key in elementsToCheck) {
+        if (!elementsToCheck[key]) {
+            console.error(`script.js: ¡Error crítico! Elemento DOM esencial con ID '${key}' no encontrado.`);
+            criticalElementsFound = false;
+        }
+    }
+
+    if (!criticalElementsFound) {
+         alert("Error crítico: No se pudieron encontrar elementos esenciales en la página (navbar, contenedor kpi, tabla, etc.). Funcionalidad limitada.");
+         return; // Detener si falta algo crítico
+    } else {
+        console.log("script.js: Referencias DOM esenciales obtenidas.");
+    }
+
+    // ========================================================================
+    // ===== INICIO BLOQUE MODIFICADO (Reemplaza tus líneas ~354 a ~398) =====
+    // ========================================================================
+
+    // Configurar listener para hamburguesa (MODIFICADO PARA touchstart)
     if (hamburgerBtn && navLinks) {
-        hamburgerBtn.addEventListener('click', () => {
+        hamburgerBtn.addEventListener('touchstart', (event) => {
+            // Previene comportamientos por defecto como scroll/zoom al tocar
+            event.preventDefault();
             navLinks.classList.toggle(NAV_ACTIVE_CLASS);
             hamburgerBtn.setAttribute('aria-expanded', navLinks.classList.contains(NAV_ACTIVE_CLASS));
-        });
+            // --- INICIO: Opcional - Cerrar submenús al cerrar menú principal ---
+            if (!navLinks.classList.contains(NAV_ACTIVE_CLASS)) {
+                document.querySelectorAll('.dropdown.open').forEach(dropdown => {
+                    dropdown.classList.remove('open');
+                });
+            }
+            // --- FIN: Opcional ---
+        }, { passive: false }); // Necesario para que preventDefault funcione en touchstart
+        console.log("script.js: Listener 'touchstart' para hamburguesa configurado.");
     }
-    // --- INICIO: Listener para Dropdowns en Móvil ---
+
+    // Configurar Listener para Dropdowns en Móvil (MODIFICADO PARA touchstart)
     const dropdownToggles = document.querySelectorAll('.dropdown > a'); // Selecciona los enlaces directos dentro de .dropdown
 
     if (dropdownToggles.length > 0 && navLinks) { // Asegúrate que existen toggles y navLinks
         dropdownToggles.forEach(toggle => {
-            toggle.addEventListener('click', (event) => {
+            toggle.addEventListener('touchstart', (event) => {
                 // Solo actuar si el menú móvil está activo
                 if (navLinks.classList.contains(NAV_ACTIVE_CLASS)) {
-                    // Prevenir navegación si es un enlace tipo #
-                    if (toggle.getAttribute('href') === '#') {
-                         event.preventDefault();
-                    }
+
+                    // Prevenir navegación y otros comportamientos por defecto
+                    event.preventDefault();
 
                     const parentDropdown = toggle.closest('.dropdown'); // Encuentra el <li> padre .dropdown
 
@@ -388,16 +441,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Detener la propagación para no cerrar el menú principal accidentalmente
                     event.stopPropagation();
                 }
-                // Si el menú móvil NO está activo, el comportamiento por defecto del enlace funcionará
-                // y el :hover del CSS se encargará en la vista de escritorio.
-            });
+                // Si el menú móvil NO está activo, no hacemos nada aquí con touchstart
+                // El :hover del CSS se encargará en la vista de escritorio.
+
+            }, { passive: false }); // Necesario para que preventDefault funcione en touchstart
         });
-        console.log("script.js: Listeners para dropdowns móviles configurados.");
+        console.log("script.js: Listeners 'touchstart' para dropdowns móviles configurados.");
     } else {
         console.warn("script.js: No se encontraron elementos '.dropdown > a' o 'navLinks' para configurar los listeners de submenús móviles.");
     }
-    // --- FIN: Listener para Dropdowns en Móvil ---
 
+    // ========================================================================
+    // ===== FIN BLOQUE MODIFICADO ============================================
+    // ========================================================================
+
+    // Estado Inicial: Mostrar KPIs por defecto (Esto ya estaba después, déjalo)
+    console.log("script.js: Llamando a mostrarKPIs() por defecto al cargar.");
+    mostrarKPIs(); // Esto llamará a cargarDatosAdaptado("kpi")
+
+    console.log("script.js: Inicialización post-DOM completa."); // Esto ya estaba después, déjalo
+}); // Fin de DOMContentLoaded (Línea ~399 de tu código)
+
+console.log("script.js: Fin del archivo alcanzado."); // Esto está fuera del DOMContentLoaded, déjalo
+   
     // Estado Inicial: Mostrar KPIs por defecto (esto ya estaba)
     console.log("script.js: Llamando a mostrarKPIs() por defecto al cargar.");
     mostrarKPIs();

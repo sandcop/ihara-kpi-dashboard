@@ -358,7 +358,52 @@ document.addEventListener('DOMContentLoaded', () => {
             hamburgerBtn.setAttribute('aria-expanded', navLinks.classList.contains(NAV_ACTIVE_CLASS));
         });
     }
+    // --- INICIO: Listener para Dropdowns en Móvil ---
+    const dropdownToggles = document.querySelectorAll('.dropdown > a'); // Selecciona los enlaces directos dentro de .dropdown
 
+    if (dropdownToggles.length > 0 && navLinks) { // Asegúrate que existen toggles y navLinks
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', (event) => {
+                // Solo actuar si el menú móvil está activo
+                if (navLinks.classList.contains(NAV_ACTIVE_CLASS)) {
+                    // Prevenir navegación si es un enlace tipo #
+                    if (toggle.getAttribute('href') === '#') {
+                         event.preventDefault();
+                    }
+
+                    const parentDropdown = toggle.closest('.dropdown'); // Encuentra el <li> padre .dropdown
+
+                    if (parentDropdown) {
+                        // Alternar la clase 'open' en el <li> padre
+                        parentDropdown.classList.toggle('open');
+
+                        // Opcional: Cerrar otros submenús que puedan estar abiertos
+                        document.querySelectorAll('.dropdown.open').forEach(otherDropdown => {
+                            if (otherDropdown !== parentDropdown) {
+                                otherDropdown.classList.remove('open');
+                            }
+                        });
+                    }
+
+                    // Detener la propagación para no cerrar el menú principal accidentalmente
+                    event.stopPropagation();
+                }
+                // Si el menú móvil NO está activo, el comportamiento por defecto del enlace funcionará
+                // y el :hover del CSS se encargará en la vista de escritorio.
+            });
+        });
+        console.log("script.js: Listeners para dropdowns móviles configurados.");
+    } else {
+        console.warn("script.js: No se encontraron elementos '.dropdown > a' o 'navLinks' para configurar los listeners de submenús móviles.");
+    }
+    // --- FIN: Listener para Dropdowns en Móvil ---
+
+    // Estado Inicial: Mostrar KPIs por defecto (esto ya estaba)
+    console.log("script.js: Llamando a mostrarKPIs() por defecto al cargar.");
+    mostrarKPIs();
+
+    console.log("script.js: Inicialización post-DOM completa.");
+}); // Fin de DOMContentLoaded
     // Estado Inicial: Mostrar KPIs por defecto
     console.log("script.js: Llamando a mostrarKPIs() por defecto al cargar.");
     mostrarKPIs(); // Esto llamará a cargarDatosAdaptado("kpi")

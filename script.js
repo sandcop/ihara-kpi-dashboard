@@ -1,38 +1,31 @@
 // script.js
 console.log("script.js: Empezando a ejecutar.");
 
-// --- URL de Google Apps Script (La misma que el primer script) ---
+// --- URL de Google Apps Script ---
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9UyKr-UcWOCvrMGCsgvc38_-HmKZpXjlj9THbGLNK0lhLJ7B-_RSVpxFpP76eWjeP/exec';
 
-// --- Referencias a elementos DOM (se asignarán después de cargar el DOM) ---
+// --- Referencias a elementos DOM ---
 let navLinks, hamburgerBtn;
 let kpiContentSection, ofertasFlashSection, enlacesExternosSection, tablaRemuneracionSection, politicasVentasSection;
-// Elementos DENTRO de kpi-content (IDs del segundo HTML)
 let tablaContainer, loader, tablaDatos, errorContainer, chartContainer, kpiChartCanvas;
-
-// Variable para la instancia del gráfico (del primer script)
 let currentChart = null;
 
-// --- CLASE CSS PARA MENÚ MÓVIL ACTIVO (Del segundo script) ---
+// --- Constantes ---
 const NAV_ACTIVE_CLASS = 'active';
 
-// --- FUNCIONES GLOBALES PARA onclick (Del segundo script, PERO llaman a la nueva lógica) ---
-
+// --- FUNCIONES GLOBALES PARA onclick (llamadas desde HTML) ---
 function mostrarKPIs() {
     console.log("script.js: mostrarKPIs() llamada.");
-    showSection('kpi-content'); // Muestra la sección principal #kpi-content
-    // Llamamos a la función de carga adaptada del PRIMER script
+    showSection('kpi-content');
     cargarDatosAdaptado("kpi");
 }
 
 function mostrarFaltantes() {
     console.log("script.js: mostrarFaltantes() llamada.");
-    showSection('kpi-content'); // Muestra la sección principal #kpi-content
-    // Llamamos a la función de carga adaptada del PRIMER script
+    showSection('kpi-content');
     cargarDatosAdaptado("faltantes");
 }
 
-// Funciones para mostrar otras secciones (Sin cambios, del segundo script)
 function mostrarOfertasFlash() {
     console.log("script.js: mostrarOfertasFlash() llamada.");
     showSection('ofertas-flash');
@@ -50,40 +43,34 @@ function mostrarPoliticasVentas() {
     showSection('politicas-ventas');
 }
 
-// Función para cerrar el menú móvil (Sin cambios, del segundo script)
+// Función para cerrar el menú móvil
 function closeMobileMenu() {
     if (navLinks && navLinks.classList.contains(NAV_ACTIVE_CLASS)) {
         console.log("script.js: closeMobileMenu() llamada.");
         navLinks.classList.remove(NAV_ACTIVE_CLASS);
         if(hamburgerBtn) hamburgerBtn.setAttribute('aria-expanded', 'false');
+        // Cerrar también dropdowns abiertos al cerrar el menú
+        document.querySelectorAll('.dropdown.open').forEach(dropdown => {
+            dropdown.classList.remove('open');
+        });
     }
 }
 
-// --- FUNCIONES ADAPTADAS DEL PRIMER SCRIPT ---
+// --- FUNCIONES DE CARGA DE DATOS Y GRÁFICOS ---
 
-// Función principal de carga (adaptada del primer script)
 function cargarDatosAdaptado(tipo) {
     console.log(`script.js: cargarDatosAdaptado(${tipo}) llamada.`);
-
-    // Verificar si los elementos necesarios existen
     if (!tablaContainer || !loader || !errorContainer || !chartContainer || !kpiChartCanvas || !tablaDatos) {
-        console.error("Error crítico: Faltan elementos DOM necesarios para cargar datos (tablaContainer, loader, etc.).");
-        // Mostrar error en un lugar visible si es posible
-        if (errorContainer) {
-           errorContainer.innerHTML = '<div class="error-message">Error interno: No se pueden cargar los datos. Falta un componente de la página.</div>';
-        } else {
-           alert("Error crítico: Faltan elementos en la página.");
-        }
+        console.error("Error crítico: Faltan elementos DOM necesarios para cargar datos.");
+        if (errorContainer) errorContainer.innerHTML = '<div class="error-message">Error interno: No se pueden cargar los datos. Falta un componente de la página.</div>';
+        else alert("Error crítico: Faltan elementos en la página.");
         return;
     }
 
-    // 1. Mostrar animación de carga DENTRO de #tabla-container
-    loader.style.display = 'flex'; // Usar flex si el CSS lo usa para centrar
-    tablaDatos.innerHTML = ''; // Limpiar tabla anterior
-    tablaDatos.style.display = 'none'; // Ocultar tabla
-    errorContainer.innerHTML = ''; // Limpiar errores anteriores
-
-    // 2. Ocultar contenedor del gráfico y destruir gráfico anterior
+    loader.style.display = 'flex';
+    tablaDatos.innerHTML = '';
+    tablaDatos.style.display = 'none';
+    errorContainer.innerHTML = '';
     chartContainer.style.display = 'none';
     if (currentChart) {
         console.log("Destruyendo gráfico anterior.");
@@ -91,231 +78,133 @@ function cargarDatosAdaptado(tipo) {
         currentChart = null;
     }
 
-    // 3. Realizar la llamada fetch (usando ?tipo= como en el primer script)
     fetch(`${APPS_SCRIPT_URL}?tipo=${tipo}`)
         .then(res => {
-            console.log(`Fetch ${tipo} - Respuesta recibida, Status:`, res.status);
-            if (!res.ok) {
-                // Intentar obtener más detalles del error si es posible
-                return res.text().then(text => {
-                    throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Respuesta: ${text}`);
-                });
-            }
+            console.log(`Fetch ${tipo} - Respuesta:`, res.status);
+            if (!res.ok) return res.text().then(text => { throw new Error(`Error HTTP ${res.status}: ${res.statusText}. Respuesta: ${text}`); });
             return res.json();
         })
         .then(data => {
-            console.log(`Datos ${tipo} procesados como JSON:`, data);
-            loader.style.display = 'none'; // Ocultar loader
-
-            if (data.error) {
-                throw new Error(`Error desde API: ${data.error}`);
-            }
-
-            // 4. Mostrar datos en la tabla (usando la función adaptada)
-            // Pasamos los elementos DOM como argumentos para claridad
+            console.log(`Datos ${tipo} JSON:`, data);
+            loader.style.display = 'none';
+            if (data.error) throw new Error(`Error API: ${data.error}`);
             mostrarDatosAdaptado(data.datos, tipo, tablaDatos, errorContainer);
-
-            // 5. Si son KPIs y hay datos, mostrar el gráfico (usando la función adaptada)
             if (tipo === 'kpi' && data.datos && data.datos.length > 0) {
                 mostrarGraficoKPIAdaptado(data.datos, kpiChartCanvas, chartContainer);
             }
         })
         .catch(err => {
             console.error(`Catch - Error al cargar ${tipo}:`, err);
-            loader.style.display = 'none'; // Ocultar loader en caso de error
-            // Mostrar error en el contenedor de errores
+            loader.style.display = 'none';
             errorContainer.innerHTML = `<div class="error-message">❌ Error al cargar datos: ${err.message}</div>`;
-            // Asegurar que tabla y gráfico estén ocultos
             tablaDatos.style.display = 'none';
             chartContainer.style.display = 'none';
         });
 }
 
-// Función para mostrar datos en tabla (adaptada del primer script)
 function mostrarDatosAdaptado(datos, tipo, tablaElement, errorElement) {
     console.log(`script.js: mostrarDatosAdaptado(${tipo}) llamada.`);
-
-    // Limpiar errores previos y asegurar que la tabla esté visible (si hay datos)
     errorElement.innerHTML = '';
-
-    // Si no hay datos o no es un array, mostrar mensaje informativo
     if (!Array.isArray(datos) || datos.length === 0) {
-        // Usamos el contenedor de errores para mostrar el mensaje de info
-        errorElement.innerHTML = "<div class='info-message'>ℹ️ No hay datos disponibles para mostrar.</div>";
-        tablaElement.style.display = 'none'; // Ocultar la tabla si no hay datos
+        errorElement.innerHTML = "<div class='info-message'>ℹ️ No hay datos disponibles.</div>";
+        tablaElement.style.display = 'none';
         return;
     }
 
-    // Calcular proporción del mes (lógica del primer script)
-    const hoy = new Date();
-    const diaActual = hoy.getDate();
-    const mesActual = hoy.getMonth();
-    const anioActual = hoy.getFullYear();
+    const hoy = new Date(), diaActual = hoy.getDate(), mesActual = hoy.getMonth(), anioActual = hoy.getFullYear();
     const diasTotalesMes = new Date(anioActual, mesActual + 1, 0).getDate();
     const proporcionMes = diasTotalesMes > 0 ? diaActual / diasTotalesMes : 0;
-    console.log(`Proporción del mes calculada: ${proporcionMes.toFixed(2)}`);
+    console.log(`Proporción mes: ${proporcionMes.toFixed(2)}`);
 
-    // Construir HTML de la tabla (lógica del primer script)
     let html = "<thead><tr>";
-    if (tipo === "kpi") {
-        html += "<th>KPI</th><th>Meta (100%)</th><th>125%</th><th>70%</th><th>Resultado Actual</th><th>Arrastre</th><th>Total</th>";
-    } else { // tipo === "faltantes"
-        html += "<th>KPI</th><th>Faltante 100%</th><th>Faltante 150%</th><th>Faltante 250%</th>";
-    }
+    if (tipo === "kpi") html += "<th>KPI</th><th>Meta(100%)</th><th>125%</th><th>70%</th><th>Resultado</th><th>Arrastre</th><th>Total</th>";
+    else html += "<th>KPI</th><th>Faltante 100%</th><th>Faltante 150%</th><th>Faltante 250%</th>";
     html += "</tr></thead><tbody>";
 
     datos.forEach(fila => {
         html += "<tr>";
         if (tipo === "kpi") {
-            const metaKPI = parseFloat(fila.valor100);
-            const resultadoActual = parseFloat(fila.resultado);
+            const metaKPI = parseFloat(fila.valor100), resultadoActual = parseFloat(fila.resultado);
             let claseExtraResultado = '';
             if (!isNaN(metaKPI) && metaKPI > 0 && !isNaN(resultadoActual)) {
-                const resultadoEsperadoHoy = metaKPI * proporcionMes;
-                if (resultadoActual < resultadoEsperadoHoy) {
-                    claseExtraResultado = 'kpi-atrasado'; // ¡Aplicar la clase CSS!
-                }
+                if (resultadoActual < (metaKPI * proporcionMes)) claseExtraResultado = 'kpi-atrasado';
             }
-            html += `<td>${fila.kpi || '-'}</td>`;
-            html += `<td>${formatNumber(fila.valor100)}</td>`;
-            html += `<td>${formatNumber(fila.valor125)}</td>`;
-            html += `<td>${formatNumber(fila.valor70)}</td>`;
-            html += `<td class="${claseExtraResultado}">${formatNumber(fila.resultado)}</td>`; // Celda con posible clase
-            html += `<td>${formatNumber(fila.arrastre)}</td>`;
-            html += `<td>${formatNumber(fila.total)}</td>`;
-        } else { // tipo === "faltantes"
-            html += `<td>${fila.kpi || '-'}</td>`;
-            html += `<td>${formatNumber(fila.faltante100)}</td>`;
-            html += `<td>${formatNumber(fila.faltante150)}</td>`;
-            html += `<td>${formatNumber(fila.faltante250)}</td>`;
+            html += `<td>${fila.kpi || '-'}</td><td>${formatNumber(fila.valor100)}</td><td>${formatNumber(fila.valor125)}</td><td>${formatNumber(fila.valor70)}</td>`;
+            html += `<td class="${claseExtraResultado}">${formatNumber(fila.resultado)}</td><td>${formatNumber(fila.arrastre)}</td><td>${formatNumber(fila.total)}</td>`;
+        } else {
+            html += `<td>${fila.kpi || '-'}</td><td>${formatNumber(fila.faltante100)}</td><td>${formatNumber(fila.faltante150)}</td><td>${formatNumber(fila.faltante250)}</td>`;
         }
         html += "</tr>";
     });
 
     html += "</tbody>";
-    tablaElement.innerHTML = html; // Insertar en el elemento tabla correcto
-    tablaElement.style.display = 'table'; // Asegurar que la tabla sea visible
-    console.log("Tabla populada exitosamente.");
+    tablaElement.innerHTML = html;
+    tablaElement.style.display = 'table';
+    console.log("Tabla populada.");
 }
 
-// Función auxiliar para formatear números (del primer script)
 function formatNumber(value) {
     if (value === null || typeof value === 'undefined') return '-';
-    if (typeof value === 'number') {
-        return value.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-    }
-    // Manejar strings que podrían ser números con formato (ej: "$1,234.56")
+    if (typeof value === 'number') return value.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     if (typeof value === 'string') {
         const num = parseFloat(value.replace(/[^0-9.,-]+/g, '').replace('.', '').replace(',', '.'));
-        if (!isNaN(num)) {
-            return num.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-        }
+        if (!isNaN(num)) return num.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     }
-    return value; // Devuelve como string si no es número convertible
+    return value;
 }
 
-// Función para mostrar gráfico (adaptada del primer script)
 function mostrarGraficoKPIAdaptado(datosKPI, canvasElement, chartContainerElement) {
     console.log("script.js: mostrarGraficoKPIAdaptado() llamada.");
     const ctx = canvasElement.getContext('2d');
     if (!ctx) {
-        console.error("No se pudo obtener el contexto del canvas para el gráfico.");
-        // Mostrar error en el contenedor de errores
+        console.error("No se pudo obtener contexto canvas.");
         if(errorContainer) errorContainer.innerHTML = `<div class="error-message">❌ Error al inicializar gráfico.</div>`;
         return;
     }
 
-    // Preparar datos (lógica del primer script)
     const labels = datosKPI.map(item => item.kpi || 'Sin nombre');
     const dataResultados = datosKPI.map(item => parseFloat(item.resultado) || 0);
     const dataTotales = datosKPI.map(item => parseFloat(item.total) || 0);
 
-    // Mostrar el contenedor del gráfico
     chartContainerElement.style.display = 'block';
 
-    // Crear la instancia del gráfico (lógica del primer script con dos ejes)
     currentChart = new Chart(ctx, {
         type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-              {
-                label: 'Resultado Actual',
-                data: dataResultados,
-                backgroundColor: 'rgba(40, 167, 69, 0.6)', // Verde
-                borderColor: 'rgba(40, 167, 69, 1)',
-                borderWidth: 1,
-                yAxisID: 'yValuesPrimary' // Eje izquierdo
-              },
-              {
-                  label: 'Total',
-                  data: dataTotales,
-                  backgroundColor: 'rgba(0, 123, 255, 0.6)', // Azul
-                  borderColor: 'rgba(0, 123, 255, 1)',
-                  borderWidth: 1,
-                  yAxisID: 'yValuesSecondary' // Eje derecho
-              }
-          ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
+        data: { labels, datasets: [
+              { label: 'Resultado Actual', data: dataResultados, backgroundColor: 'rgba(40, 167, 69, 0.6)', borderColor: 'rgba(40, 167, 69, 1)', borderWidth: 1, yAxisID: 'yValuesPrimary' },
+              { label: 'Total', data: dataTotales, backgroundColor: 'rgba(0, 123, 255, 0.6)', borderColor: 'rgba(0, 123, 255, 1)', borderWidth: 1, yAxisID: 'yValuesSecondary' } ] },
+        options: { responsive: true, maintainAspectRatio: false,
             scales: {
                  x: { ticks: { autoSkip: false, maxRotation: 45, minRotation: 30 } },
-                 yValuesPrimary: { // Eje Y izquierdo (Resultado)
-                    type: 'linear', position: 'left', beginAtZero: true,
-                    title: { display: true, text: 'Resultado Actual' },
-                    grid: { drawOnChartArea: true }
-                 },
-                 yValuesSecondary: { // Eje Y derecho (Total)
-                    type: 'linear', position: 'right', beginAtZero: true,
-                    title: { display: true, text: 'Total' },
-                    grid: { drawOnChartArea: false } // No superponer rejillas
-                 }
-            },
-            plugins: {
-                legend: { position: 'bottom' },
-                tooltip: { mode: 'index', intersect: false }
-            }
-        }
+                 yValuesPrimary: { type: 'linear', position: 'left', beginAtZero: true, title: { display: true, text: 'Resultado Actual' }, grid: { drawOnChartArea: true } },
+                 yValuesSecondary: { type: 'linear', position: 'right', beginAtZero: true, title: { display: true, text: 'Total' }, grid: { drawOnChartArea: false } } },
+            plugins: { legend: { position: 'bottom' }, tooltip: { mode: 'index', intersect: false } } }
     });
-    console.log("Gráfico KPI creado/actualizado exitosamente.");
+    console.log("Gráfico KPI creado/actualizado.");
 }
 
+// --- FUNCIONES AUXILIARES ---
 
-// --- FUNCIONES AUXILIARES DEL SEGUNDO SCRIPT (sin cambios) ---
-
-// Muestra una sección principal por ID y oculta las demás
 function showSection(sectionIdToShow) {
-    console.log(`script.js: showSection llamada para '${sectionIdToShow}'`);
-    const sections = [
-        kpiContentSection, ofertasFlashSection, enlacesExternosSection,
-        tablaRemuneracionSection, politicasVentasSection
-    ];
+    console.log(`script.js: showSection '${sectionIdToShow}'`);
+    const sections = [kpiContentSection, ofertasFlashSection, enlacesExternosSection, tablaRemuneracionSection, politicasVentasSection];
     let sectionFound = false;
     sections.forEach(section => {
         if (section) {
-            if (section.id === sectionIdToShow) {
-                section.style.display = 'block';
-                sectionFound = true;
-                console.log(`script.js: Mostrando sección '${section.id}'`);
-            } else {
-                section.style.display = 'none';
-            }
-        } else {
-             console.warn(`script.js: Referencia a sección es null/undefined en showSection.`);
-        }
+            if (section.id === sectionIdToShow) { section.style.display = 'block'; sectionFound = true; }
+            else section.style.display = 'none';
+        } else console.warn(`Referencia sección null en showSection.`);
     });
-     if (!sectionFound) {
-         console.error(`script.js: No se encontró el elemento de sección con ID '${sectionIdToShow}'.`);
-     }
+     if (!sectionFound) console.error(`No se encontró sección ID '${sectionIdToShow}'.`);
 }
 
-// --- INICIALIZACIÓN CUANDO EL DOM ESTÁ LISTO (Adaptado del segundo script) ---
+// ========================================================================
+// ===== INICIO: EJECUCIÓN CUANDO EL DOM ESTÁ LISTO ========================
+// ========================================================================
 document.addEventListener('DOMContentLoaded', () => {
     console.log("script.js: DOMContentLoaded evento disparado.");
 
-    // Asignar referencias DOM (IDs del segundo HTML)
+    // --- Asignar referencias DOM ---
     navLinks = document.getElementById('nav-links');
     hamburgerBtn = document.getElementById('hamburger-btn');
     kpiContentSection = document.getElementById('kpi-content');
@@ -323,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
     enlacesExternosSection = document.getElementById('enlaces-externos');
     tablaRemuneracionSection = document.getElementById('tabla-remuneracion');
     politicasVentasSection = document.getElementById('politicas-ventas');
-    // Elementos dentro de kpi-content
     tablaContainer = document.getElementById('tabla-container');
     loader = document.getElementById('loader');
     tablaDatos = document.getElementById('tablaDatos');
@@ -331,150 +219,106 @@ document.addEventListener('DOMContentLoaded', () => {
     chartContainer = document.getElementById('chart-container');
     kpiChartCanvas = document.getElementById('kpiChart');
 
-    // Verificar referencias esenciales
-    const elementsToCheck = {
-        navLinks, hamburgerBtn, kpiContentSection, tablaContainer, loader, tablaDatos, errorContainer, chartContainer, kpiChartCanvas
-        // No incluimos las otras secciones como 'críticas' aquí
-    };
+    // --- Verificar referencias esenciales ---
+    const elementsToCheck = { navLinks, hamburgerBtn, kpiContentSection, tablaContainer, loader, tablaDatos, errorContainer, chartContainer, kpiChartCanvas };
     let criticalElementsFound = true;
     for (const key in elementsToCheck) {
         if (!elementsToCheck[key]) {
-            console.error(`script.js: ¡Error crítico! Elemento DOM esencial con ID '${key}' no encontrado.`);
+            console.error(`¡Error crítico! Elemento DOM ID '${key}' no encontrado.`);
             criticalElementsFound = false;
         }
     }
-
     if (!criticalElementsFound) {
-         alert("Error crítico: No se pudieron encontrar elementos esenciales en la página (navbar, contenedor kpi, tabla, etc.). Funcionalidad limitada.");
-         return; // Detener si falta algo crítico
-    } else {
-        console.log("script.js: Referencias DOM esenciales obtenidas.");
-    }
-// --- INICIALIZACIÓN CUANDO EL DOM ESTÁ LISTO (Adaptado del segundo script) ---
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("script.js: DOMContentLoaded evento disparado.");
-
-    // Asignar referencias DOM (IDs del segundo HTML) - (Líneas ~318-332 de tu código)
-    navLinks = document.getElementById('nav-links');
-    hamburgerBtn = document.getElementById('hamburger-btn');
-    kpiContentSection = document.getElementById('kpi-content');
-    ofertasFlashSection = document.getElementById('ofertas-flash');
-    enlacesExternosSection = document.getElementById('enlaces-externos');
-    tablaRemuneracionSection = document.getElementById('tabla-remuneracion');
-    politicasVentasSection = document.getElementById('politicas-ventas');
-    // Elementos dentro de kpi-content
-    tablaContainer = document.getElementById('tabla-container');
-    loader = document.getElementById('loader');
-    tablaDatos = document.getElementById('tablaDatos');
-    errorContainer = document.getElementById('error-container');
-    chartContainer = document.getElementById('chart-container');
-    kpiChartCanvas = document.getElementById('kpiChart');
-
-    // Verificar referencias esenciales - (Líneas ~334-352 de tu código)
-    const elementsToCheck = {
-        navLinks, hamburgerBtn, kpiContentSection, tablaContainer, loader, tablaDatos, errorContainer, chartContainer, kpiChartCanvas
-        // No incluimos las otras secciones como 'críticas' aquí
-    };
-    let criticalElementsFound = true;
-    for (const key in elementsToCheck) {
-        if (!elementsToCheck[key]) {
-            console.error(`script.js: ¡Error crítico! Elemento DOM esencial con ID '${key}' no encontrado.`);
-            criticalElementsFound = false;
-        }
-    }
-
-    if (!criticalElementsFound) {
-         alert("Error crítico: No se pudieron encontrar elementos esenciales en la página (navbar, contenedor kpi, tabla, etc.). Funcionalidad limitada.");
-         return; // Detener si falta algo crítico
+         alert("Error crítico: Faltan elementos esenciales. Funcionalidad limitada.");
+         return;
     } else {
         console.log("script.js: Referencias DOM esenciales obtenidas.");
     }
 
-    // ========================================================================
-    // ===== INICIO BLOQUE MODIFICADO (Reemplaza tus líneas ~354 a ~398) =====
-    // ========================================================================
-
-    // Configurar listener para hamburguesa (MODIFICADO PARA touchstart)
+    // --- Listener para hamburguesa (touchstart) ---
     if (hamburgerBtn && navLinks) {
         hamburgerBtn.addEventListener('touchstart', (event) => {
-            // Previene comportamientos por defecto como scroll/zoom al tocar
+             console.log("Hamburguesa touchstart INICIADO"); // LOG DE DEBUG
             event.preventDefault();
             navLinks.classList.toggle(NAV_ACTIVE_CLASS);
             hamburgerBtn.setAttribute('aria-expanded', navLinks.classList.contains(NAV_ACTIVE_CLASS));
-            // --- INICIO: Opcional - Cerrar submenús al cerrar menú principal ---
-            if (!navLinks.classList.contains(NAV_ACTIVE_CLASS)) {
+            if (!navLinks.classList.contains(NAV_ACTIVE_CLASS)) { // Si se cierra el menú
                 document.querySelectorAll('.dropdown.open').forEach(dropdown => {
-                    dropdown.classList.remove('open');
+                    dropdown.classList.remove('open'); // Cerrar submenús
                 });
             }
-            // --- FIN: Opcional ---
-        }, { passive: false }); // Necesario para que preventDefault funcione en touchstart
+        }, { passive: false });
         console.log("script.js: Listener 'touchstart' para hamburguesa configurado.");
     }
 
-    // Configurar Listener para Dropdowns en Móvil (MODIFICADO PARA touchstart)
-    const dropdownToggles = document.querySelectorAll('.dropdown > a'); // Selecciona los enlaces directos dentro de .dropdown
-
-    if (dropdownToggles.length > 0 && navLinks) { // Asegúrate que existen toggles y navLinks
+    // --- Listener para Dropdowns en Móvil (touchstart CON LOGS) ---
+    const dropdownToggles = document.querySelectorAll('.dropdown > a');
+    if (dropdownToggles.length > 0 && navLinks) {
         dropdownToggles.forEach(toggle => {
             toggle.addEventListener('touchstart', (event) => {
-                // Solo actuar si el menú móvil está activo
+                console.log("Dropdown touchstart INICIADO en:", event.target); // LOG 1
                 if (navLinks.classList.contains(NAV_ACTIVE_CLASS)) {
-
-                    // Prevenir navegación y otros comportamientos por defecto
+                    console.log("Menú móvil ACTIVO. Procesando toque."); // LOG 2
                     event.preventDefault();
-
-                    const parentDropdown = toggle.closest('.dropdown'); // Encuentra el <li> padre .dropdown
-
+                    const parentDropdown = toggle.closest('.dropdown');
                     if (parentDropdown) {
-                        // Alternar la clase 'open' en el <li> padre
+                        console.log("Elemento padre encontrado:", parentDropdown); // LOG 3
+                        console.log("Clases ANTES:", parentDropdown.className); // LOG 3.1
                         parentDropdown.classList.toggle('open');
-
-                        // Opcional: Cerrar otros submenús que puedan estar abiertos
+                        console.log("Clases DESPUÉS:", parentDropdown.className); // LOG 4
+                        // Cerrar otros dropdowns
                         document.querySelectorAll('.dropdown.open').forEach(otherDropdown => {
-                            if (otherDropdown !== parentDropdown) {
-                                otherDropdown.classList.remove('open');
-                            }
+                            if (otherDropdown !== parentDropdown) otherDropdown.classList.remove('open');
                         });
+                    } else {
+                        console.error("¡No se encontró el elemento padre .dropdown!");
                     }
-
-                    // Detener la propagación para no cerrar el menú principal accidentalmente
                     event.stopPropagation();
+                } else {
+                     console.log("Menú móvil INACTIVO. No se procesa toque dropdown."); // LOG 5
                 }
-                // Si el menú móvil NO está activo, no hacemos nada aquí con touchstart
-                // El :hover del CSS se encargará en la vista de escritorio.
-
-            }, { passive: false }); // Necesario para que preventDefault funcione en touchstart
+            }, { passive: false });
         });
-        console.log("script.js: Listeners 'touchstart' para dropdowns móviles configurados.");
+        console.log("script.js: Listeners 'touchstart' con LOGS para dropdowns móviles configurados.");
     } else {
-        console.warn("script.js: No se encontraron elementos '.dropdown > a' o 'navLinks' para configurar los listeners de submenús móviles.");
+        console.warn("script.js: No se encontraron elementos '.dropdown > a' o 'navLinks' para configurar listeners de submenús móviles.");
     }
 
-    // ========================================================================
-    // ===== FIN BLOQUE MODIFICADO ============================================
-    // ========================================================================
+    // --- Llamadas al hacer clic en enlaces del menú (para cerrar menú móvil) ---
+     if (navLinks) {
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (event) => {
+                // Si el enlace NO es de un dropdown O si es un enlace final dentro de un dropdown
+                const parentDropdown = link.closest('.dropdown');
+                const isDropdownToggle = parentDropdown && parentDropdown.querySelector('a') === link;
 
-    // Estado Inicial: Mostrar KPIs por defecto (Esto ya estaba después, déjalo)
+                // Solo cerrar el menú si NO es un toggle de dropdown en móvil
+                // O si es un enlace final (que no sea toggle)
+                if (!isDropdownToggle || (parentDropdown && !isDropdownToggle)) {
+                     // Si es un enlace que no sea #, permite la navegación antes de cerrar
+                     if (link.getAttribute('href') !== '#') {
+                         // Pequeña demora para permitir navegación o llamada a función antes de cerrar
+                         setTimeout(closeMobileMenu, 100);
+                     } else {
+                         // Si es solo # (como los toggles), cierra inmediatamente si no es un toggle
+                         if(!isDropdownToggle) closeMobileMenu();
+                     }
+                }
+                // No usamos stopPropagation aquí para permitir que las funciones onclick del HTML se ejecuten
+            });
+        });
+        console.log("Listeners 'click' en enlaces para cerrar menú móvil configurados.");
+    }
+
+
+    // --- Estado Inicial: Mostrar KPIs por defecto ---
     console.log("script.js: Llamando a mostrarKPIs() por defecto al cargar.");
     mostrarKPIs(); // Esto llamará a cargarDatosAdaptado("kpi")
 
-    console.log("script.js: Inicialización post-DOM completa."); // Esto ya estaba después, déjalo
-}); // Fin de DOMContentLoaded (Línea ~399 de tu código)
-
-console.log("script.js: Fin del archivo alcanzado."); // Esto está fuera del DOMContentLoaded, déjalo
-   
-    // Estado Inicial: Mostrar KPIs por defecto (esto ya estaba)
-    console.log("script.js: Llamando a mostrarKPIs() por defecto al cargar.");
-    mostrarKPIs();
-
     console.log("script.js: Inicialización post-DOM completa.");
 }); // Fin de DOMContentLoaded
-    // Estado Inicial: Mostrar KPIs por defecto
-    console.log("script.js: Llamando a mostrarKPIs() por defecto al cargar.");
-    mostrarKPIs(); // Esto llamará a cargarDatosAdaptado("kpi")
-
-    console.log("script.js: Inicialización post-DOM completa.");
-}); // Fin de DOMContentLoaded
+// ========================================================================
+// ===== FIN: EJECUCIÓN CUANDO EL DOM ESTÁ LISTO ==========================
+// ========================================================================
 
 console.log("script.js: Fin del archivo alcanzado.");

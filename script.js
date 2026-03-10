@@ -356,7 +356,77 @@ function showHogarPlans(type){ const c=document.getElementById('hogar-plans-card
 function openHogarForm(planId = null, planNombreEncoded = '') { const popup = document.getElementById('hogar-plan-formPopup'); const overlay = document.getElementById('hogar-plan-overlay'); const iframe = document.getElementById('hogar-plan-google-form-iframe'); if (!popup || !overlay || !iframe) { console.error("Elementos del popup hogar no encontrados"); return; } let formUrl = GOOGLE_FORM_URL_HOGAR; if (iframe.src !== formUrl) iframe.src = formUrl; popup.style.display = 'flex'; requestAnimationFrame(() => popup.classList.add('visible')); overlay.style.display = 'block'; requestAnimationFrame(() => overlay.classList.add('visible')); document.body.style.overflow = 'hidden'; }
 function closeHogarForm() { const popup = document.getElementById('hogar-plan-formPopup'); const overlay = document.getElementById('hogar-plan-overlay'); if (popup) { popup.classList.remove('visible'); popup.addEventListener('transitionend', function onEnd() { if (!popup.classList.contains('visible')) popup.style.display = 'none'; popup.removeEventListener('transitionend', onEnd);}, { once: true }); } if (overlay) { overlay.classList.remove('visible'); overlay.addEventListener('transitionend', function onEnd() { if (!overlay.classList.contains('visible')) overlay.style.display = 'none'; overlay.removeEventListener('transitionend', onEnd);}, { once: true }); } document.body.style.overflow = ''; }
 function toggleOriginalHogarIframe(buttonClicked){ const ic=document.getElementById('parrilla-hogar-iframe-original-container'); const pc=document.getElementById('parrilla-planes-hogar-integrada'); if(!ic || !pc) return; const isPlanesCurrentlyVisible = pc.style.display === 'block'; if(isPlanesCurrentlyVisible){ pc.style.display = 'none'; ic.style.display = 'block'; const btnEnIframe = ic.querySelector('.boton-simple'); if(btnEnIframe) btnEnIframe.textContent = '← Volver a Planes'; cargarParrillaFile('hogar'); } else { ic.style.display = 'none'; pc.style.display = 'block'; const btnEnPlanes = pc.querySelector('.boton-simple'); if(btnEnPlanes) btnEnPlanes.textContent = 'Más detalles'; const hogarCardsContainer = document.getElementById('hogar-plans-cards-container'); if (hogarCardsContainer && hogarCardsContainer.children.length === 0) showHogarPlans('fibra'); } }
-function showMovilPlans(type) { const container = document.getElementById('movil-plans-cards-container'); if (!container) return; container.innerHTML = ''; container.dataset.currentType = type;  const plans = movilPagePlansData[type]; if (!plans || plans.length === 0) { container.innerHTML = '<p style="text-align:center;padding:20px;">No hay planes de este tipo para mostrar.</p>'; return; } plans.forEach(plan => { const cardDiv = document.createElement('div'); cardDiv.className = 'card parrilla-movil-card-item'; let caracteristicasHTML = ''; const caracteristicasSource = plan.caracteristicas || plan.caracteristicasDestino; if (caracteristicasSource && caracteristicasSource.length > 0) { caracteristicasHTML = '<ul class="plan-features">'; caracteristicasSource.forEach(car => { caracteristicasHTML += `<li>${car}</li>`; }); caracteristicasHTML += '</ul>';} let precioHTML = `<p class="plan-precio">${plan.precio}</p>`; if (plan.precioAdicional) precioHTML += `<p class="plan-precio-adicional">${plan.precioAdicional}</p>`; let tituloPlan = plan.nombre; let infoAdicionalMigracionHTML = ''; if (type === 'migracion') { tituloPlan = `${plan.destino}`; infoAdicionalMigracionHTML = `<p class="migracion-origen"><strong>Desde:</strong> ${plan.origen || 'Plan Actual'}</p><p class="migracion-oferta"><strong>Oferta:</strong> ${plan.oferta}</p>${plan.precioNormalDestino ? `<p class="migracion-normal">Precio Normal Destino: ${plan.precioNormalDestino}</p>` : ''}`; precioHTML = '';} cardDiv.innerHTML = `<h3>${tituloPlan}</h3>${type === 'migracion' ? infoAdicionalMigracionHTML : precioHTML}${caracteristicasHTML}${plan.descuento && type !== 'migracion' ? `<p class="plan-descuento"><strong>Oferta/s:</strong> ${plan.descuento}</p>` : ''}<button onclick="openMovilForm('${plan.id}', '${encodeURIComponent(tituloPlan)}')">Solicitar Plan</button>`; container.appendChild(cardDiv); }); }
+
+
+function initLoaders() {
+    const loaderIds = ['loader','prospectos-lista-loader','resultados-ventas-loader',
+        'remuneracion-loader-tabla-ppm','remuneracion-loader-tabla-entradas',
+        'kpis-fijos-loader','simulacion-loader','grafico-pesos-loader',
+        'ai-loader','add-sale-loader','kpi-details-loader',
+        'flash-offers-add-loader','flash-offers-management-loader'];
+    const html = `<div class="newtons-cradle"><div class="newtons-cradle__dot"></div><div class="newtons-cradle__dot"></div><div class="newtons-cradle__dot"></div><div class="newtons-cradle__dot"></div></div>`;
+    loaderIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.querySelector('.newtons-cradle')) el.innerHTML = html;
+    });
+}
+function copiarCodigo(btn, codigo) {
+    navigator.clipboard.writeText(codigo).then(() => {
+        btn.textContent = '✅ Copiado!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+            btn.textContent = '📋 ' + codigo;
+            btn.classList.remove('copied');
+        }, 1800);
+    }).catch(() => {
+        btn.textContent = '✅ ' + codigo;
+    });
+}
+function showMovilPlans(type) {
+    const container = document.getElementById('movil-plans-cards-container');
+    if (!container) return;
+    container.innerHTML = '';
+    container.dataset.currentType = type;
+    const plans = movilPagePlansData[type];
+    if (!plans || plans.length === 0) {
+        container.innerHTML = '<p style="text-align:center;padding:20px;">No hay planes de este tipo para mostrar.</p>';
+        return;
+    }
+    plans.forEach(plan => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card parrilla-movil-card-item';
+        const caracteristicasSource = plan.caracteristicas || plan.caracteristicasDestino || [];
+        const caracteristicasHTML = caracteristicasSource.length > 0
+            ? '<ul class="plan-features">' + caracteristicasSource.map(c => `<li>${c}</li>`).join('') + '</ul>'
+            : '';
+        const tituloPlan = type === 'migracion' ? (plan.destino || plan.nombre || '') : (plan.nombre || '');
+        const codigoMatch = caracteristicasSource.find(c => c.toLowerCase().includes('código:'));
+        const codigoVal = codigoMatch ? codigoMatch.split('Código:')[1]?.trim() : null;
+        const btnCopiar = codigoVal ? `<button class="btn-copy-codigo" onclick="copiarCodigo(this, '${codigoVal}')">📋 ${codigoVal}</button>` : '';
+        let innerContent = '';
+        if (type === 'migracion') {
+            innerContent = `<div class="plan-inner">
+                <h3>${tituloPlan}</h3>
+                <p style="font-size:0.82em;color:var(--text-color-secondary);margin:0"><strong>Desde:</strong> ${plan.origen || 'Plan Actual'}</p>
+                <p style="font-size:0.85em;color:var(--color-orange-accent);margin:0"><strong>Oferta:</strong> ${plan.oferta || plan.descuento || ''}</p>
+                ${caracteristicasHTML}
+                <div class="plan-action"><button class="btn-solicitar-plan" onclick="openMovilForm('${plan.id}', '${encodeURIComponent(tituloPlan)}')">Solicitar Plan</button>${btnCopiar}</div>
+            </div>`;
+        } else {
+            const precio = plan.precio || '';
+            innerContent = `<div class="plan-inner">
+                ${precio ? `<div class="plan-pricing-badge">${precio}</div>` : ''}
+                <h3>${tituloPlan}</h3>
+                ${plan.precioAdicional ? `<p style="font-size:0.8em;color:var(--text-color-secondary);margin:0">${plan.precioAdicional}</p>` : ''}
+                ${caracteristicasHTML}
+                ${plan.descuento ? `<p class="plan-descuento">🏷️ ${plan.descuento}</p>` : ''}
+                <div class="plan-action"><button class="btn-solicitar-plan" onclick="openMovilForm('${plan.id}', '${encodeURIComponent(tituloPlan)}')">Solicitar Plan</button>${btnCopiar}</div>
+            </div>`;
+        }
+        cardDiv.innerHTML = innerContent;
+        container.appendChild(cardDiv);
+    });
+}
 function openMovilForm(planId = null, planNombreEncoded = '') { const popup = document.getElementById('movil-plan-formPopup'); const overlay = document.getElementById('movil-plan-overlay'); const iframe = document.getElementById('movil-plan-google-form-iframe'); if (!popup || !overlay || !iframe) { console.error("Elementos del popup móvil no encontrados"); return; } let formUrl = GOOGLE_FORM_URL_MOVIL; if (iframe.src !== formUrl) { iframe.src = formUrl; } popup.style.display = 'flex'; requestAnimationFrame(() => popup.classList.add('visible')); overlay.style.display = 'block'; requestAnimationFrame(() => overlay.classList.add('visible')); document.body.style.overflow = 'hidden'; }
 function closeMovilForm() { const popup = document.getElementById('movil-plan-formPopup'); const overlay = document.getElementById('movil-plan-overlay'); if (popup) { popup.classList.remove('visible'); popup.addEventListener('transitionend', function onEnd() { if (!popup.classList.contains('visible')) popup.style.display = 'none'; popup.removeEventListener('transitionend', onEnd); }, { once: true }); } if (overlay) { overlay.classList.remove('visible'); overlay.addEventListener('transitionend', function onEnd() { if (!overlay.classList.contains('visible')) overlay.style.display = 'none'; overlay.removeEventListener('transitionend', onEnd); }, { once: true }); } document.body.style.overflow = ''; }
 function toggleOriginalMovilIframe(buttonClicked) { const ic = document.getElementById('parrilla-movil-iframe-original-container'); const pc = document.getElementById('parrilla-planes-movil-integrada'); if (!ic || !pc) return; const isPlanesCurrentlyVisible = pc.style.display === 'block'; if(isPlanesCurrentlyVisible){ pc.style.display = 'none'; ic.style.display = 'block'; const btnEnIframe = ic.querySelector('.boton-simple'); if(btnEnIframe) btnEnIframe.textContent = '← Volver a Planes Destacados'; cargarParrillaFile('movil'); } else { ic.style.display = 'none'; pc.style.display = 'block'; const btnEnPlanes = pc.querySelector('.boton-simple'); if(btnEnPlanes) btnEnPlanes.textContent = 'Ver Parrilla Completa (Hoja de Cálculo)'; const movilCardsContainer = document.getElementById('movil-plans-cards-container'); if (movilCardsContainer && movilCardsContainer.children.length === 0) showMovilPlans('monolinea'); } }
@@ -1008,12 +1078,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lógica del tema (claro/oscuro)
     const LSTORAGE_THEME_KEY = 'themePreference';
     function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); if (themeToggleButtonFooter) { themeToggleButtonFooter.innerHTML = theme === 'dark' ? ICON_SUN_SVG : ICON_MOON_SVG; } localStorage.setItem(LSTORAGE_THEME_KEY, theme); }
-    function toggleTheme() { const currentTheme = document.documentElement.getAttribute('data-theme') || 'light'; const newTheme = currentTheme === 'dark' ? 'light' : 'dark'; applyTheme(newTheme); }
+    window.toggleTheme = function toggleTheme() { const currentTheme = document.documentElement.getAttribute('data-theme') || 'light'; const newTheme = currentTheme === 'dark' ? 'light' : 'dark'; applyTheme(newTheme); };
     const savedTheme = localStorage.getItem(LSTORAGE_THEME_KEY);
     applyTheme(savedTheme || 'light');
 
     // --- Listeners de eventos ---
-    if (themeToggleButtonFooter) themeToggleButtonFooter.addEventListener('click', toggleTheme);
+    // toggle ahora es onclick directo en HTML
     if (loginForm) loginForm.addEventListener('submit', (e) => { e.preventDefault(); attemptLogin(loginPasswordInput.value); });
     if (hamburgerBtnMobile) hamburgerBtnMobile.addEventListener('click', () => { sidebarLeft.classList.toggle('open'); document.body.classList.toggle('sidebar-left-open'); hamburgerBtnMobile.setAttribute('aria-expanded', String(sidebarLeft.classList.contains('open'))); });
     if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', closeMobileSidebar);

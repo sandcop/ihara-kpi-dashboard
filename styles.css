@@ -1181,21 +1181,33 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
 }
 
 /* --- BOTÓN WHATSAPP --- */
-.whatsapp-button-footer {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  background-color: #25d366;
-  box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-  overflow: hidden;
-  transition: width 0.3s ease, border-radius 0.3s ease;
-  text-decoration: none;
-  gap: 0;
+.fixed-bottom-bar a.whatsapp-button-footer,
+a.whatsapp-button-footer {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 45px !important;
+  height: 45px !important;
+  border-radius: 50% !important;
+  background-color: #25d366 !important;
+  background: #25d366 !important;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.2) !important;
+  overflow: hidden !important;
+  transition: width 0.3s ease, border-radius 0.3s ease !important;
+  text-decoration: none !important;
+  color: white !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  transform: none !important;
 }
-.whatsapp-button-footer .sign {
+.fixed-bottom-bar a.whatsapp-button-footer:hover,
+a.whatsapp-button-footer:hover {
+  width: 140px !important;
+  border-radius: 40px !important;
+  color: white !important;
+  transform: none !important;
+}
+a.whatsapp-button-footer .sign {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1203,9 +1215,13 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
   width: 45px;
   transition: width 0.3s ease;
 }
-.whatsapp-button-footer .wtext {
+a.whatsapp-button-footer svg {
+  fill: white !important;
+  color: white !important;
+}
+a.whatsapp-button-footer .wtext {
   color: white;
-  font-size: 0.9em;
+  font-size: 0.88em;
   font-weight: 600;
   white-space: nowrap;
   max-width: 0;
@@ -1213,14 +1229,10 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
   opacity: 0;
   transition: max-width 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
 }
-.whatsapp-button-footer:hover {
-  width: 140px;
-  border-radius: 40px;
-}
-.whatsapp-button-footer:hover .sign {
+a.whatsapp-button-footer:hover .sign {
   width: 40px;
 }
-.whatsapp-button-footer:hover .wtext {
+a.whatsapp-button-footer:hover .wtext {
   max-width: 100px;
   opacity: 1;
   padding-right: 12px;

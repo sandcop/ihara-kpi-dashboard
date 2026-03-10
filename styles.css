@@ -735,7 +735,68 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
 .kpi-details-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
 .kpi-details-table th, .kpi-details-table td { border: 1px solid var(--border-color-dark); padding: 8px 10px; text-align: left; vertical-align: middle; }
 .kpi-details-table th { background-color: var(--bg-content-alt); font-weight: 600; }
-.card-actions { margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border-color-light); text-align: right; }
+.card-actions {
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color-light);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Botón Ver Oferta en flash cards */
+.card-actions .view-offer-btn {
+  background-color: var(--color-orange-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 3px 10px rgba(251,133,0,0.3);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.card-actions .view-offer-btn:hover {
+  background-color: #d97500;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(251,133,0,0.4);
+}
+.card-actions .view-offer-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(251,133,0,0.3);
+}
+
+/* Botón Eliminar en flash cards */
+.card-actions .btn-delete-flash-offer {
+  background-color: transparent;
+  color: #e55;
+  border: 1.5px solid #e55;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+.card-actions .btn-delete-flash-offer:hover {
+  background-color: #e55;
+  color: #fff;
+  transform: translateY(-2px);
+}
+.card-actions .btn-delete-flash-offer svg {
+  width: 14px;
+  height: 14px;
+}
 .btn-details { font-size: 0.8em; padding: 5px 12px; background-color: transparent; color: var(--text-color-link); border: 1px solid var(--text-color-link); border-radius: 20px; cursor: pointer; transition: background-color 0.2s, color 0.2s; }
 .btn-details:hover { background-color: var(--text-color-link); color: var(--bg-content); text-decoration: none; }
 .terminal-image-container { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background-color: var(--bg-content); border-radius: 4px; padding: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }

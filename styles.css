@@ -1220,22 +1220,25 @@ a.whatsapp-button-footer svg {
   color: white !important;
 }
 a.whatsapp-button-footer .wtext {
-  color: white;
+  color: white !important;
   font-size: 0.88em;
   font-weight: 600;
   white-space: nowrap;
-  max-width: 0;
+  width: 0;
   overflow: hidden;
   opacity: 0;
-  transition: max-width 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+  transition: width 0.3s ease, opacity 0.2s ease, padding 0.3s ease;
+  display: block;
+  flex-shrink: 0;
 }
 a.whatsapp-button-footer:hover .sign {
-  width: 40px;
+  width: 38px;
+  flex-shrink: 0;
 }
 a.whatsapp-button-footer:hover .wtext {
-  max-width: 100px;
-  opacity: 1;
-  padding-right: 12px;
+  width: 90px;
+  opacity: 1 !important;
+  padding-right: 10px;
 }
 
 /* --- BOTONES GENERALES --- */

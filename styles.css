@@ -512,11 +512,145 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
 #enlaces-externos ul { list-style: none; padding-left: 0; } #enlaces-externos li { margin-bottom: 10px; }
 
 .parrilla-hogar-cards, .parrilla-movil-cards { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 20px; width: 100%; max-width: 1200px; }
-.parrilla-hogar-cards .card, .parrilla-movil-card-item { border: 1px solid var(--border-color-light); border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px var(--shadow-color); display: flex; flex-direction: column; justify-content: space-between; background-color: var(--bg-content); transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; }
-.parrilla-hogar-cards .card h3, .parrilla-movil-card-item h3 { margin-top: 0; margin-bottom: 10px; color: var(--text-color-headings); font-size: 1.3em; border-bottom: none; padding-bottom: 0; }
-.parrilla-hogar-cards .card .plan-precio, .parrilla-movil-card-item .plan-precio { font-size: 1.2em; font-weight: bold; color: var(--color-orange-accent); margin-top: 10px; }
-.parrilla-hogar-cards .card button, .parrilla-movil-card-item button { margin-top: 15px; padding: 10px 15px; background-color: var(--btn-solicitar-bg); color: var(--btn-primary-text); border: none; border-radius: 5px; cursor: pointer; align-self: flex-start; font-size: 0.9em; transition: background-color 0.2s ease; }
-.parrilla-hogar-cards .card button:hover, .parrilla-movil-card-item button:hover { background-color: var(--btn-solicitar-hover-bg); }
+
+/* Card contenedor externo */
+.parrilla-hogar-cards .card, .parrilla-movil-card-item {
+  border-radius: 16px;
+  box-shadow: 0 30px 30px -25px rgba(251, 133, 0, 0.18);
+  padding: 10px;
+  background-color: var(--bg-content);
+  border: 1px solid var(--border-color-light);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.parrilla-hogar-cards .card:hover, .parrilla-movil-card-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 40px -20px rgba(251, 133, 0, 0.32);
+}
+
+/* Inner con fondo alternativo */
+.plan-inner {
+  background-color: var(--bg-content-alt);
+  border-radius: 12px;
+  padding: 20px;
+  padding-top: 44px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+/* Badge precio arriba derecha */
+.plan-pricing-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--color-orange-accent);
+  border-radius: 99em 0 0 99em;
+  padding: 0.4em 0.9em;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.plan-pricing-badge small {
+  font-size: 0.7em;
+  opacity: 0.85;
+  font-weight: 400;
+}
+
+/* Título plan */
+.parrilla-hogar-cards .card h3, .parrilla-movil-card-item h3 {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--text-color-headings);
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* Lista características */
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.plan-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.85em;
+  color: var(--text-color-secondary);
+  line-height: 1.4;
+}
+.plan-features li::before {
+  content: "";
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background-color: var(--color-orange-accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-top: 2px;
+}
+
+/* Descuento/oferta */
+.plan-descuento {
+  font-size: 0.82em;
+  color: var(--color-orange-accent);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Área de botones */
+.plan-action {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* Botón Solicitar Plan */
+.parrilla-hogar-cards .card button, .parrilla-movil-card-item button {
+  background-color: var(--color-orange-accent);
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  padding: 0.55em 1em;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 0;
+}
+.parrilla-hogar-cards .card button:hover, .parrilla-movil-card-item button:hover {
+  background-color: #d97500;
+}
+
+/* Botón copiar código */
+.btn-copy-codigo {
+  background-color: transparent;
+  border: 1.5px solid var(--color-orange-accent);
+  border-radius: 6px;
+  color: var(--color-orange-accent);
+  font-size: 0.82rem;
+  padding: 0.55em 0.8em;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+.btn-copy-codigo:hover { background-color: var(--color-orange-accent); color: #fff; }
+.btn-copy-codigo.copied { background-color: #1a7a4a; border-color: #1a7a4a; color: #fff; }
 
 .dashboard-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
 .dashboard-kpi .card { background: var(--bg-content); padding: 1.2rem 1.5rem; border-radius: 10px; box-shadow: 0 4px 12px var(--shadow-color); border-left: 5px solid var(--border-card-kpi); opacity: 0; transform: scale(0.95) translateY(10px); transition: opacity 0.3s ease-out, transform 0.3s ease-out, background-color 0.3s ease, border-left-color 0.3s ease, box-shadow 0.3s ease; }
@@ -734,169 +868,721 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
   }
 }
 
-/* ===== OFERTAS FLASH - TARJETAS ===== */
-#flash-offers-cards-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-top: 20px;
+/* ===== ADMIN PANEL ===== */
+#admin-panel h2 {
+  margin-bottom: 24px;
 }
 
-.tilt-card-wrapper {
-  background: var(--bg-content);
-  border-radius: 12px;
-  border: 1px solid var(--border-color-dark);
-  overflow: hidden;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  opacity: 0;
-  transform: translateY(20px);
-  will-change: transform;
-  cursor: pointer;
+#admin-panel h3 {
+  font-size: 1.1em;
+  color: var(--text-color-primary);
+  border-bottom: 1px solid var(--border-color-dark);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
 }
 
-.tilt-card-wrapper.vcard-visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.15s ease;
-}
-
-.tilt-card-wrapper:hover {
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-}
-
-.tilt-card-image-container {
-  width: 100%;
-  height: 180px;
-  overflow: hidden;
-  background: var(--bg-content-alt);
+#admin-codigos-lista {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-.tilt-card-image {
+/* ===== PARRILLAS - UPLOADER ===== */
+#parrilla-movil-admin-upload,
+#parrilla-hogar-admin-upload {
+  background: var(--bg-content-alt);
+  border: 1px solid var(--border-color-dark);
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 10px;
+}
+
+#parrilla-movil-file-container,
+#parrilla-hogar-file-container {
+  background: var(--bg-content-alt);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#parrilla-movil-no-file-msg,
+#parrilla-hogar-no-file-msg {
+  padding: 30px;
+  font-size: 0.9em;
+}
+
+
+/* ============================================================
+   REDISEÑO UI - Uiverse Components
+   ============================================================ */
+
+/* --- TARJETAS PLANES (Ofertas del Mes) --- */
+.parrilla-hogar-cards, .parrilla-movil-cards {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin-bottom: 20px;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.3s ease;
+  max-width: 1200px;
 }
 
-.tilt-card-wrapper:hover .tilt-card-image {
-  transform: scale(1.04);
-}
-
-.tilt-card-pdf-placeholder {
+.parrilla-hogar-cards .card,
+.parrilla-movil-card-item {
+  border-radius: 16px !important;
+  box-shadow: 0 30px 30px -25px rgba(251, 133, 0, 0.2) !important;
+  padding: 10px !important;
+  background-color: var(--bg-content) !important;
+  color: var(--text-color-secondary) !important;
+  border: 1px solid var(--border-color-light) !important;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--text-color-secondary);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.parrilla-hogar-cards .card:hover,
+.parrilla-movil-card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 40px -20px rgba(251, 133, 0, 0.35) !important;
+}
+
+.plan-inner {
+  align-items: flex-start;
+  padding: 20px;
+  padding-top: 48px;
+  background-color: var(--bg-content-alt);
+  border-radius: 12px;
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
-.tilt-card-pdf-icon {
-  color: var(--color-orange-accent);
+.plan-pricing-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--color-orange-accent);
+  border-radius: 99em 0 0 99em;
+  display: flex;
+  align-items: center;
+  padding: 0.5em 0.85em;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+.plan-pricing-badge small {
+  font-size: 0.7em;
+  margin-left: 0.25em;
+  opacity: 0.85;
+  font-weight: 400;
 }
 
-.tilt-card-title {
-  font-size: 1em;
-  font-weight: 600;
-  padding: 12px 14px 4px;
-  color: var(--text-color-primary);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.parrilla-hogar-cards .card h3,
+.parrilla-movil-card-item h3 {
+  font-weight: 700 !important;
+  font-size: 1.15rem !important;
+  color: var(--text-color-headings) !important;
+  margin: 0 !important;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
 }
 
-.tilt-card-description {
+.plan-features {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.plan-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
   font-size: 0.85em;
   color: var(--text-color-secondary);
-  padding: 0 14px 10px;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+}
+.plan-features li::before {
+  content: "";
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--color-orange-accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-top: 2px;
 }
 
-.tilt-card-wrapper .card-actions {
+.plan-descuento {
+  font-size: 0.8em !important;
+  color: var(--color-orange-accent) !important;
+  margin: 0 !important;
+  font-weight: 500;
+}
+
+.plan-action {
+  width: 100%;
   display: flex;
   gap: 8px;
-  padding: 10px 14px 14px;
-  border-top: 1px solid var(--border-color-light);
+  margin-top: auto;
+  padding-top: 12px;
 }
 
-.tilt-card-wrapper .card-actions .btn-principal {
+.parrilla-hogar-cards .card button,
+.parrilla-movil-card-item button.btn-solicitar-plan {
+  background-color: var(--color-orange-accent) !important;
+  border-radius: 6px !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+  text-align: center;
+  border: 0 !important;
+  outline: 0 !important;
   flex: 1;
-  padding: 8px 10px;
-  font-size: 0.85em;
+  padding: 0.6em 0.75em !important;
+  cursor: pointer;
+  transition: background-color 0.2s ease !important;
+  margin-top: 0 !important;
+}
+.parrilla-hogar-cards .card button:hover,
+.parrilla-movil-card-item button.btn-solicitar-plan:hover {
+  background-color: #d97500 !important;
 }
 
-.tilt-card-wrapper .card-actions .btn-secundario {
-  padding: 8px 10px;
-  font-size: 0.85em;
+.btn-copy-codigo {
+  background-color: var(--bg-content) !important;
+  border: 1px solid var(--color-orange-accent) !important;
+  border-radius: 6px !important;
+  color: var(--color-orange-accent) !important;
+  font-size: 0.85rem !important;
+  padding: 0.6em 0.75em !important;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease !important;
+  margin-top: 0 !important;
+}
+.btn-copy-codigo:hover {
+  background-color: var(--color-orange-accent) !important;
+  color: #fff !important;
+}
+.btn-copy-codigo.copied {
+  background-color: #1a7a4a !important;
+  border-color: #1a7a4a !important;
+  color: #fff !important;
+}
+
+/* --- DARK MODE TOGGLE --- */
+#theme-toggle-btn-footer {
+  position: relative !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer;
+}
+.toggle-switch {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  --light: #d8dbe0;
+  --dark: #28292c;
+}
+.switch-label {
+  position: absolute;
+  width: 100%;
+  height: 28px;
+  background-color: var(--dark);
+  border-radius: 14px;
+  cursor: pointer;
+  border: 2px solid var(--dark);
+  transition: background-color 0.3s;
+}
+[data-theme="light"] .switch-label {
+  background-color: var(--light);
+  border-color: #aaa;
+}
+.toggle-switch .slider {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  transition: 0.3s;
+}
+.toggle-switch .slider::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: inset 8px -2px 0px 0px var(--light);
+  background-color: var(--dark);
+  transition: 0.3s;
+}
+[data-theme="light"] .toggle-switch .slider::before {
+  transform: translateX(28px);
+  background-color: var(--dark);
+  box-shadow: none;
+}
+
+/* --- BOTÓN WHATSAPP --- */
+.whatsapp-button-footer, .btn-whatsapp-enviar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 45px !important;
+  height: 45px !important;
+  border: none !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: width 0.3s ease, border-radius 0.3s ease !important;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2) !important;
+  background-color: #00d757 !important;
+  padding: 0 !important;
+  color: white !important;
+}
+.whatsapp-button-footer .sign, .btn-whatsapp-enviar .sign {
+  width: 100%;
   display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* ===== POPUP IMAGEN PANTALLA COMPLETA ===== */
-#flash-offer-fullscreen-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.92);
-  z-index: 9999;
   align-items: center;
   justify-content: center;
-  cursor: zoom-out;
+  transition: width 0.3s;
+  flex-shrink: 0;
 }
-
-#flash-offer-fullscreen-overlay.visible {
-  display: flex;
-}
-
-#flash-offer-fullscreen-img {
-  max-width: 95vw;
-  max-height: 95vh;
-  object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 0 60px rgba(0,0,0,0.8);
-}
-
-#flash-offer-fullscreen-close {
-  position: fixed;
-  top: 18px;
-  right: 22px;
-  background: rgba(255,255,255,0.15);
-  border: none;
+.whatsapp-button-footer .wtext, .btn-whatsapp-enviar .wtext {
+  position: absolute;
+  right: 0;
+  width: 0;
+  opacity: 0;
   color: white;
-  font-size: 2em;
+  font-size: 0.95em;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: width 0.3s, opacity 0.3s;
+  overflow: hidden;
+}
+.whatsapp-button-footer:hover, .btn-whatsapp-enviar:hover {
+  width: 130px !important;
+  border-radius: 40px !important;
+}
+.whatsapp-button-footer:hover .sign, .btn-whatsapp-enviar:hover .sign {
+  width: 30%;
+  padding-left: 8px;
+}
+.whatsapp-button-footer:hover .wtext, .btn-whatsapp-enviar:hover .wtext {
+  opacity: 1;
+  width: 70%;
+  padding-right: 8px;
+}
+
+/* --- BOTONES GENERALES --- */
+.btn-principal, .boton-opcion, .boton-simple,
+#guardar-prospecto-btn, .oferta-contenido > button,
+#btn-simular-comision {
+  position: relative !important;
+  text-transform: uppercase !important;
+  padding: 0.7em 1.8em !important;
+  border-radius: 6em !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+}
+.btn-principal::after, .boton-opcion::after, .boton-simple::after {
+  content: "";
+  display: inline-block;
+  height: 100%;
+  width: 100%;
+  border-radius: 100px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  transition: all 0.4s;
+  background-color: var(--btn-primary-bg);
+}
+.btn-principal:hover::after, .boton-opcion:hover::after, .boton-simple:hover::after {
+  transform: scaleX(1.4) scaleY(1.6);
+  opacity: 0;
+}
+.btn-principal:hover, .boton-opcion:hover, .boton-simple:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+}
+.btn-principal:active, .boton-opcion:active, .boton-simple:active {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2) !important;
+}
+
+/* --- ICONOS BARRA VERTICAL (vnav) --- */
+.vnav-item {
+  transition: background-color 0.2s ease, transform 0.2s ease !important;
+}
+.vnav-item:hover {
+  transform: scale(1.15) !important;
+}
+.vnav-icon {
+  transition: filter 0.2s ease, transform 0.2s ease !important;
+}
+.vnav-item:hover .vnav-icon,
+.vnav-item.active .vnav-icon {
+  transform: scale(1.1);
+}
+
+/* --- CHECKBOXES --- */
+.checkbox-btn {
+  display: block;
+  position: relative;
+  padding-left: 34px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  color: var(--text-color-primary);
+}
+.checkbox-btn input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+.checkbox-btn .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 22px;
+  width: 22px;
+  border: 2px solid var(--color-orange-accent);
+  border-radius: 4px;
+  transition: 0.2s linear;
+  background-color: transparent;
+}
+.checkbox-btn input:checked ~ .checkmark {
+  background-color: transparent;
+  transform: rotate(45deg);
+  border: none;
+}
+.checkbox-btn .checkmark::after {
+  content: "";
+  position: absolute;
+  visibility: hidden;
+  opacity: 0;
+  left: 50%;
+  top: 40%;
+  width: 8px;
+  height: 12px;
+  border: 2px solid var(--color-orange-accent);
+  filter: drop-shadow(0px 0px 6px var(--color-orange-accent));
+  border-width: 0 2px 2px 0;
+  transition: 0.2s linear;
+  transform: translate(-50%, -50%) rotate(-90deg) scale(0.2);
+}
+.checkbox-btn input:checked ~ .checkmark::after {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  animation: cbpulse 0.6s ease-in;
+}
+@keyframes cbpulse {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  50% { transform: translate(-50%, -50%) rotate(0deg) scale(1.5); }
+}
+
+/* Aplicar checkbox-btn a checkboxes del formulario de venta */
+#add-sale-form input[type="checkbox"] {
+  display: none;
+}
+#add-sale-form .checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+#add-sale-form .checkbox-wrapper input[type="checkbox"] {
+  display: block;
+  position: absolute;
+  opacity: 0;
+}
+
+/* --- INPUTS --- */
+.form-control-animated {
+  position: relative;
+  margin: 20px 0 30px;
+  width: 100%;
+}
+.form-control-animated input,
+.form-control-animated select,
+.form-control-animated textarea {
+  background-color: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--border-color-medium);
+  display: block;
+  width: 100%;
+  padding: 12px 0;
+  font-size: 16px;
+  color: var(--text-color-primary);
+  transition: border-color 0.3s ease;
+}
+.form-control-animated input:focus,
+.form-control-animated input:valid {
+  outline: 0;
+  border-bottom-color: var(--color-orange-accent);
+}
+.form-control-animated label {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  pointer-events: none;
+  font-size: 15px;
+  color: var(--text-color-secondary);
+  transition: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.form-control-animated input:focus + label,
+.form-control-animated input:valid + label {
+  color: var(--color-orange-accent);
+  transform: translateY(-26px);
+  font-size: 12px;
+}
+
+/* --- POPUP REGISTRO VENTA --- */
+.form-popup {
+  background-color: #171717 !important;
+  border-radius: 20px !important;
+  border: 1px solid #2a2a2a !important;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5) !important;
+}
+.form-popup > h3 {
+  background-color: #1e1e1e !important;
+  color: #fff !important;
+  border-bottom: 1px solid #2a2a2a !important;
+  border-radius: 20px 20px 0 0 !important;
+  letter-spacing: 0.03em;
+}
+.form-popup .iframe-container {
+  background-color: #171717;
+}
+#add-sale-form {
+  background-color: transparent !important;
+  border: none !important;
+}
+#add-sale-form h4 {
+  color: var(--color-orange-accent) !important;
+  letter-spacing: 0.05em;
+}
+#add-sale-form input,
+#add-sale-form select,
+#add-sale-form textarea {
+  background-color: #171717 !important;
+  border: none !important;
+  border-bottom: 2px solid #333 !important;
+  border-radius: 0 !important;
+  color: #d3d3d3 !important;
+  box-shadow: inset 0 3px 8px rgb(5,5,5) !important;
+  padding: 10px 12px !important;
+  transition: border-bottom-color 0.3s ease !important;
+}
+#add-sale-form input:focus,
+#add-sale-form select:focus,
+#add-sale-form textarea:focus {
+  border-bottom-color: var(--color-orange-accent) !important;
+  outline: none !important;
+  box-shadow: inset 0 3px 8px rgb(5,5,5) !important;
+}
+#btn-submit-sale {
+  background-color: #252525 !important;
+  color: white !important;
+  padding: 0.5em 2em !important;
+  border-radius: 5px !important;
+  border: none !important;
+  transition: background-color 0.3s ease !important;
+}
+#btn-submit-sale:hover {
+  background-color: var(--color-orange-accent) !important;
+}
+
+/* --- CHAT IA --- */
+.ai-chat-container {
+  background-color: var(--bg-content);
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color-dark);
+}
+.ai-chat-header {
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color-medium);
+  margin-bottom: 10px;
+  gap: 12px;
+}
+.ai-chat-avatar {
   width: 44px;
   height: 44px;
   border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-orange-accent), #d97500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1em;
+  flex-shrink: 0;
+}
+.ai-message-box {
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  max-width: 85%;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+.ai-message-box.left {
+  background-color: var(--bg-content-alt);
+  color: var(--text-color-primary);
+  align-self: flex-start;
+}
+.ai-message-box.right {
+  background-color: var(--color-orange-accent);
+  color: #fff;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+/* --- LOADER NEWTON'S CRADLE --- */
+#loader, #prospectos-lista-loader, #resultados-ventas-loader,
+#remuneracion-loader-tabla-ppm, #remuneracion-loader-tabla-entradas,
+#kpis-fijos-loader, #simulacion-loader, #grafico-pesos-loader,
+#ai-loader, #add-sale-loader, #kpi-details-loader,
+#flash-offers-add-loader, #flash-offers-management-loader {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  min-height: 60px !important;
+  gap: 0 !important;
+}
+#loader::after, #prospectos-lista-loader::after, #resultados-ventas-loader::after,
+#remuneracion-loader-tabla-ppm::after, #remuneracion-loader-tabla-entradas::after,
+#kpis-fijos-loader::after, #simulacion-loader::after, #grafico-pesos-loader::after,
+#ai-loader::after, #add-sale-loader::after, #kpi-details-loader::after,
+#flash-offers-add-loader::after, #flash-offers-management-loader::after {
+  display: none !important;
+}
+.newtons-cradle {
+  --uib-size: 44px;
+  --uib-speed: 1.2s;
+  --uib-color: var(--color-orange-accent);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--uib-size);
+  height: var(--uib-size);
+}
+.newtons-cradle__dot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 25%;
+  transform-origin: center top;
+}
+.newtons-cradle__dot::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 25%;
+  border-radius: 50%;
+  background-color: var(--uib-color);
+}
+.newtons-cradle__dot:first-child {
+  animation: nc-swing var(--uib-speed) linear infinite;
+}
+.newtons-cradle__dot:last-child {
+  animation: nc-swing2 var(--uib-speed) linear infinite;
+}
+@keyframes nc-swing {
+  0% { transform: rotate(0deg); animation-timing-function: ease-out; }
+  25% { transform: rotate(70deg); animation-timing-function: ease-in; }
+  50% { transform: rotate(0deg); animation-timing-function: linear; }
+}
+@keyframes nc-swing2 {
+  0% { transform: rotate(0deg); animation-timing-function: linear; }
+  50% { transform: rotate(0deg); animation-timing-function: ease-out; }
+  75% { transform: rotate(-70deg); animation-timing-function: ease-in; }
+}
+
+/* --- FLASH OFFER CARDS - botón + con opciones --- */
+.flash-offer-item {
+  position: relative;
+}
+.flash-offer-item .offer-actions-menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+.flash-offer-item .btn-offer-toggle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-orange-accent);
+  color: white;
+  border: none;
+  font-size: 1.3em;
+  line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
-
-#flash-offer-fullscreen-close:hover {
-  background: rgba(255,255,255,0.3);
+.flash-offer-item .btn-offer-toggle:hover {
+  background: #d97500;
+  transform: rotate(45deg);
 }
-
-@media (max-width: 900px) {
-  #flash-offers-cards-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.flash-offer-item .offer-actions-dropdown {
+  display: none;
+  position: absolute;
+  top: 36px;
+  right: 0;
+  background: var(--bg-content);
+  border: 1px solid var(--border-color-dark);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  min-width: 140px;
+  flex-direction: column;
 }
-
-@media (max-width: 600px) {
-  #flash-offers-cards-container {
-    grid-template-columns: 1fr;
-  }
+.flash-offer-item .offer-actions-dropdown.open {
+  display: flex;
+}
+.flash-offer-item .offer-actions-dropdown button {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text-color-primary);
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.15s ease;
+}
+.flash-offer-item .offer-actions-dropdown button:hover {
+  background-color: var(--bg-content-alt);
+}
+.flash-offer-item .offer-actions-dropdown button.btn-delete {
+  color: #e55;
+}
+.flash-offer-item .offer-actions-dropdown button.btn-delete:hover {
+  background-color: rgba(220, 50, 50, 0.1);
 }

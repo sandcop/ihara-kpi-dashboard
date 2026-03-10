@@ -338,8 +338,7 @@ main section h4 { color: var(--text-color-secondary); margin-top: 25px; margin-b
 .fixed-bottom-bar button, .fixed-bottom-bar a { background: none; border: none; color: var(--bottom-bar-icon); font-size: 1.6em; padding: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: color 0.2s ease, transform 0.2s ease; }
 .fixed-bottom-bar button:hover, .fixed-bottom-bar a:hover { color: var(--color-orange-accent); transform: scale(1.1); }
 .fixed-bottom-bar .lucide, .fixed-bottom-bar img, .fixed-bottom-bar svg { width: 28px; height: 28px; }
-.whatsapp-button-footer svg { fill: currentColor; }
-[data-theme="dark"] .whatsapp-button-footer svg { fill: var(--bottom-bar-icon); }
+/* whatsapp svg heredada del nuevo estilo */
 
 /* ===== Header Móvil ===== */
 .mobile-header { display: none; background-color: var(--mobile-header-bg); color: var(--mobile-header-text); padding: 10px 15px; border-bottom: 1px solid var(--mobile-header-border); position: sticky; top: 0; z-index: 1000; align-items: center; height: var(--mobile-header-height); flex-shrink: 0; }

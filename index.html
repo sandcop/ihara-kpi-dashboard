@@ -1,115 +1,508 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es"> <!-- data-theme será añadido por JS -->
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Indicadores Ejecutivo</title>
+
+  <!-- ===== CÓDIGO DEL FAVICON (REEMPLAZAR CON EL TUYO GENERADO) ===== -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <!-- ====================================================== -->
+  
   <link rel="stylesheet" href="styles.css" />
-  <!-- Chart.js -->
+   <!-- Incluir Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 
-  <!-- ===== Barra de Navegación ===== -->
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <h1>Avances de metas</h1>
+  <!-- ===== Overlay de Login ===== -->
+  <div id="login-overlay" class="login-overlay-container" style="display: none;">
+    <div class="login-box">
+      <h2>Iniciar Sesión</h2>
+      <p>Ingresa la contraseña para acceder al contenido.</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-password">Contraseña:</label>
+          <input type="password" id="login-password" required>
+        </div>
+        <button type="submit" class="btn-principal">Ingresar</button>
+        <p id="login-error" class="login-error-message" style="display: none;"></p>
+      </form>
+      <div class="public-access-links">
+        <p>O accede a las secciones públicas:</p>
+        <!-- Actualiza estos onclick para que usen window.location.hash y aseguren el cierre del overlay -->
+        <a href="#ofertas-mes" onclick="document.getElementById('login-overlay').style.display='none'; document.getElementById('login-overlay').classList.remove('visible'); window.location.hash='ofertas-mes';">Ver Ofertas del Mes</a>
+        <a href="#prospectos" onclick="document.getElementById('login-overlay').style.display='none'; document.getElementById('login-overlay').classList.remove('visible'); window.location.hash='prospectos';">Ver Prospectos</a>
+      </div>
     </div>
-    <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle menu" aria-expanded="false">
-      <i class="fas fa-bars"></i>
-    </button>
-    <ul class="nav-links" id="nav-links">
-      <!-- Enlaces llaman a funciones JS y cierran menú móvil. return false evita que la página salte por href="#" -->
-      <li><a href="#" onclick="mostrarKPIs(); closeMobileMenu(); return false;">KPIs</a></li>
-      <li><a href="#" onclick="mostrarFaltantes(); closeMobileMenu(); return false;">Faltantes</a></li>
-      <li class="dropdown">
-        <!-- El enlace principal del dropdown no necesita onclick si solo abre el submenú -->
-        <a href="#">Ofertas del Mes <i class="fas fa-chevron-down fa-xs"></i></a>
-        <ul class="dropdown-menu">
-           <!-- Este enlace SÍ necesita onclick si debe mostrar una sección -->
-          <li><a href="#ofertas-flash" onclick="mostrarOfertasFlash(); closeMobileMenu(); return false;">Ofertas Flash</a></li>
-        </ul>
-      </li>
-      <li><a href="#enlaces-externos" onclick="mostrarEnlacesExternos(); closeMobileMenu(); return false;">Enlaces Externos</a></li>
-      <li><a href="#tabla-remuneracion" onclick="mostrarTablaRemuneracion(); closeMobileMenu(); return false;">Tabla Remuneración</a></li>
-      <li><a href="#politicas-ventas" onclick="mostrarPoliticasVentas(); closeMobileMenu(); return false;">Políticas de Ventas</a></li>
-    </ul>
-  </nav>
+  </div>
+  <!-- ===== Fin Overlay de Login ===== -->
 
-  <!-- ===== Saludo al Usuario ===== -->
-  <div class="user-greeting">
-    <p><i class="fas fa-user"></i> Usuario: Manuel Rojas</p>
+  <div class="app-container">
+    <!-- ===== Sidebar Izquierdo (Azul) ===== -->
+    <aside class="sidebar-left" id="sidebar-left">
+      <div class="sidebar-header">
+        <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Cerrar menú">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+        </button>
+        <h2>Bienvenido Manu</h2>
+      </div>
+      <div class="sidebar-content">
+        <div class="sidebar-section">
+          <h3>Tu Enfoque para Hoy:</h3>
+          <div class="objetivos-diarios-container">
+            <div class="objetivo-item" id="objetivo-voz"><span class="kpi-icon-wrapper" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-signal"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg></span><span class="kpi-nombre">Voz:</span><span class="meta-diaria-texto">Calculando...</span></div>
+            <div class="objetivo-item" id="objetivo-fo"><span class="kpi-icon-wrapper" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wifi"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.859a10 10 0 0 1 14 0"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/></svg></span><span class="kpi-nombre">Fibra Óptica (FO):</span><span class="meta-diaria-texto">Calculando...</span></div>
+            <div class="objetivo-item" id="objetivo-terminales"><span class="kpi-icon-wrapper" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smartphone"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></span><span class="kpi-nombre">N° Terminales:</span><span class="meta-diaria-texto">Calculando...</span></div>
+            <div class="objetivo-item" id="objetivo-accesorios"><span class="kpi-icon-wrapper" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span><span class="kpi-nombre">Monto Accesorios:</span><span class="meta-diaria-texto">Calculando...</span></div>
+            <div class="objetivo-item" id="objetivo-seguros"><span class="kpi-icon-wrapper" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span><span class="kpi-nombre">Seguros:</span><span class="meta-diaria-texto">Calculando...</span></div>
+          </div>
+        </div>
+        <div class="sidebar-section">
+          <h3>Última Atención</h3>
+          <div class="ultima-atencion-info">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItY2hlY2staWNvbiBsdWNpZGUtdXNlci1jaGVjayI+PHBhdGggZD0ibTE2IDExIDIgMiA0LTQiLz48cGF0aCBkPSJNMTYgMjF2LTJhNCA0IDAgMCAwLTQtNEg2YTQgNCAwIDAgMC00IDR2MiIvPjxjaXJjbGUgY3g9IjkiIGN5PSI3IiByPSI0Ii8+PC9zdmc+" alt="Usuario Icono" class="sidebar-icon">
+            <div class="atencion-details">
+              <p id="ultima-atencion-nombre">Cargando...</p>
+              <p id="ultima-atencion-rut">-</p>
+              <p id="ultima-atencion-telefono">-</p>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-section">
+          <h3>Notas</h3>
+          <textarea id="sidebar-notes" placeholder="Escribe tus notas aquí..."></textarea>
+        </div>
+        <nav class="mobile-nav-links" id="mobile-nav-links"></nav>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-greeting-sidebar">
+          <p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Manuel Rojas
+          </p>
+        </div>
+        <div id="datetime-container" class="datetime-container">
+          <span id="time">--:--</span> | <span id="date">--/--/----</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="page-wrapper">
+      <header class="mobile-header">
+        <button class="hamburger-btn-mobile" id="hamburger-btn-mobile" aria-label="Abrir menú" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+        <h1 class="mobile-app-title">Indicadores Ejecutivo</h1>
+      </header>
+
+      <div class="content-area-wrapper">
+        <nav class="vertical-navbar" id="vertical-navbar">
+            <a href="#inicio" class="vnav-item" data-tooltip="Inicio"><span class="vnav-icon-wrapper"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWhvdXNlLWljb24gbHVjaWRlLWhvdXNlIj48cGF0aCBkPSJNMTUgMjF2LThhMSAxIDAgMCAwLTEtMWgtNGExIDEgMCAwIDAtMSAxdjgiLz48cGF0aCBkPSJNMyAxMGEyIDIgMCAwIDEgLjcwOS0xLjUyOGw3LTUuOTk5YTIgMiAwIDAgMSAyLjU4MiAwbDcgNS45OTlBMiAyIDAgMCAxIDIxIDEwdjlhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJ6Ii8+PC9zdmc+" alt="Inicio Icono" class="vnav-icon"></span><span class="vnav-text">Inicio</span></a>
+            <a href="#kpis" class="vnav-item" data-tooltip="KPIs"><span class="vnav-icon-wrapper"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoYXJ0LW5vLWF4ZXMtY29sdW1uLWljb24gbHVjaWRlLWNoYXJ0LW5vLWF4ZXMtY29sdW1uIj48bGluZSB4MT0iMTgiIHgyPSIxOCIgeTE9IjIwIiB5Mj0iMTAiLz48bGluZSB4MT0iMTIiIHgyPSIxMiIgeTE9IjIwIiB5Mj0iNCIvPjxsaW5lIHgxPSI2IiB4Mj0iNiIgeTE9IjIwIiB5Mj0iMTQiLz48L3N2Zz4=" alt="KPIs Icono" class="vnav-icon"></span><span class="vnav-text">KPIs</span></a>
+            <a href="#faltantes" class="vnav-item" data-tooltip="Faltantes"><span class="vnav-icon-wrapper"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXRyaWFuZ2xlLWFsZXJ0LWljb24gbHVjaWRlLXRyaWFuZ2xlLWFsZXJ0Ij48cGF0aCBkPSJtMjEuNzMgMTgtOC0xNGEyIDIgMCAwIDAtMy40NiAwbC04IDE0QTIgMiAwIDAgMCA0IDIxaDE2YTIgMiAwIDAgMCAxLjczLTMiLz48cGF0aCBkPSJNMTIgOXY0Ii8+PHBhdGggZD0iTTEyIDE3aC4wMSIvPjwvc3ZnPg==" alt="Faltantes Icono" class="vnav-icon"></span><span class="vnav-text">Faltantes</span></a>
+            <a href="#ofertas-flash" class="vnav-item" data-tooltip="Ofertas Flash"><span class="vnav-icon-wrapper"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXphcC1pY29uIGx1Y2lkZS16YXAiPjxwYXRoIGQ9Ik00IDE0YTEgMSAwIDAgMS0uNzgtMS42M2w5LjktMTAuMmEuNS41IDAgMCAxIC44Ni40NmwtMS45MiA2LjAyQTEgMSAwIDAgMCAxMyAxMGg3YTEgMSAwIDAgMSAuNzggMS42M2wtOS45IDEwLjJhLjUuNSAwIDAgMS0uODYtLjQ2bDEuOTItNi4wMkExIDEgMCAwIDAgMTEgMTR6Ii8+PC9zdmc+" alt="Ofertas Flash Icono" class="vnav-icon"></span><span class="vnav-text">Ofertas Flash</span></a>
+            <a href="#ofertas-mes" class="vnav-item" data-tooltip="Ofertas del Mes"><span class="vnav-icon-wrapper"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXRhZy1pY29uIGx1Y2lkZS10YWciPjxwYXRoIGQ9Ik0xMi41ODYgMi41ODZBMiAyIDAgMCAwIDExLjE3MiAySDRhMiAyIDAgMCAwLTIgMnY3LjE3MmEyIDIgMCAwIDAgLjU4NiAxLjQxNGw4LjcwNCA4LjcwNGEyLjQyNiAyLjQyNiAwIDAgMCAzLjQyIDBsNi41OC02LjU4YTIuNDI2IDIuNDI2IDAgMCAwIDAtMy40MnoiLz48Y2lyY2xlIGN4PSI3LjUiIGN5PSI3LjUiIHI9Ii41IiBmaWxsPSJjdXJyZW50Q29sb3IiLz48L3N2Zz4=" alt="Ofertas Mes Icono" class="vnav-icon"></span><span class="vnav-text">Ofertas del Mes</span></a>
+            <a href="#buscador-ventas" class="vnav-item" data-tooltip="Buscar Ventas"><span class="vnav-icon-wrapper"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlYXJjaC1pY29uIGx1Y2lkZS1zZWFyY2giPjxwYXRoIGQ9Im0yMSAyMS00LjM0LTQuMzQiLz48Y2lyY2xlIGN4PSIxMSIgY3k9IjExIiByPSI4Ii8+PC9zdmc+" alt="Buscador Ventas Icono" class="vnav-icon"></span><span class="vnav-text">Buscar Ventas</span></a>
+            <a href="#tabla-remuneracion" class="vnav-item" data-tooltip="Simulador Comisión"><span class="vnav-icon-wrapper"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNhbGN1bGF0b3ItaWNvbiBsdWNpZGUtY2FsY3VsYXRvciI+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjIwIiB4PSI0IiB5PSIyIiByeD0iMiIvPjxsaW5lIHgxPSI4IiB4Mj0iMTYiIHkxPSI2IiB5Mj0iNiIvPjxsaW5lIHgxPSIxNiIgeDI9IjE2IiB5MT0iMTQiIHkyPSIxOCIvPjxwYXRoIGQ9Ik0xNiAxMGguMDEiLz48cGF0aCBkPSJNMTIgMTBoLjAxIi8+PHBhdGggZD0iTTggMTBoLjAxIi8+PHBhdGggZD0iTTEyIDE0aC4wMSIvPjxwYXRoIGQ9Ik04IDE0aC4wMSIvPjxwYXRoIGQ9Ik0xMiAxOGguMDEiLz48cGF0aCBkPSJNOCAxOGguMDEiLz48L3N2Zz4=" alt="Simulador Comisión Icono" class="vnav-icon"></span><span class="vnav-text">Simulador</span></a>
+            <a href="#enlaces-externos" class="vnav-item" data-tooltip="Enlaces Externos"><span class="vnav-icon-wrapper"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWV4dGVybmFsLWxpbmstaWNvbiBsdWNpZGUtZXh0ZXJuYWwtbGluayI+PHBhdGggZD0iTTE1IDNoNnY2Ii8+PHBhdGggZD0iTTEwIDE0IDIxIDMiLz48cGF0aCBkPSJNMTggMTN2NmEyIDIgMCAwIDEtMiAySDVhMiAyIDAgMCAxLTItMlY4YTIgMiAwIDAgMSAyLTJoNiIvPjwvc3ZnPg==" alt="Enlaces Externos Icono" class="vnav-icon"></span><span class="vnav-text">Enlaces</span></a>
+            <a href="#politicas-ventas" class="vnav-item" data-tooltip="Políticas de Ventas"><span class="vnav-icon-wrapper"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWZpbGUtdGV4dC1pY29uIGx1Y2lkZS1maWxlLXRleHQiPjxwYXRoIGQ9Ik0xNSAySDZhMiAyIDAgMCAwLTIgMnYxNmEyIDIgMCAwIDAgMiAyaDEyYTIgMiAwIDAgMCAyLTJWN1oiLz48cGF0aCBkPSJNMTQgMnY0YTIgMiAwIDAgMCAyIDJoNCIvPjxwYXRoIGQ9Ik0xMCA5SDgiLz48cGF0aCBkPSJNMTYgMTNIOCIvPjxwYXRoIGQ9Ik0xNiAxN0g4Ii8+PC9zdmc+" alt="Políticas Ventas Icono" class="vnav-icon"></span><span class="vnav-text">Políticas</span></a>
+            <a href="#prospectos" class="vnav-item" data-tooltip="Prospectos"><span class="vnav-icon-wrapper"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcGx1cy1pY29uIGx1Y2lkZS11c2VyLXBsdXMiPjxwYXRoIGQ9Ik0xNiAyMXYtMmE0IDQgMCAwIDAtNC00SDZhNCA0IDAgMCAwLTQgNHYyIi8+PGNpcmNsZSBjeD0iOSIgY3k9IjciIHI9IjQiLz48bGluZSB4MT0iMTkiIHgyPSIxOSIgeTE9IjgiIHkyPSIxNCIvPjxsaW5lIHgxPSIyMiIgeDI9IjE2IiB5MT0iMTEiIHkyPSIxMSIvPjwvc3ZnPg==" alt="Prospectos Icono" class="vnav-icon"></span><span class="vnav-text">Prospectos</span></a>
+            <a href="#admin-panel" class="vnav-item" data-tooltip="Admin Panel"><span class="vnav-icon-wrapper"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></span><span class="vnav-text">Admin</span></a>
+            <a href="#asistente-ai" class="vnav-item" data-tooltip="Asistente AI"><span class="vnav-icon-wrapper"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg></span><span class="vnav-text">Asistente AI</span></a>
+        </nav>
+
+        <main class="main-content"> 
+          
+          <section id="inicio-content" class="section-hidden" style="display: none;">
+            <div class="inspiracion-container">
+              <div class="slideshow-container">
+                <div class="slide fade"><img src="https://firebasestorage.googleapis.com/v0/b/seguimiento-ventas-manuel.firebasestorage.app/o/eden.jpg?alt=media&token=6cd1c2b6-f73b-4675-b574-cb3eb6e9d6cb" alt="Imagen Personal 1"></div>
+                <div class="slide fade"><img src="https://firebasestorage.googleapis.com/v0/b/seguimiento-ventas-manuel.firebasestorage.app/o/comida.jpg?alt=media&token=424e4587-8739-4717-988f-a41554d61e03" alt="Imagen Personal 2"></div>
+                <div class="slide fade"><img src="https://firebasestorage.googleapis.com/v0/b/seguimiento-ventas-manuel.firebasestorage.app/o/kathy.jpg?alt=media&token=b60aba3c-76f1-4e83-9ba0-7301ff88f001" alt="Imagen Personal 3"></div>
+                <div class="slide fade"><img src="https://firebasestorage.googleapis.com/v0/b/seguimiento-ventas-manuel.firebasestorage.app/o/nosotros%202.jpg?alt=media&token=33b9fda1-a16f-490b-be26-9fabeac269ac" alt="Imagen Personal 4"></div>
+                <div class="slide fade"><img src="https://firebasestorage.googleapis.com/v0/b/seguimiento-ventas-manuel.firebasestorage.app/o/nosotros.jpg?alt=media&token=6c162c24-f43e-4c42-8670-3f5f3a131e8b" alt="Imagen Personal 5"></div>
+              </div>
+              <p class="frase-motivacional">"Cada logro empieza en casa, donde nace mi fuerza y mi propósito"</p>
+            </div>
+          </section>
+          
+          <section id="kpi-content" class="section-hidden" style="display: none;">
+            <div class="form-actions" style="margin-bottom: 25px;">
+              <button id="btn-open-add-sale" class="btn-principal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle" style="width: 1.2em; height: 1.2em; margin-right: 8px; vertical-align: middle;"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="16"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
+                Agregar Venta
+              </button>
+            </div>
+            <div id="kpi-cards-container" class="dashboard-kpi"></div>
+            <div id="tabla-container" style="display:none; margin-top: 20px;">
+                <div class="loader" id="loader">Cargando datos...</div>
+                <div class="tabla-responsive-wrapper">
+                    <table id="tablaDatos" class="data-table"></table>
+                </div>
+                <div id="error-container"></div>
+            </div>
+          </section>
+
+          <!-- Sección de Ofertas Flash (MODIFICADA) -->
+          <section id="ofertas-flash" class="section-hidden" style="display: none;">
+            <h2>Ofertas Flash</h2>
+            <div class="form-actions" style="margin-bottom: 25px; justify-content: flex-end;">
+              <button id="btn-open-upload-offer" class="btn-principal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                Subir Nueva Oferta
+              </button>
+            </div>
+            <div id="flash-offers-display-loader" class="loader" style="display: none;">Cargando ofertas...</div>
+            <div id="flash-offers-cards-container" class="vcard-container" style="justify-content: center; margin-top: 0;">
+                <!-- Las tarjetas de ofertas flash se renderizarán aquí dinámicamente -->
+            </div>
+            <p style="text-align: center; margin-top: 25px; font-style: italic; color: var(--text-color-secondary);">
+              ¡Aprovecha estas ofertas por tiempo limitado!
+            </p>
+          </section>
+          <!-- Fin Sección de Ofertas Flash -->
+
+          <section id="ofertas-mes" class="section-hidden" style="display: none;">
+            <h2>Ofertas del Mes</h2>
+            <div class="tabs-container">
+              <button class="tab-link active" data-tab="movil">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smartphone"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+                <span>Parrilla Móvil</span>
+              </button>
+              <button class="tab-link" data-tab="hogar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-home"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Parrilla Hogar</span>
+              </button>
+            </div>
+
+            <div id="movil" class="tab-content active">
+              <div id="parrilla-planes-movil-integrada">
+                <div class="buttons parrilla-movil-buttons">
+                  <button class="sub-tab-link active" onclick="showMovilPlans('monolinea')">Monolínea</button>
+                  <button class="sub-tab-link" onclick="showMovilPlans('multilinea')">Multilínea</button>
+                  <button class="sub-tab-link" onclick="showMovilPlans('general')">General</button>
+                  <button class="sub-tab-link" onclick="showMovilPlans('totalizacion')">Totalización</button>
+                  <button class="sub-tab-link" onclick="showMovilPlans('migracion')">Migración</button>
+                </div>
+                <div class="cards parrilla-movil-cards" id="movil-plans-cards-container"></div>
+                <button class="boton-simple" onclick="toggleOriginalMovilIframe(this)">Ver Parrilla Completa (Hoja de Cálculo)</button>
+              </div>
+              <div id="parrilla-movil-iframe-original-container" style="display: none;">
+                <h4>Parrilla Móvil Completa</h4>
+                <div id="parrilla-movil-file-viewer" style="margin-bottom:12px;">
+                  <div id="parrilla-movil-file-container" style="width:100%;min-height:80px;display:flex;align-items:center;justify-content:center;color:var(--text-color-secondary);">
+                    <span id="parrilla-movil-no-file-msg">No hay archivo cargado aún.</span>
+                    <iframe id="parrilla-movil-iframe-viewer" src="" width="100%" height="600" style="border:none;display:none;"></iframe>
+                    <img id="parrilla-movil-img-viewer" src="" style="max-width:100%;display:none;" alt="Parrilla Móvil"/>
+                  </div>
+                </div>
+                <div id="parrilla-movil-admin-upload" style="display:none;margin-bottom:10px;">
+                  <label style="font-size:0.85em;color:var(--text-color-secondary);">Subir nueva parrilla (Excel, PDF o imagen):</label>
+                  <div style="display:flex;gap:8px;margin-top:6px;">
+                    <input type="file" id="parrilla-movil-file-input" accept=".xlsx,.xls,.pdf,.png,.jpg,.jpeg" style="flex:1;font-size:0.85em;">
+                    <button class="btn-principal" onclick="subirParrillaFile('movil')" style="white-space:nowrap;">Subir</button>
+                  </div>
+                  <div id="parrilla-movil-upload-msg" style="font-size:0.8em;margin-top:4px;"></div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <button class="boton-simple" onclick="toggleOriginalMovilIframe(this)">← Volver a Planes Destacados</button>
+                  <button class="btn-secundario" onclick="toggleParrillaAdminUpload('movil')" style="font-size:0.8em;">🔧 Admin</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="hogar" class="tab-content">
+              <div id="parrilla-planes-hogar-integrada">
+                <div class="buttons parrilla-hogar-buttons">
+                  <button class="sub-tab-link active" onclick="showHogarPlans('fibra')">Solo Fibra</button>
+                  <button class="sub-tab-link" onclick="showHogarPlans('duo')">Dúo (Fibra + TV)</button>
+                  <button class="sub-tab-link" onclick="showHogarPlans('trio')">Trío (Fibra + TV + Tel)</button>
+                </div>
+                <div class="cards parrilla-hogar-cards" id="hogar-plans-cards-container"></div>
+                <button class="boton-simple" onclick="toggleOriginalHogarIframe(this)">Más detalles</button>
+              </div>
+              <div id="parrilla-hogar-iframe-original-container" style="display: none;">
+                <h4>Parrilla Hogar Completa</h4>
+                <div id="parrilla-hogar-file-viewer" style="margin-bottom:12px;">
+                  <div id="parrilla-hogar-file-container" style="width:100%;min-height:80px;display:flex;align-items:center;justify-content:center;color:var(--text-color-secondary);">
+                    <span id="parrilla-hogar-no-file-msg">No hay archivo cargado aún.</span>
+                    <iframe id="parrilla-hogar-iframe-viewer" src="" width="100%" height="600" style="border:none;display:none;"></iframe>
+                    <img id="parrilla-hogar-img-viewer" src="" style="max-width:100%;display:none;" alt="Parrilla Hogar"/>
+                  </div>
+                </div>
+                <div id="parrilla-hogar-admin-upload" style="display:none;margin-bottom:10px;">
+                  <label style="font-size:0.85em;color:var(--text-color-secondary);">Subir nueva parrilla (Excel, PDF o imagen):</label>
+                  <div style="display:flex;gap:8px;margin-top:6px;">
+                    <input type="file" id="parrilla-hogar-file-input" accept=".xlsx,.xls,.pdf,.png,.jpg,.jpeg" style="flex:1;font-size:0.85em;">
+                    <button class="btn-principal" onclick="subirParrillaFile('hogar')" style="white-space:nowrap;">Subir</button>
+                  </div>
+                  <div id="parrilla-hogar-upload-msg" style="font-size:0.8em;margin-top:4px;"></div>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <button class="boton-simple" onclick="toggleOriginalHogarIframe(this)">← Volver a Planes</button>
+                  <button class="btn-secundario" onclick="toggleParrillaAdminUpload('hogar')" style="font-size:0.8em;">🔧 Admin</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="overlay parrilla-movil-overlay" id="movil-plan-overlay" onclick="closeMovilForm()"></div>
+            <div class="form-popup parrilla-movil-form-popup" id="movil-plan-formPopup"><h3>Solicitar Plan Móvil<button class="close-btn" onclick="closeMovilForm()" title="Cerrar" aria-label="Cerrar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button></h3><div class="iframe-container parrilla-movil-iframe-container"><iframe id="movil-plan-google-form-iframe" src="" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe></div></div>
+            <div class="overlay parrilla-hogar-overlay" id="hogar-plan-overlay" onclick="closeHogarForm()"></div>
+            <div class="form-popup parrilla-hogar-form-popup" id="hogar-plan-formPopup"><h3>Solicitar Plan Hogar<button class="close-btn" onclick="closeHogarForm()" title="Cerrar" aria-label="Cerrar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button></h3><div class="iframe-container parrilla-hogar-iframe-container"><iframe id="hogar-plan-google-form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSfUnRFmauKoiSii1g9rBSRFmMwmb79ImhVW9U80zY3ABU04aA/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe></div></div>
+          </section>
+          
+          <section id="buscador-ventas-content" class="section-hidden" style="display: none;">
+            <h2>Buscador de Ventas</h2>
+            <form id="buscador-ventas-form">
+              <div class="buscador-grid">
+                <div class="form-group"><label for="buscar-nombre">Nombre Cliente:</label><input type="text" id="buscar-nombre" placeholder="Parte del nombre..."></div>
+                <div class="form-group"><label for="buscar-orden-aloha">N° Orden o N° Aloha:</label><input type="text" id="buscar-orden-aloha" placeholder="N° Orden o Aloha..."></div>
+                <div class="form-group"><label for="buscar-rut">RUT Cliente:</label><input type="text" id="buscar-rut" placeholder="RUT (ej: 123456789)"></div>
+              </div>
+              <div class="form-actions"><button type="submit" class="btn-principal">Buscar Ventas</button><button type="reset" class="btn-secundario" id="limpiar-buscador-btn">Limpiar</button></div>
+            </form>
+            <div id="resultados-ventas-loader" class="loader" style="display: none;">Buscando ventas...</div>
+            <div id="resultados-ventas-mensaje" class="mensaje-estado" style="display: none;"></div>
+            <div id="resultados-ventas-container" class="vcard-container"></div>
+          </section>
+          
+          <section id="tabla-remuneracion" class="section-hidden" style="display: none;">
+            <h2>Simulador de Comisión por Cumplimiento</h2>
+            <div id="kpis-fijos-container" style="margin-bottom: 40px; padding-bottom:20px; border-bottom: 1px solid var(--border-color-light);">
+              <h3>Indicadores Clave de Desempeño (Datos Actuales de Hoja)</h3>
+              <div id="kpis-fijos-loader" class="loader" style="display: none;">Cargando KPIs actuales...</div>
+              <div class="vcard-grid" id="kpi-display-grid">
+                <div class="vcard-item"><span class="vcard-label">ALTAS VOZ MOVIL (Real):</span> <span id="kpi-fijo-voz-real-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">ALTAS VOZ MOVIL (Meta):</span> <span id="kpi-fijo-voz-meta-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">ALTAS FO TERMINADAS FIJO (Real):</span> <span id="kpi-fijo-fo-real-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">ALTAS FO TERMINADAS FIJO (Meta):</span> <span id="kpi-fijo-fo-meta-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">GESTION DE VALOR (Real):</span> <span id="kpi-fijo-gestionvalor-real-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">GESTION DE VALOR (Meta):</span> <span id="kpi-fijo-gestionvalor-meta-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">ENCUESTA SATISFACCION (ISN) (Real):</span> <span id="kpi-fijo-isn-real-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">ENCUESTA SATISFACCION (ISN) (Meta):</span> <span id="kpi-fijo-isn-meta-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">ADHESION O AMPLIADO (Real):</span> <span id="kpi-fijo-adhesion-real-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">ADHESION O AMPLIADO (Meta):</span> <span id="kpi-fijo-adhesion-meta-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">TERMINALES (Real):</span> <span id="kpi-fijo-terminales-real-val" class="vcard-value">-</span></div>
+                <div class="vcard-item"><span class="vcard-label">ACCESORIOS (Real):</span> <span id="kpi-fijo-accesorios-real-val" class="vcard-value">-</span></div>
+              </div>
+              <div id="kpis-fijos-error" class="mensaje-estado" style="display:none;"></div>
+            </div>
+            <h3>Simulador Interactivo</h3>
+            <div class="calculadora-comision-grid">
+              <div class="form-group"><label for="sim-entradas-voz">Entradas VOZ (Sim):</label><input type="number" id="sim-entradas-voz" class="form-control-calculadora" placeholder="Ej: 20" min="0"></div>
+              <div class="form-group"><label for="sim-entradas-fo">Entradas FO (Sim):</label><input type="number" id="sim-entradas-fo" class="form-control-calculadora" placeholder="Ej: 5" min="0"></div>
+              <div class="form-group"><label for="sim-entradas-totalizacion">Entradas Totalización (Sim):</label><input type="number" id="sim-entradas-totalizacion" class="form-control-calculadora" placeholder="Ej: 2" min="0"></div>
+              <div class="form-group"><label for="sim-entradas-isn">Entradas ISN (Sim):</label><input type="number" id="sim-entradas-isn" class="form-control-calculadora" placeholder="Ej: 70" min="0"></div>
+              <div class="form-group"><label for="sim-entradas-adhesion">Entradas Adhesión (Sim):</label><input type="number" id="sim-entradas-adhesion" class="form-control-calculadora" placeholder="Ej: 80" min="0"></div>
+              <div class="form-actions" style="grid-column: 1 / -1; justify-content: center; margin-top: 10px;"><button id="btn-simular-comision" class="btn-principal">Simular Comisión</button></div>
+            </div>
+            <div id="simulacion-loader" class="loader" style="display: none;">Simulando...</div>
+            <div id="simulacion-error" class="mensaje-estado" style="display:none;"></div>
+            <div id="output-simulacion" style="margin-top: 20px; display:none; text-align:center; padding: 15px; background-color: var(--bg-content-alt); border-radius: 5px;">
+              <h4>Resultado de la Simulación:</h4>
+              <p style="font-size: 1.2em;">Cumplimiento Ponderado Estimado: <strong id="res-sim-porcentaje" style="color: var(--color-orange-accent);">-</strong>%</p>
+              <p style="font-size: 1.3em; font-weight: bold;">Incentivo CLP Estimado: $<strong id="res-sim-incentivo" style="color: var(--kpi-progress-verde);">-</strong></p>
+            </div>
+            <div style="margin-top: 40px;">
+                <h4>Referencia: Tabla de Factores e Incentivos (PPM)</h4>
+                <div id="remuneracion-loader-tabla-ppm" class="loader" style="display: none;">Cargando tabla...</div>
+                <div class="tabla-responsive-wrapper">
+                    <table id="tablaFactoresPPMRef" class="data-table">
+                        <thead><tr><th>% Cumplimiento Desde</th><th>Factor</th><th>Incentivo CLP</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="contenedor-grafico-pesos-kpi" style="margin-top:40px; padding: 20px; background-color: var(--bg-content-alt); border-radius: 8px;">
+                <h4>Distribución de Pesos KPI</h4>
+                <div style="max-width: 500px; margin: auto; position: relative; height:300px;"><canvas id="graficoPesosKPI"></canvas></div>
+                <div id="grafico-pesos-loader" class="loader" style="display: none;">Cargando gráfico...</div>
+                <div id="grafico-pesos-error" class="mensaje-estado" style="display:none;"></div>
+            </div>
+          </section>
+          
+          <section id="admin-panel" class="section-hidden" style="display: none;">
+            <h2>⚙️ Panel de Administración</h2>
+            <div style="max-width:700px;margin:0 auto;">
+              <div style="background:var(--bg-content);border:1px solid var(--border-color-dark);border-radius:12px;padding:24px;margin-bottom:24px;">
+                <h3 style="margin-top:0;">Códigos Producto Regla</h3>
+                <p style="color:var(--text-color-secondary);font-size:0.9em;">Estos códigos se cargan desde la hoja <strong>CodigosProductoRegla</strong> en Google Sheets. Agrégalos o elimínalos directamente en la hoja y actualiza aquí.</p>
+                <div id="admin-codigos-lista" style="background:var(--bg-content-alt);border-radius:8px;padding:16px;min-height:60px;margin-bottom:16px;">
+                  <span style="color:var(--text-color-secondary);font-size:0.9em;">Cargando...</span>
+                </div>
+                <div style="display:flex;gap:10px;">
+                  <button class="btn-principal" onclick="cargarCodigosProductoReglaAdmin()">🔄 Actualizar desde Sheets</button>
+                </div>
+                <div id="admin-codigos-msg" style="font-size:0.85em;margin-top:10px;"></div>
+              </div>
+
+              <div style="background:var(--bg-content);border:1px solid var(--border-color-dark);border-radius:12px;padding:24px;">
+                <h3 style="margin-top:0;">Planes Ofertas del Mes</h3>
+                <p style="color:var(--text-color-secondary);font-size:0.9em;">Edita los planes directamente en la hoja <strong>PlanesOfertasMes</strong> de Google Sheets con las columnas: <code>tipo | categoria | nombre | precio | descuento | caracteristicas | detalles</code></p>
+                <p style="color:var(--text-color-secondary);font-size:0.85em;">El campo <strong>tipo</strong> debe ser <code>movil</code> u <code>hogar</code>. El campo <strong>categoria</strong> debe ser una de: <code>monolinea, multilinea, general, totalizacion, migracion, fibra, duo, trio</code>. Las <strong>caracteristicas</strong> se separan con <code>;</code></p>
+                <div id="admin-planes-lista" style="background:var(--bg-content-alt);border-radius:8px;padding:16px;min-height:60px;margin:14px 0;max-height:400px;overflow-y:auto;">
+                  <span style="color:var(--text-color-secondary);font-size:0.9em;">Haz clic en Actualizar para ver los planes actuales.</span>
+                </div>
+                <div style="display:flex;gap:10px;">
+                  <button class="btn-principal" onclick="cargarPlanesAdmin()">🔄 Actualizar desde Sheets</button>
+                </div>
+                <div id="admin-planes-msg" style="font-size:0.85em;margin-top:10px;"></div>
+              </div>
+            </div>
+          </section>
+
+          <section id="enlaces-externos" class="section-hidden" style="display: none;">
+            <h2>Enlaces Externos</h2>
+            <ul>
+              <li><a href="https://believe.telefonicachile.cl/vpn/index.html" target="_blank" rel="noopener noreferrer">Citrix</a></li>
+              <li><a href="https://minifrontws.tchile.local/AA_TENENCIA/AATenencia.jsf" target="_blank" rel="noopener noreferrer">Tenencia</a></li>
+              <li><a href="https://movistarclick.movistar.cl/auth/login" target="_blank" rel="noopener noreferrer">movistarclick</a></li>
+              <li><a href="http://multiservicio.ctc.cl/DirNormalizadaWeb/direcNormFactNum.jsp" target="_blank" rel="noopener noreferrer">Factibilizador</a></li>
+              <li><a href="https://www.academiamovistar.cl/auth/recaptcha/index.php" target="_blank" rel="noopener noreferrer">Academia</a></li>
+              <li><a href="https://dyrk.org/tools/imei/" target="_blank" rel="noopener noreferrer">Generador IMEI</a></li>
+              <li><a href="https://atentochile.buk.cl/" target="_blank" rel="noopener noreferrer">Asistencia buk</a></li>
+              <li><a href="https://www.capacitacionmovistar.cl/descuentos/index.asp" target="_blank" rel="noopener noreferrer">Consulta de descuento cobranza</a></li>
+              <li><a href="https://ofertador-frontend-prod-tch-downselling.apps.prdaro.tchile.local/" target="_blank" rel="noopener noreferrer">Ofertador</a></li>
+              <li><a href="https://docs.google.com/spreadsheets/u/0/d/1civbKrusNq4tXUSrxkEFahMlkhzGENqaj31Z5hWBhu4/htmlview?pli=1" target="_blank" rel="noopener noreferrer">Planilla de seguimiento</a></li>
+              <li><a href="https://telefonicacorp-my.sharepoint.com/:x:/r/personal/marta_ceballos_telefonica_com/_layouts/15/Doc.aspx?sourcedoc=%7B83F4E84B-0F2A-4C62-A3B8-59FEF07AAEE4%7D&file=Registro%20de%20Evaluaciones.xlsx&fromShare=true&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer">Registro de atención</a></li>
+              <li><a href="https://apps.powerapps.com/play/e/default-9744600e-3e04-492e-baa1-25ec245c6f10/a/9e6a8513-4c67-4383-9328-9275fec2fd69?tenantId=9744600e-3e04-492e-baa1-25ec245c6f10&hint=270ca7b8-483e-41f1-a950-c1f939a9a21b&sourcetime=1749214158388" target="_blank" rel="noopener noreferrer">Bajas y Contenciones</a></li>
+              <li><a href="https://gestion-clientes-6588c.web.app/" target="_blank" rel="noopener noreferrer">Gestion de Clientes</a></li>
+            </ul>
+          </section>
+          
+          <section id="politicas-ventas" class="section-hidden" style="display: none;"><h2>Políticas de Ventas</h2><p>Contenido...</p></section>
+          
+          <section id="prospectos-content" class="section-hidden" style="display: none;"><h2>Gestión de Prospectos</h2><form id="prospecto-form"><h3>Añadir Nuevo Prospecto</h3><div class="form-group"><label for="prospecto-nombre">Nombre:</label><input type="text" id="prospecto-nombre" name="nombre" required></div><div class="form-group"><label for="prospecto-rut">RUT:</label><input type="text" id="prospecto-rut" name="rut" placeholder="Ej: 12345678-9"></div><div class="form-group"><label for="prospecto-telefono">Teléfono:</label><input type="tel" id="prospecto-telefono" name="telefono"></div><div class="form-group"><label for="prospecto-email">Email:</label><input type="email" id="prospecto-email" name="email"></div><div class="form-group"><label for="prospecto-notas">Notas:</label><textarea id="prospecto-notas" name="notas" rows="3"></textarea></div><div class="form-actions"><button type="submit" id="guardar-prospecto-btn">Guardar Prospecto</button><span id="prospecto-loader" class="form-loader" style="display: none;">Guardando...</span></div><div id="prospecto-mensaje" class="mensaje-estado"></div></form><div id="prospectos-lista-container" style="margin-top: 40px; display: none;"><h3>Prospectos Registrados</h3><div id="prospectos-lista-loader" class="loader">Cargando lista...</div><div id="prospectos-lista-error"></div><div id="prospectos-lista-tabla"></div></div></section>
+          
+          <section id="asistente-ai-content" class="section-hidden" style="display: none;">
+            <h2>Asistente de Ventas AI</h2>
+            <p>Pídele a la IA que te ayude a redactar mensajes, preparar argumentos de venta o resolver dudas de clientes.</p>
+            <div class="ai-assistant-container">
+              <div id="ai-chat-log" class="ai-chat-log"></div>
+              <div id="ai-loader" class="loader" style="display: none; margin: 15px auto;">La IA está pensando...</div>
+              <div class="form-group" style="margin-top: 20px;">
+                <label for="ai-prompt">Tu mensaje:</label>
+                <textarea id="ai-prompt" rows="3" placeholder="Ej: Redacta un mensaje de WhatsApp para un cliente..."></textarea>
+              </div>
+              <div class="form-actions">
+                <button id="ai-generate-btn" class="btn-principal">Enviar Mensaje</button>
+                <button id="ai-new-chat-btn" class="btn-secundario">Nuevo Chat</button>
+              </div>
+            </div>
+          </section>
+
+          <div class="overlay" id="add-sale-overlay" style="display: none;"></div>
+          <div class="form-popup wide" id="add-sale-popup" style="display: none;">
+            <h3>Registrar Nueva Venta
+              <button class="close-btn" id="btn-close-add-sale" title="Cerrar" aria-label="Cerrar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+              </button>
+            </h3>
+            <div class="iframe-container">
+              <form id="add-sale-form">
+                <h4>Datos para 'ventas generales'</h4>
+                <div class="form-grid">
+                  <div class="form-group"><label for="sale-fecha">Fecha Venta:</label><input type="date" id="sale-fecha" required></div>
+                  <div class="form-group"><label for="sale-nombreCompleto">Nombre Completo:</label><input type="text" id="sale-nombreCompleto" required></div>
+                  <div class="form-group"><label for="sale-rutCliente">RUT Cliente:</label><input type="text" id="sale-rutCliente" placeholder="12345678-9"></div>
+                  <div class="form-group"><label for="sale-suscripcion">Suscripción/Teléfono:</label><input type="text" id="sale-suscripcion"></div>
+                  <div class="form-group"><label for="sale-tipoVenta">Tipo de Venta (General):</label><input type="text" id="sale-tipoVenta" placeholder="Ej: FO, Móvil, etc."></div>
+                  <div class="form-group"><label for="sale-maestro">Maestro:</label><input type="text" id="sale-maestro"></div>
+                  <div class="form-group"><label for="sale-numeroOrden">N° Orden:</label><input type="text" id="sale-numeroOrden"></div>
+                  <div class="form-group"><label for="sale-aloha">N° Aloha:</label><input type="text" id="sale-aloha"></div>
+                  <div class="form-group"><label for="sale-terminales">Terminales:</label><input type="text" id="sale-terminales" placeholder="Ej: Samsung S24"></div>
+                  <div class="form-group"><label for="sale-nombreAccesorio">Nombre del Accesorio:</label><input type="text" id="sale-nombreAccesorio" placeholder="Ej: Carcasa S24, Cargador 25W"></div>
+                  <div class="form-group"><label for="sale-accesorio">Monto del Accesorio:</label><input type="text" id="sale-accesorio" placeholder="Ej: 20000"></div>
+                  <div class="form-group"><label for="sale-rgu">RGU:</label><input type="text" id="sale-rgu"></div>
+                </div>
+                <h4>Datos para 'RegistroVentas'</h4>
+                <div class="form-grid">
+                  <div class="form-group"><label for="sale-codigoProductoRegla">Código Producto Regla:</label><select id="sale-codigoProductoRegla"></select></div>
+                  <div class="form-group"><label for="sale-tipoEntradaRegla">Tipo Entrada Regla:</label><select id="sale-tipoEntradaRegla"></select></div>
+                  <div class="form-group"><label for="sale-cantidadVendida">Cantidad Vendida:</label><input type="number" id="sale-cantidadVendida" min="0" value="1"></div>
+                  <div class="form-group"><label for="sale-tipoKPIPrincipal">Tipo KPI Principal:</label><select id="sale-tipoKPIPrincipal"></select></div>
+                  <div class="form-group"><label for="sale-cantidadMovil">Cantidad Móvil (para KPI):</label><input type="number" id="sale-cantidadMovil" min="0"></div>
+                </div>
+                <h4>Opciones Adicionales</h4>
+                <div class="form-grid">
+                  <div class="form-group-checkbox"><input type="checkbox" id="sale-firma"><label for="sale-firma">Firma OK</label></div>
+                  <div class="form-group-checkbox"><input type="checkbox" id="sale-instalacion"><label for="sale-instalacion">Instalación OK</label></div>
+                  <div class="form-group-checkbox"><input type="checkbox" id="sale-seguro"><label for="sale-seguro">Seguro Contratado</label></div>
+                  <div class="form-group-checkbox"><input type="checkbox" id="sale-qCelulares"><label for="sale-qCelulares">Q Celulares OK</label></div>
+                </div>
+                <div id="add-sale-mensaje" class="mensaje-estado" style="display: none;"></div>
+                <div class="form-actions">
+                  <button type="submit" id="btn-submit-sale" class="btn-principal">Guardar Venta</button>
+                  <div id="add-sale-loader" class="loader" style="display: none;">Guardando...</div>
+                </div>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Nuevo Overlay y Popup para Subir Oferta Flash -->
+          <div class="overlay" id="upload-offer-overlay" style="display: none;"></div>
+          <div class="form-popup wide" id="upload-offer-popup" style="display: none;">
+            <h3>Subir Nueva Oferta Flash
+              <button class="close-btn" id="btn-close-upload-offer" title="Cerrar" aria-label="Cerrar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+              </button>
+            </h3>
+            <div class="iframe-container" style="padding: 20px;">
+              <form id="upload-offer-form">
+                <div class="form-group">
+                  <label for="upload-offer-file">Archivo de Oferta (Imagen o PDF):</label>
+                  <input type="file" id="upload-offer-file" accept="image/*,application/pdf" required>
+                </div>
+                <div class="form-group">
+                  <label for="upload-offer-title">Título de la Oferta:</label>
+                  <input type="text" id="upload-offer-title" placeholder="Ej: Cyberday, Oferta Terminales" required>
+                </div>
+                <div class="form-group">
+                  <label for="upload-offer-description">Descripción Breve:</label>
+                  <textarea id="upload-offer-description" rows="3" placeholder="Ej: Descuentos de hasta 50% en equipos seleccionados."></textarea>
+                </div>
+                <div id="upload-offer-message" class="mensaje-estado" style="display: none;"></div>
+                <div class="form-actions" style="justify-content: flex-end;">
+                  <button type="submit" id="btn-submit-upload-offer" class="btn-principal">Cargar Oferta</button>
+                  <div id="upload-offer-loader" class="loader" style="display: none;">Cargando...</div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <!-- Fin Nuevo Overlay y Popup para Subir Oferta Flash -->
+
+        </main>
+      </div>
+    </div>
   </div>
 
-  <!-- ===== Contenido Principal ===== -->
-  <main class="main-content">
+  <div class="fixed-bottom-bar">
+    <button id="theme-toggle-btn-footer" aria-label="Cambiar tema claro/oscuro"></button>
+    <a href="#inicio" id="home-btn-footer" aria-label="Ir a Inicio"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWhvdXNlLWljb24gbHVjaWRlLWhvdXNlIj48cGF0aCBkPSJNMTUgMjF2LThhMSAxIDAgMCAwLTEtMWgtNGExIDEgMCAwIDAtMSAxdjgiLz48cGF0aCBkZ2R9ZTMgMTBmMjIgMCAwIDEgLjcwOS0xLjUyOGw3LTUuOTk5YTIgMiAwIDAgMSAyLjU4MiAwbDcgNS45OTlBMiAyIDAgMCAxIDIxIDEwdjlhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJ6Ii8+PC9zdmc+" alt="Inicio"></a>
+    <a href="https://wa.me/+56953627871?text=Hola%20Manu,%0AQuisiera%20consultar%20sobre%20una%20contratación.%0AGracias." class="whatsapp-button-footer" target="_blank" aria-label="Contactar por WhatsApp"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M16.75 13.96c.25.13.42.2.49.28.07.08.15.28.04.51-.14.26-.86.85-1.18.97-.31.1-.58.09-.89-.14-.39-.29-1.21-.72-1.96-1.33-.93-.76-1.63-1.69-1.92-2.13-.29-.44-.13-.67.03-.88.13-.17.29-.44.4-.58.12-.14.23-.29.38-.47.14-.18.22-.32.14-.58s-.4-.97-.55-1.32c-.15-.35-.3-.42-.45-.42-.15-.01-.33-.01-.51-.01h-.24c-.31.05-.72.28-.92.73-.22.43-.77,1.28-.77,2.45S10.08 15 10.2 15.21c.13.19.77.84 1.92,1.42.3.15.72.35 1.03.41.48.1,1.02.03,1.41-.22.43-.28.66-.54.82-.89.15-.35.15-.64.11-.81-.04-.17-.14-.26-.29-.41zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></a>
+  </div>
 
-    <!-- Sección para KPIs y Faltantes (Contenedor Principal) -->
-    <!-- Se mostrará/ocultará por JS -->
-    <section id="kpi-content" style="display: none;">
-      <h2>KPIs / Faltantes</h2> <!-- Título opcional para la sección -->
-      <!-- Contenedor interno para la tabla/loader/error -->
-      <section id="tabla-container">
-        <div class="loader" id="loader">Cargando datos...</div>
-        <table id="tablaDatos"></table>
-        <div id="error-container"></div> <!-- Para mostrar errores de carga -->
-      </section>
-      <!-- Contenedor interno para el gráfico (solo para KPIs) -->
-      <section id="chart-container" style="height: 400px; width: 80%; margin: 20px auto;">
-        <canvas id="kpiChart"></canvas>
-      </section>
-    </section>
+  <div class="overlay" id="kpi-details-overlay" style="display: none;"></div>
+  <div class="form-popup wide" id="kpi-details-popup" style="display: none;">
+    <h3 id="kpi-details-title">Detalles del KPI
+      <button class="close-btn" id="btn-close-kpi-details" title="Cerrar" aria-label="Cerrar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+      </button>
+    </h3>
+    <div class="iframe-container" id="kpi-details-content">
+      <div class="loader" id="kpi-details-loader">Cargando detalles...</div>
+    </div>
+  </div>
+  
+  <div id="toast-container"></div>
+  <!-- Librería para ventanas emergentes bonitas (SweetAlert) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Otras Secciones (Ocultas por defecto) -->
-    <section id="ofertas-flash" style="display: none;">
-      <h2>Ofertas Flash</h2>
-      <p>Aquí va el contenido detallado de las ofertas flash...</p>
-      <!-- Puedes añadir imágenes, tablas, etc. -->
-    </section>
-
-    <section id="enlaces-externos" style="display: none;">
-      <h2>Enlaces Externos</h2>
-       <ul>
-         <li><a href="https://www.ejemplo.com" target="_blank">Enlace Ejemplo 1</a></li>
-         <li><a href="https://www.otroejemplo.org" target="_blank">Enlace Ejemplo 2</a></li>
-         <!-- Añade más enlaces -->
-       </ul>
-    </section>
-
-     <section id="tabla-remuneracion" style="display: none;">
-      <h2>Tabla de Remuneración</h2>
-       <p>Aquí puedes insertar una tabla HTML con la información o una descripción.</p>
-       <!-- Ejemplo de tabla simple: -->
-       <table>
-         <thead><tr><th>Nivel</th><th>Salario Base</th><th>Comisión</th></tr></thead>
-         <tbody><tr><td>Junior</td><td>$XXX</td><td>Y%</td></tr></tbody>
-       </table>
-    </section>
-
-     <section id="politicas-ventas" style="display: none;">
-      <h2>Políticas de Ventas</h2>
-       <p>Detalles de las políticas de ventas vigentes...</p>
-       <p>Puedes incluir:</p>
-       <ul>
-         <li>Condiciones de crédito</li>
-         <li>Políticas de devolución</li>
-         <li>Proceso de aprobación de descuentos</li>
-       </ul>
-    </section>
-
-  </main> <!-- Fin del main-content wrapper -->
-
-  <!-- ===== Botón Flotante de WhatsApp ===== -->
-  <!-- Reemplaza TUNUMERODEWHATSAPPCONCODIGOPAIS con tu número real, ej: 569XXXXXXXX -->
-  <a href="https://wa.me/TUNUMERODEWHATSAPPCONCODIGOPAIS" class="whatsapp-button" target="_blank" aria-label="Contactar por WhatsApp">
-    <i class="fab fa-whatsapp"></i>
-  </a>
-
-  <!-- Enlace al script JavaScript (justo antes de cerrar body) -->
-  <!-- Asegúrate de que 'script.js' esté en la misma carpeta -->
   <script src="script.js"></script>
-
 </body>
 </html>

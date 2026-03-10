@@ -736,11 +736,11 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
 .kpi-details-table th, .kpi-details-table td { border: 1px solid var(--border-color-dark); padding: 8px 10px; text-align: left; vertical-align: middle; }
 .kpi-details-table th { background-color: var(--bg-content-alt); font-weight: 600; }
 .card-actions {
-  margin-top: 15px;
-  padding-top: 12px;
+  margin: 0 12px 12px;
+  padding-top: 10px;
   border-top: 1px solid var(--border-color-light);
   display: flex;
-  gap: 8px;
+  gap: 6px;
   justify-content: flex-end;
   align-items: center;
 }
@@ -750,52 +750,45 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
   background-color: var(--color-orange-accent);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 8px 18px;
-  font-size: 0.88rem;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 3px 10px rgba(251,133,0,0.3);
+  gap: 5px;
+  transition: background-color 0.2s ease, transform 0.15s ease;
   text-transform: none;
   letter-spacing: 0;
 }
 .card-actions .view-offer-btn:hover {
   background-color: #d97500;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(251,133,0,0.4);
-}
-.card-actions .view-offer-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(251,133,0,0.3);
+  transform: translateY(-1px);
 }
 
 /* Botón Eliminar en flash cards */
 .card-actions .btn-delete-flash-offer {
   background-color: transparent;
-  color: #e55;
-  border: 1.5px solid #e55;
-  border-radius: 8px;
-  padding: 8px 14px;
-  font-size: 0.85rem;
+  color: #c44;
+  border: 1px solid #c44;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  gap: 4px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 .card-actions .btn-delete-flash-offer:hover {
-  background-color: #e55;
+  background-color: #c44;
   color: #fff;
-  transform: translateY(-2px);
 }
 .card-actions .btn-delete-flash-offer svg {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
 }
 .btn-details { font-size: 0.8em; padding: 5px 12px; background-color: transparent; color: var(--text-color-link); border: 1px solid var(--text-color-link); border-radius: 20px; cursor: pointer; transition: background-color 0.2s, color 0.2s; }
 .btn-details:hover { background-color: var(--text-color-link); color: var(--bg-content); text-decoration: none; }

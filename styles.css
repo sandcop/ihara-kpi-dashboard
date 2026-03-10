@@ -1181,55 +1181,49 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
 }
 
 /* --- BOTÓN WHATSAPP --- */
-.whatsapp-button-footer, .btn-whatsapp-enviar {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;
-  width: 45px !important;
-  height: 45px !important;
-  border: none !important;
-  border-radius: 50% !important;
-  cursor: pointer !important;
-  position: relative !important;
-  overflow: hidden !important;
-  transition: width 0.3s ease, border-radius 0.3s ease !important;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2) !important;
-  background-color: #00d757 !important;
-  padding: 0 !important;
-  color: white !important;
+.whatsapp-button-footer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: #25d366;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+  overflow: hidden;
+  transition: width 0.3s ease, border-radius 0.3s ease;
+  text-decoration: none;
+  gap: 0;
 }
-.whatsapp-button-footer .sign, .btn-whatsapp-enviar .sign {
-  width: 100%;
+.whatsapp-button-footer .sign {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: width 0.3s;
   flex-shrink: 0;
+  width: 45px;
+  transition: width 0.3s ease;
 }
-.whatsapp-button-footer .wtext, .btn-whatsapp-enviar .wtext {
-  position: absolute;
-  right: 0;
-  width: 0;
-  opacity: 0;
+.whatsapp-button-footer .wtext {
   color: white;
-  font-size: 0.95em;
+  font-size: 0.9em;
   font-weight: 600;
   white-space: nowrap;
-  transition: width 0.3s, opacity 0.3s;
+  max-width: 0;
   overflow: hidden;
+  opacity: 0;
+  transition: max-width 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
 }
-.whatsapp-button-footer:hover, .btn-whatsapp-enviar:hover {
-  width: 130px !important;
-  border-radius: 40px !important;
+.whatsapp-button-footer:hover {
+  width: 140px;
+  border-radius: 40px;
 }
-.whatsapp-button-footer:hover .sign, .btn-whatsapp-enviar:hover .sign {
-  width: 30%;
-  padding-left: 8px;
+.whatsapp-button-footer:hover .sign {
+  width: 40px;
 }
-.whatsapp-button-footer:hover .wtext, .btn-whatsapp-enviar:hover .wtext {
+.whatsapp-button-footer:hover .wtext {
+  max-width: 100px;
   opacity: 1;
-  width: 70%;
-  padding-right: 8px;
+  padding-right: 12px;
 }
 
 /* --- BOTONES GENERALES --- */

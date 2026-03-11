@@ -1190,55 +1190,23 @@ a.whatsapp-button-footer {
   height: 45px !important;
   border-radius: 50% !important;
   background-color: #25d366 !important;
-  background: #25d366 !important;
-  box-shadow: 2px 2px 10px rgba(0,0,0,0.2) !important;
-  overflow: hidden !important;
-  transition: width 0.3s ease, border-radius 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4) !important;
   text-decoration: none !important;
   color: white !important;
   padding: 0 !important;
   font-size: inherit !important;
-  transform: none !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 .fixed-bottom-bar a.whatsapp-button-footer:hover,
 a.whatsapp-button-footer:hover {
-  width: 140px !important;
-  border-radius: 40px !important;
+  transform: scale(1.12) !important;
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.55) !important;
   color: white !important;
-  transform: none !important;
-}
-a.whatsapp-button-footer .sign {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 45px;
-  transition: width 0.3s ease;
 }
 a.whatsapp-button-footer svg {
   fill: white !important;
-  color: white !important;
 }
-a.whatsapp-button-footer .wtext {
-  color: white !important;
-  font-size: 0.88em;
-  font-weight: 600;
-  white-space: nowrap;
-  max-width: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-width 0.4s ease, opacity 0.3s ease, padding 0.3s ease;
-  display: inline-block;
-}
-a.whatsapp-button-footer:hover .sign {
-  width: 38px;
-  flex-shrink: 0;
-}
-a.whatsapp-button-footer:hover .wtext {
-  max-width: 120px;
-  opacity: 1 !important;
-  padding: 0 10px 0 4px;
-}
+a.whatsapp-button-footer .wtext { display: none; }
 
 /* --- BOTONES GENERALES --- */
 .btn-principal, .boton-opcion, .boton-simple,

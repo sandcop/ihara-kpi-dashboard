@@ -1224,21 +1224,20 @@ a.whatsapp-button-footer .wtext {
   font-size: 0.88em;
   font-weight: 600;
   white-space: nowrap;
-  width: 0;
+  max-width: 0;
   overflow: hidden;
   opacity: 0;
-  transition: width 0.3s ease, opacity 0.2s ease, padding 0.3s ease;
-  display: block;
-  flex-shrink: 0;
+  transition: max-width 0.4s ease, opacity 0.3s ease, padding 0.3s ease;
+  display: inline-block;
 }
 a.whatsapp-button-footer:hover .sign {
   width: 38px;
   flex-shrink: 0;
 }
 a.whatsapp-button-footer:hover .wtext {
-  width: 90px;
+  max-width: 120px;
   opacity: 1 !important;
-  padding-right: 10px;
+  padding: 0 10px 0 4px;
 }
 
 /* --- BOTONES GENERALES --- */

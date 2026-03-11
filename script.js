@@ -367,7 +367,10 @@ function initLoaders() {
     const html = `<div class="newtons-cradle"><div class="newtons-cradle__dot"></div><div class="newtons-cradle__dot"></div><div class="newtons-cradle__dot"></div><div class="newtons-cradle__dot"></div></div>`;
     loaderIds.forEach(id => {
         const el = document.getElementById(id);
-        if (el && !el.querySelector('.newtons-cradle')) el.innerHTML = html;
+        if (el) {
+            if (!el.querySelector('.newtons-cradle')) el.innerHTML = html;
+            el.style.display = 'none';
+        }
     });
 }
 function copiarCodigo(btn, codigo) {

@@ -1066,13 +1066,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Lógica del tema (claro/oscuro)
     const LSTORAGE_THEME_KEY = 'themePreference';
-    function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); if (themeToggleButtonFooter) { themeToggleButtonFooter.innerHTML = theme === 'dark' ? ICON_SUN_SVG : ICON_MOON_SVG; } localStorage.setItem(LSTORAGE_THEME_KEY, theme); }
+    function applyTheme(theme) { document.documentElement.setAttribute('data-theme', theme); localStorage.setItem(LSTORAGE_THEME_KEY, theme); }
     window.toggleTheme = function toggleTheme() { const currentTheme = document.documentElement.getAttribute('data-theme') || 'light'; const newTheme = currentTheme === 'dark' ? 'light' : 'dark'; applyTheme(newTheme); };
     const savedTheme = localStorage.getItem(LSTORAGE_THEME_KEY);
     applyTheme(savedTheme || 'light');
 
     // --- Listeners de eventos ---
-    // toggle ahora es onclick directo en HTML
+    if (themeToggleButtonFooter) themeToggleButtonFooter.addEventListener('click', toggleTheme);
     if (loginForm) loginForm.addEventListener('submit', (e) => { e.preventDefault(); attemptLogin(loginPasswordInput.value); });
     if (hamburgerBtnMobile) hamburgerBtnMobile.addEventListener('click', () => { sidebarLeft.classList.toggle('open'); document.body.classList.toggle('sidebar-left-open'); hamburgerBtnMobile.setAttribute('aria-expanded', String(sidebarLeft.classList.contains('open'))); });
     if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', closeMobileSidebar);

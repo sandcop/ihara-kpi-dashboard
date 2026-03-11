@@ -1188,48 +1188,49 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
 }
 .toggle-switch {
   position: relative;
-  width: 56px;
-  height: 28px;
+  width: 52px;
+  height: 26px;
   --light: #d8dbe0;
   --dark: #28292c;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 .switch-label {
   position: absolute;
   width: 100%;
-  height: 28px;
+  height: 100%;
   background-color: var(--dark);
-  border-radius: 14px;
+  border-radius: 13px;
   cursor: pointer;
-  border: 2px solid var(--dark);
-  transition: background-color 0.3s;
+  border: 2px solid #444;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 [data-theme="light"] .switch-label {
-  background-color: var(--light);
-  border-color: #aaa;
+  background-color: #a8c8f8;
+  border-color: #88aadd;
 }
 .toggle-switch .slider {
   position: absolute;
   width: 100%;
   height: 100%;
-  border-radius: 14px;
-  transition: 0.3s;
+  border-radius: 13px;
 }
 .toggle-switch .slider::before {
   content: "";
   position: absolute;
-  top: 4px;
-  left: 4px;
+  top: 3px;
+  left: 3px;
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  box-shadow: inset 8px -2px 0px 0px var(--light);
   background-color: var(--dark);
-  transition: 0.3s;
+  box-shadow: inset 6px -2px 0px 0px #d8dbe0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
 }
 [data-theme="light"] .toggle-switch .slider::before {
-  transform: translateX(28px);
-  background-color: var(--dark);
-  box-shadow: none;
+  transform: translateX(26px);
+  background-color: #ffe55c;
+  box-shadow: 0 0 6px 2px rgba(255,200,0,0.4);
 }
 
 /* --- BOTÓN WHATSAPP --- */

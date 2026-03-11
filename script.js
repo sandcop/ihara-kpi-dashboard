@@ -1,7 +1,7 @@
 // script.js
 console.log("script.js: Empezando a ejecutar.");
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFJeZvznq1HYq4DH61FRsJQGXA_S8kvhAkgN23exELblm3Wn6qqeeEY4XUBANGPH-5/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5kUerJ0kpS_yIUX1f9VK50tv2gV839kjXQ1XVuwvrGBxCbVuNSIUU5dBicZUYBChU/exec';
 const GOOGLE_FORM_URL_HOGAR = "https://docs.google.com/forms/d/e/1FAIpQLSfUnRFmauKoiSii1g9rBSRFmMwmb79ImhVW9U80zY3ABU04aA/viewform?embedded=true";
 const GOOGLE_FORM_URL_MOVIL = "https://docs.google.com/forms/d/e/1FAIpQLSexD3YnCTfjZcxbZkUp4684hTLL_UxcprWOtBTTZPOGB1N-eA/viewform?embedded=true";
 
@@ -358,21 +358,7 @@ function closeHogarForm() { const popup = document.getElementById('hogar-plan-fo
 function toggleOriginalHogarIframe(buttonClicked){ const ic=document.getElementById('parrilla-hogar-iframe-original-container'); const pc=document.getElementById('parrilla-planes-hogar-integrada'); if(!ic || !pc) return; const isPlanesCurrentlyVisible = pc.style.display === 'block'; if(isPlanesCurrentlyVisible){ pc.style.display = 'none'; ic.style.display = 'block'; const btnEnIframe = ic.querySelector('.boton-simple'); if(btnEnIframe) btnEnIframe.textContent = '← Volver a Planes'; cargarParrillaFile('hogar'); } else { ic.style.display = 'none'; pc.style.display = 'block'; const btnEnPlanes = pc.querySelector('.boton-simple'); if(btnEnPlanes) btnEnPlanes.textContent = 'Más detalles'; const hogarCardsContainer = document.getElementById('hogar-plans-cards-container'); if (hogarCardsContainer && hogarCardsContainer.children.length === 0) showHogarPlans('fibra'); } }
 
 
-function initLoaders() {
-    const loaderIds = ['loader','prospectos-lista-loader','resultados-ventas-loader',
-        'remuneracion-loader-tabla-ppm','remuneracion-loader-tabla-entradas',
-        'kpis-fijos-loader','simulacion-loader','grafico-pesos-loader',
-        'ai-loader','add-sale-loader','kpi-details-loader',
-        'flash-offers-add-loader','flash-offers-management-loader'];
-    const html = `<div class="newtons-cradle"><div class="newtons-cradle__dot"></div><div class="newtons-cradle__dot"></div><div class="newtons-cradle__dot"></div><div class="newtons-cradle__dot"></div></div>`;
-    loaderIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            if (!el.querySelector('.newtons-cradle')) el.innerHTML = html;
-            el.style.display = 'none';
-        }
-    });
-}
+
 function copiarCodigo(btn, codigo) {
     navigator.clipboard.writeText(codigo).then(() => {
         btn.textContent = '✅ Copiado!';
@@ -1177,5 +1163,5 @@ document.addEventListener('DOMContentLoaded', () => {
     if (toastContainer && typeof startPeriodicNotifications === 'function') { startPeriodicNotifications(); }
     
     console.log("script.js: Inicialización completa.");
-    initLoaders();
+    
 });

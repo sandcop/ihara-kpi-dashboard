@@ -454,13 +454,13 @@ main section h4 { color: var(--text-color-secondary); margin-top: 25px; margin-b
 .close-btn .lucide { width: 1.2em; height: 1.2em; stroke: var(--text-color-secondary); }
 .close-btn:hover .lucide { stroke: var(--text-color-headings); }
 
-.btn-principal, .boton-opcion, .boton-simple, #guardar-prospecto-btn, .oferta-contenido > button, #btn-simular-comision { display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; font-size: 1em; font-weight: 500; color: var(--btn-primary-text); background-color: var(--btn-primary-bg); border: none; border-radius: 5px; cursor: pointer; text-align: center; text-decoration: none; transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease; box-shadow: 0 2px 4px var(--shadow-color); }
-.btn-principal:hover, .boton-opcion:hover, .boton-simple:hover, #guardar-prospecto-btn:hover, .oferta-contenido > button:hover, #btn-simular-comision:hover { background-color: var(--btn-primary-hover-bg); color: var(--btn-primary-hover-text); transform: translateY(-1px); box-shadow: 0 3px 6px var(--shadow-color); }
-.btn-principal:active, .boton-opcion:active, .boton-simple:active, #guardar-prospecto-btn:active, .oferta-contenido > button:active, #btn-simular-comision:active { transform: translateY(0px); box-shadow: 0 1px 2px var(--shadow-color); }
+.btn-principal, .boton-opcion, .boton-simple, #guardar-prospecto-btn, .oferta-contenido > button, #btn-simular-comision { display: inline-flex; align-items: center; justify-content: center; padding: 0.65em 1.6em; font-size: 0.92em; font-weight: 600; color: var(--btn-primary-text); background-color: var(--btn-primary-bg); border: none; border-radius: 8px; cursor: pointer; text-align: center; text-decoration: none; position: relative; overflow: hidden; transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15); letter-spacing: 0.03em; }
+.btn-principal:hover, .boton-opcion:hover, .boton-simple:hover, #guardar-prospecto-btn:hover, .oferta-contenido > button:hover, #btn-simular-comision:hover { background-color: var(--btn-primary-hover-bg); color: var(--btn-primary-hover-text); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+.btn-principal:active, .boton-opcion:active, .boton-simple:active, #guardar-prospecto-btn:active, .oferta-contenido > button:active, #btn-simular-comision:active { transform: translateY(0); box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
 .btn-principal:disabled, #guardar-prospecto-btn:disabled, #btn-submit-sale:disabled { background-color: #adb5bd; color: #6c757d; cursor: not-allowed; transform: none; box-shadow: none; }
 [data-theme="dark"] .btn-principal:disabled, [data-theme="dark"] #guardar-prospecto-btn:disabled, [data-theme="dark"] #btn-submit-sale:disabled { background-color: #5a5a5a; color: #999; }
-.btn-secundario { background-color: var(--text-color-secondary); color: var(--bg-content); display: inline-block; padding: 10px 20px; font-size: 1em; font-weight: 500; border: none; border-radius: 5px; cursor: pointer; text-align: center; text-decoration: none; transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease; box-shadow: 0 2px 4px var(--shadow-color); }
-.btn-secundario:hover { background-color: var(--text-color-primary); transform: translateY(-1px); box-shadow: 0 3px 6px var(--shadow-color); }
+.btn-secundario { background-color: transparent; color: var(--text-color-primary); display: inline-flex; align-items: center; justify-content: center; padding: 0.65em 1.6em; font-size: 0.92em; font-weight: 600; border: 1.5px solid var(--border-color-dark); border-radius: 8px; cursor: pointer; text-align: center; text-decoration: none; transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease; letter-spacing: 0.03em; }
+.btn-secundario:hover { background-color: var(--bg-content-alt); border-color: var(--color-orange-accent); transform: translateY(-2px); }
 [data-theme="dark"] .btn-secundario { background-color: var(--border-color-dark); color: var(--text-color-primary); }
 [data-theme="dark"] .btn-secundario:hover { background-color: var(--border-color-medium); }
 
@@ -1262,42 +1262,20 @@ a.whatsapp-button-footer svg {
 a.whatsapp-button-footer .wtext { display: none; }
 
 /* --- BOTONES GENERALES --- */
-.btn-principal, .boton-opcion, .boton-simple,
-#guardar-prospecto-btn, .oferta-contenido > button,
-#btn-simular-comision {
-  position: relative !important;
-  text-transform: uppercase !important;
-  padding: 0.7em 1.8em !important;
-  border-radius: 6em !important;
-  transition: transform 0.2s, box-shadow 0.2s !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.04em;
-  overflow: hidden;
-}
-.btn-principal::after, .boton-opcion::after, .boton-simple::after {
+/* Ripple effect en botones principales */
+.btn-principal::after, .boton-opcion::after, .boton-simple::after,
+#guardar-prospecto-btn::after, #btn-simular-comision::after {
   content: "";
-  display: inline-block;
-  height: 100%;
-  width: 100%;
-  border-radius: 100px;
   position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  transition: all 0.4s;
-  background-color: var(--btn-primary-bg);
-}
-.btn-principal:hover::after, .boton-opcion:hover::after, .boton-simple:hover::after {
-  transform: scaleX(1.4) scaleY(1.6);
+  inset: 0;
+  background: rgba(255,255,255,0.15);
   opacity: 0;
+  transition: opacity 0.2s ease;
+  border-radius: inherit;
 }
-.btn-principal:hover, .boton-opcion:hover, .boton-simple:hover {
-  transform: translateY(-3px) !important;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
-}
-.btn-principal:active, .boton-opcion:active, .boton-simple:active {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 5px 10px rgba(0,0,0,0.2) !important;
+.btn-principal:hover::after, .boton-opcion:hover::after, .boton-simple:hover::after,
+#guardar-prospecto-btn:hover::after, #btn-simular-comision:hover::after {
+  opacity: 1;
 }
 
 /* --- ICONOS BARRA VERTICAL (vnav) --- */
@@ -2025,4 +2003,56 @@ label.sale-check input:checked ~ .checkmark::after { display: block; }
   }
   #add-sale-popup.form-popup.visible { transform: none !important; }
   #add-sale-form .form-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ===== SISTEMA DE BOTONES UNIFICADO ===== */
+
+/* Tab links armónicos */
+.tab-link {
+  font-weight: 600 !important;
+  font-size: 0.88rem !important;
+  letter-spacing: 0.03em !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  transition: color 0.2s ease, background-color 0.2s ease !important;
+}
+.tab-link:hover {
+  background-color: var(--bg-content-alt) !important;
+}
+.tab-link.active {
+  background-color: var(--bg-content-alt) !important;
+}
+
+/* btn-copy-codigo unificado */
+.btn-copy-codigo {
+  border-radius: 6px !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  padding: 5px 12px !important;
+  letter-spacing: 0.03em !important;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease !important;
+}
+.btn-copy-codigo:hover {
+  transform: translateY(-1px) !important;
+}
+
+/* Botones de acción pequeños (admin, upload, etc) */
+.btn-admin,
+button[onclick*="admin"],
+.btn-small {
+  border-radius: 6px !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  padding: 6px 14px !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* Botón cerrar popup armónico */
+.close-btn {
+  border-radius: 6px !important;
+  transition: color 0.2s ease, transform 0.2s ease !important;
+}
+.close-btn:hover {
+  color: var(--color-orange-accent) !important;
+  transform: rotate(90deg) !important;
 }

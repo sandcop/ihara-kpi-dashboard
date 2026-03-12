@@ -8,7 +8,7 @@ const GOOGLE_FORM_URL_MOVIL = "https://docs.google.com/forms/d/e/1FAIpQLSexD3YnC
 // ¡¡ADVERTENCIA DE SEGURIDAD CRÍTICA!!
 // Esta contraseña (Movistar2025) está hardcodeada y visible en el código fuente del frontend.
 // CUALQUIER persona que inspeccione el código puede verla y usarla para registrar ventas.
-// Esto es un riesgo de seguridad MUY ALTO. Se recomienda ENCARECIDAMENTE cambiar este
+// Esto es un riesgo de seguridad MUY ALTO. Se recomienda ENCARECIDAMENTE cambiar este.
 // sistema de autenticación a uno basado en tokens gestionados por el backend, o al menos
 // usar una validación de contraseña mucho más robusta que NO exponga la clave en el cliente.
 const CORRECT_PASSWORD_B64 = btoa("Movistar2025");

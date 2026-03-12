@@ -2107,25 +2107,32 @@ button[onclick*="admin"],
   box-shadow: -4px -4px 0 2px var(--bg-content);
 }
 
-/* Header del top: icono + nombre */
+/* Header del top: icono en esquina blanca + nombre arriba derecha */
 .kpi-top-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 4px;
-  padding-left: 2px;
+  justify-content: flex-end;
+  gap: 6px;
+  padding-right: 4px;
+  margin-top: 0;
+}
+.kpi-icon-uiverse {
+  position: absolute;
+  top: 4px;
+  left: 10px;
 }
 .kpi-icon-uiverse svg {
-  width: 20px; height: 20px;
-  stroke: rgba(255,255,255,0.9);
+  width: 18px; height: 18px;
+  stroke: var(--color-orange-accent);
   fill: none;
 }
 .kpi-nombre-top {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.92);
+  color: rgba(255,255,255,0.95);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-align: right;
 }
 
 /* Valor grande */

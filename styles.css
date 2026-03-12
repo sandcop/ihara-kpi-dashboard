@@ -1932,6 +1932,27 @@ a.whatsapp-button-footer .wtext { display: none; }
   height: 88vh !important;
   max-height: 860px !important;
 }
+[data-theme="light"] #add-sale-popup.form-popup {
+  background-color: #ffffff !important;
+  border-color: #e0e0e0 !important;
+}
+[data-theme="light"] #add-sale-popup > h3 {
+  background-color: #f5f5f5 !important;
+  border-color: #e0e0e0 !important;
+}
+[data-theme="light"] label.sale-field .sale-input {
+  background-color: #f5f7fa !important;
+  border-color: #d0d5dd !important;
+  color: #1a1a1a !important;
+}
+[data-theme="light"] label.sale-check {
+  background-color: #f5f7fa !important;
+  border-color: #d0d5dd !important;
+  color: #1a1a1a !important;
+}
+[data-theme="light"] #add-sale-form .form-actions {
+  border-color: #e0e0e0 !important;
+}
 
 #add-sale-popup > h3 {
   background-color: var(--bg-content-alt) !important;
@@ -2030,6 +2051,10 @@ label.sale-field span.span-select {
   font-size: 0.68em !important;
   font-weight: 600 !important;
   color: #00bfff !important;
+}
+label.sale-field select.sale-input {
+  padding-top: 20px !important;
+  padding-bottom: 8px !important;
 }
 
 /* Checkboxes */

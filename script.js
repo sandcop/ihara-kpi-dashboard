@@ -367,9 +367,10 @@ function popularKPICards(kpis) { if (!kpiCardsContainer) return; Array.from(kpiC
         const barWidth = Math.min(porcCumpl, 100);
 
         let cardHTML = `
-        <div class="card kpi-uiverse-card">
-          <div class="kpi-top-section kpi-urgencia-${colorUrgencia}">
-            <div class="kpi-top-corner"></div>
+        <div class="card kpi-uiverse-card kpi-urgencia-${colorUrgencia}">
+          <div class="kpi-blob kpi-blob-${colorUrgencia}"></div>
+          <div class="kpi-bg"></div>
+          <div class="kpi-top-section">
             <div class="kpi-top-header">
               <div class="kpi-icon-uiverse">${iconSvg}</div>
               <span class="kpi-nombre-top">${kpiD ? kpiD.kpi : nomKpiRel}</span>

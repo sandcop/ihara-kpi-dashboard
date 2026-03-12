@@ -1920,3 +1920,200 @@ a.whatsapp-button-footer .wtext { display: none; }
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ===== POPUP REGISTRO VENTA - ESTILO UIVERSE AMMARSAA ===== */
+#add-sale-popup.form-popup {
+  background-color: var(--bg-content) !important;
+  border-radius: 20px !important;
+  border: 1px solid var(--border-color-dark) !important;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.28) !important;
+  max-width: 860px !important;
+  width: 94% !important;
+  height: 88vh !important;
+  max-height: 860px !important;
+}
+
+#add-sale-popup > h3 {
+  background-color: var(--bg-content-alt) !important;
+  border-bottom: 1px solid var(--border-color-dark) !important;
+  border-radius: 20px 20px 0 0 !important;
+  padding: 18px 24px !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  color: var(--text-color-headings) !important;
+}
+#add-sale-popup .close-btn {
+  color: var(--text-color-secondary) !important;
+  transition: color 0.2s, transform 0.2s !important;
+}
+#add-sale-popup .close-btn:hover {
+  color: #00bfff !important;
+  transform: rotate(90deg) !important;
+}
+
+/* Scrollbar */
+#add-sale-popup .iframe-container {
+  padding: 20px 24px 28px !important;
+  scrollbar-width: thin;
+  scrollbar-color: #00bfff transparent;
+}
+#add-sale-popup .iframe-container::-webkit-scrollbar { width: 4px; }
+#add-sale-popup .iframe-container::-webkit-scrollbar-track { background: transparent; }
+#add-sale-popup .iframe-container::-webkit-scrollbar-thumb { background: #00bfff; border-radius: 4px; }
+
+/* Form */
+#add-sale-form { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+
+#add-sale-form h4 {
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: #00bfff !important;
+  border-bottom: 1px solid var(--border-color-dark) !important;
+  padding-bottom: 8px !important;
+  margin: 24px 0 16px !important;
+  grid-column: 1 / -1;
+}
+#add-sale-form h4:first-of-type { margin-top: 4px !important; }
+
+#add-sale-form .form-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 18px 20px !important;
+  padding: 0 !important;
+}
+
+/* Campo con label flotante */
+label.sale-field {
+  position: relative;
+  display: block;
+}
+label.sale-field .sale-input {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--bg-content-alt);
+  color: var(--text-color-primary);
+  border: 1px solid var(--border-color-dark);
+  border-radius: 10px;
+  padding: 20px 12px 8px 12px;
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  -webkit-appearance: none;
+}
+label.sale-field .sale-input:focus {
+  border-color: #00bfff;
+  box-shadow: 0 0 0 3px rgba(0,191,255,0.15);
+}
+label.sale-field > span {
+  position: absolute;
+  left: 12px;
+  top: 13px;
+  font-size: 0.9em;
+  color: var(--text-color-secondary);
+  pointer-events: none;
+  transition: top 0.25s ease, font-size 0.25s ease, color 0.25s ease;
+}
+/* Label flotante — sube cuando input tiene valor o focus */
+label.sale-field .sale-input:focus + span,
+label.sale-field .sale-input:not(:placeholder-shown) + span,
+label.sale-field .sale-input[type="date"] + span {
+  top: 5px;
+  font-size: 0.68em;
+  font-weight: 600;
+  color: #00bfff;
+}
+/* Selects: label siempre arriba */
+label.sale-field span.span-select {
+  top: 5px !important;
+  font-size: 0.68em !important;
+  font-weight: 600 !important;
+  color: #00bfff !important;
+}
+
+/* Checkboxes */
+.form-grid-check {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+}
+label.sale-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background-color: var(--bg-content-alt);
+  border: 1px solid var(--border-color-dark);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--text-color-primary);
+  transition: border-color 0.2s ease;
+  user-select: none;
+}
+label.sale-check:hover { border-color: #00bfff; }
+label.sale-check input[type="checkbox"] { display: none; }
+label.sale-check .checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-color-dark);
+  border-radius: 5px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+label.sale-check input:checked ~ .checkmark {
+  background-color: #00bfff;
+  border-color: #00bfff;
+}
+label.sale-check .checkmark::after {
+  content: '';
+  width: 5px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+  display: none;
+}
+label.sale-check input:checked ~ .checkmark::after { display: block; }
+
+/* Botón guardar */
+#add-sale-form .form-actions {
+  margin-top: 24px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid var(--border-color-dark) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+#btn-submit-sale {
+  background-color: #00bfff !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 11px 32px !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s, transform 0.15s !important;
+}
+#btn-submit-sale:hover {
+  background-color: #009dcc !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  #add-sale-popup.form-popup {
+    width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    top: 0 !important; left: 0 !important;
+    transform: none !important;
+  }
+  #add-sale-popup.form-popup.visible { transform: none !important; }
+  #add-sale-form .form-grid { grid-template-columns: 1fr !important; }
+}

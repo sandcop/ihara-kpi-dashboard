@@ -400,44 +400,44 @@
           <div class="form-popup wide" id="add-sale-popup" style="display: none;">
             <h3>Registrar Nueva Venta
               <button class="close-btn" id="btn-close-add-sale" title="Cerrar" aria-label="Cerrar">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
               </button>
             </h3>
             <div class="iframe-container">
               <form id="add-sale-form">
                 <h4>Datos para 'ventas generales'</h4>
                 <div class="form-grid">
-                  <div class="form-group"><label for="sale-fecha">Fecha Venta:</label><input type="date" id="sale-fecha" required></div>
-                  <div class="form-group"><label for="sale-nombreCompleto">Nombre Completo:</label><input type="text" id="sale-nombreCompleto" required></div>
-                  <div class="form-group"><label for="sale-rutCliente">RUT Cliente:</label><input type="text" id="sale-rutCliente" placeholder="12345678-9"></div>
-                  <div class="form-group"><label for="sale-suscripcion">Suscripción/Teléfono:</label><input type="text" id="sale-suscripcion"></div>
-                  <div class="form-group"><label for="sale-tipoVenta">Tipo de Venta (General):</label><input type="text" id="sale-tipoVenta" placeholder="Ej: FO, Móvil, etc."></div>
-                  <div class="form-group"><label for="sale-maestro">Maestro:</label><input type="text" id="sale-maestro"></div>
-                  <div class="form-group"><label for="sale-numeroOrden">N° Orden:</label><input type="text" id="sale-numeroOrden"></div>
-                  <div class="form-group"><label for="sale-aloha">N° Aloha:</label><input type="text" id="sale-aloha"></div>
-                  <div class="form-group"><label for="sale-terminales">Terminales:</label><input type="text" id="sale-terminales" placeholder="Ej: Samsung S24"></div>
-                  <div class="form-group"><label for="sale-nombreAccesorio">Nombre del Accesorio:</label><input type="text" id="sale-nombreAccesorio" placeholder="Ej: Carcasa S24, Cargador 25W"></div>
-                  <div class="form-group"><label for="sale-accesorio">Monto del Accesorio:</label><input type="text" id="sale-accesorio" placeholder="Ej: 20000"></div>
-                  <div class="form-group"><label for="sale-rgu">RGU:</label><input type="text" id="sale-rgu"></div>
+                  <label class="sale-field"><input class="sale-input" type="date" id="sale-fecha" required placeholder=" "><span>Fecha Venta</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-nombreCompleto" required placeholder=" "><span>Nombre Completo</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-rutCliente" placeholder=" "><span>RUT Cliente</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-suscripcion" placeholder=" "><span>Suscripción / Teléfono</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-tipoVenta" placeholder=" "><span>Tipo de Venta</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-maestro" placeholder=" "><span>Maestro</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-numeroOrden" placeholder=" "><span>N° Orden</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-aloha" placeholder=" "><span>N° Aloha</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-terminales" placeholder=" "><span>Terminales</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-nombreAccesorio" placeholder=" "><span>Nombre Accesorio</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-accesorio" placeholder=" "><span>Monto Accesorio</span></label>
+                  <label class="sale-field"><input class="sale-input" type="text" id="sale-rgu" placeholder=" "><span>RGU</span></label>
                 </div>
                 <h4>Datos para 'RegistroVentas'</h4>
                 <div class="form-grid">
-                  <div class="form-group"><label for="sale-codigoProductoRegla">Código Producto Regla:</label><select id="sale-codigoProductoRegla"></select></div>
-                  <div class="form-group"><label for="sale-tipoEntradaRegla">Tipo Entrada Regla:</label><select id="sale-tipoEntradaRegla"></select></div>
-                  <div class="form-group"><label for="sale-cantidadVendida">Cantidad Vendida:</label><input type="number" id="sale-cantidadVendida" min="0" value="1"></div>
-                  <div class="form-group"><label for="sale-tipoKPIPrincipal">Tipo KPI Principal:</label><select id="sale-tipoKPIPrincipal"></select></div>
-                  <div class="form-group"><label for="sale-cantidadMovil">Cantidad Móvil (para KPI):</label><input type="number" id="sale-cantidadMovil" min="0"></div>
+                  <label class="sale-field"><select class="sale-input" id="sale-codigoProductoRegla"></select><span class="span-select">Código Producto Regla</span></label>
+                  <label class="sale-field"><select class="sale-input" id="sale-tipoEntradaRegla"></select><span class="span-select">Tipo Entrada Regla</span></label>
+                  <label class="sale-field"><input class="sale-input" type="number" id="sale-cantidadVendida" min="0" value="1" placeholder=" "><span>Cantidad Vendida</span></label>
+                  <label class="sale-field"><select class="sale-input" id="sale-tipoKPIPrincipal"></select><span class="span-select">Tipo KPI Principal</span></label>
+                  <label class="sale-field"><input class="sale-input" type="number" id="sale-cantidadMovil" min="0" placeholder=" "><span>Cantidad Móvil (KPI)</span></label>
                 </div>
                 <h4>Opciones Adicionales</h4>
-                <div class="form-grid">
-                  <div class="form-group-checkbox"><input type="checkbox" id="sale-firma"><label for="sale-firma">Firma OK</label></div>
-                  <div class="form-group-checkbox"><input type="checkbox" id="sale-instalacion"><label for="sale-instalacion">Instalación OK</label></div>
-                  <div class="form-group-checkbox"><input type="checkbox" id="sale-seguro"><label for="sale-seguro">Seguro Contratado</label></div>
-                  <div class="form-group-checkbox"><input type="checkbox" id="sale-qCelulares"><label for="sale-qCelulares">Q Celulares OK</label></div>
+                <div class="form-grid form-grid-check">
+                  <label class="sale-check"><input type="checkbox" id="sale-firma"><span class="checkmark"></span>Firma OK</label>
+                  <label class="sale-check"><input type="checkbox" id="sale-instalacion"><span class="checkmark"></span>Instalación OK</label>
+                  <label class="sale-check"><input type="checkbox" id="sale-seguro"><span class="checkmark"></span>Seguro Contratado</label>
+                  <label class="sale-check"><input type="checkbox" id="sale-qCelulares"><span class="checkmark"></span>Q Celulares OK</label>
                 </div>
                 <div id="add-sale-mensaje" class="mensaje-estado" style="display: none;"></div>
                 <div class="form-actions">
-                  <button type="submit" id="btn-submit-sale" class="btn-principal">Guardar Venta</button>
+                  <button type="submit" id="btn-submit-sale">Guardar Venta</button>
                   <div id="add-sale-loader" class="loader" style="display: none;">Guardando...</div>
                 </div>
               </form>

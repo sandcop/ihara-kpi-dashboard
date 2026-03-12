@@ -2069,8 +2069,8 @@ button[onclick*="admin"],
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
 }
 .kpi-uiverse-card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+  transform: scale(1.05);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.22);
 }
 
 /* Top section con color urgencia */
@@ -2088,20 +2088,21 @@ button[onclick*="admin"],
 .kpi-urgencia-amarillo { background: linear-gradient(135deg, #b8860b 0%, #f0c040 100%); }
 .kpi-urgencia-rojo   { background: linear-gradient(135deg, #8b1a1a 0%, #e74c3c 100%); }
 
-/* Esquina decorativa (efecto Uiverse) */
+/* Esquina decorativa (efecto Uiverse) - más pequeña */
 .kpi-top-corner {
   position: absolute;
   top: 0; left: 0;
-  width: 90px; height: 28px;
+  width: 55px; height: 22px;
   background: var(--bg-content);
   border-bottom-right-radius: 10px;
-  transform: skew(-35deg) translateX(-10px);
+  transform: skew(-35deg) translateX(-8px);
+  box-shadow: -8px -8px 0 0 var(--bg-content);
 }
 .kpi-top-corner::before {
   content: "";
   position: absolute;
-  top: 0; right: -14px;
-  width: 14px; height: 14px;
+  top: 0; right: -12px;
+  width: 12px; height: 12px;
   background: transparent;
   border-top-left-radius: 8px;
   box-shadow: -4px -4px 0 2px var(--bg-content);
@@ -2234,5 +2235,5 @@ button[onclick*="admin"],
 }
 
 /* Dark mode ajustes */
-[data-theme="dark"] .kpi-top-corner { background: var(--bg-content); }
+[data-theme="dark"] .kpi-top-corner { background: var(--bg-content); box-shadow: -8px -8px 0 0 var(--bg-content); }
 [data-theme="dark"] .kpi-top-corner::before { box-shadow: -4px -4px 0 2px var(--bg-content); }

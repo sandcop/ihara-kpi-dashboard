@@ -420,7 +420,7 @@ main section h4 { color: var(--text-color-secondary); margin-top: 25px; margin-b
   .public-access-links a { margin: 8px 5px; font-size: 0.9em; }
   .form-popup { width: 95%; height: 90%; max-height: 95vh; }
   .form-popup.wide { max-width: 95%; }
-  #add-sale-form .form-grid { grid-template-columns: 1fr; }
+  #add-sale-form .form-grid { grid-template-columns: 1fr !important; }
   .form-popup > h3 { font-size: 1.1em; padding: 12px 15px; }
   #toast-container { right: 10px; bottom: calc(var(--bottom-bar-height) + 10px); width: calc(100% - 20px); align-items: center; }
   .toast { min-width: initial; width: 100%; max-width: 400px; font-size: 0.9em; padding: 12px 15px; }
@@ -848,9 +848,9 @@ a { color: var(--text-color-link); text-decoration: none; } a:hover { color: var
 
 /* ===== ESTILOS PARA FORMULARIO DE VENTA ===== */
 .form-popup.wide { max-width: 950px; height: 90%; max-height: 800px; }
-#add-sale-form h4 { grid-column: 1 / -1; margin-top: 20px; margin-bottom: 5px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color-medium); color: var(--text-color-headings); font-size: 1.05em; }
-#add-sale-form h4:first-of-type { margin-top: 5px; }
-#add-sale-form .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px 25px; padding: 10px; }
+
+
+
 .form-group-checkbox { display: flex; align-items: center; padding: 8px; background-color: var(--bg-content); border-radius: 5px; border: 1px solid var(--border-color-medium); }
 .form-group-checkbox input[type="checkbox"] { width: 18px; height: 18px; margin-right: 12px; accent-color: var(--color-orange-accent); cursor: pointer; }
 .form-group-checkbox label { font-weight: 500; color: var(--text-color-primary); cursor: pointer; }
@@ -1432,60 +1432,7 @@ a.whatsapp-button-footer .wtext { display: none; }
 }
 
 /* --- POPUP REGISTRO VENTA --- */
-.form-popup {
-  background-color: #171717 !important;
-  border-radius: 20px !important;
-  border: 1px solid #2a2a2a !important;
-  box-shadow: 0 25px 50px rgba(0,0,0,0.5) !important;
-}
-.form-popup > h3 {
-  background-color: #1e1e1e !important;
-  color: #fff !important;
-  border-bottom: 1px solid #2a2a2a !important;
-  border-radius: 20px 20px 0 0 !important;
-  letter-spacing: 0.03em;
-}
-.form-popup .iframe-container {
-  background-color: #171717;
-}
-#add-sale-form {
-  background-color: transparent !important;
-  border: none !important;
-}
-#add-sale-form h4 {
-  color: var(--color-orange-accent) !important;
-  letter-spacing: 0.05em;
-}
-#add-sale-form input,
-#add-sale-form select,
-#add-sale-form textarea {
-  background-color: #171717 !important;
-  border: none !important;
-  border-bottom: 2px solid #333 !important;
-  border-radius: 0 !important;
-  color: #d3d3d3 !important;
-  box-shadow: inset 0 3px 8px rgb(5,5,5) !important;
-  padding: 10px 12px !important;
-  transition: border-bottom-color 0.3s ease !important;
-}
-#add-sale-form input:focus,
-#add-sale-form select:focus,
-#add-sale-form textarea:focus {
-  border-bottom-color: var(--color-orange-accent) !important;
-  outline: none !important;
-  box-shadow: inset 0 3px 8px rgb(5,5,5) !important;
-}
-#btn-submit-sale {
-  background-color: #252525 !important;
-  color: white !important;
-  padding: 0.5em 2em !important;
-  border-radius: 5px !important;
-  border: none !important;
-  transition: background-color 0.3s ease !important;
-}
-#btn-submit-sale:hover {
-  background-color: var(--color-orange-accent) !important;
-}
+/* form-popup estilos hardcodeados removidos — ahora usa variables de tema */
 
 /* --- CHAT IA --- */
 .ai-chat-container {
@@ -1810,70 +1757,7 @@ a.whatsapp-button-footer .wtext { display: none; }
   padding: 0 !important;
 }
 
-/* Inputs minimalistas */
-#add-sale-form .form-group {
-  margin-bottom: 0;
-}
-#add-sale-form .form-group label {
-  display: block;
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-color-secondary);
-  margin-bottom: 6px;
-}
-#add-sale-form .form-group input,
-#add-sale-form .form-group select,
-#add-sale-form .form-group textarea {
-  width: 100% !important;
-  background-color: var(--bg-content-alt) !important;
-  border: 1px solid var(--border-color-dark) !important;
-  border-radius: 8px !important;
-  padding: 10px 12px !important;
-  font-size: 0.9rem !important;
-  color: var(--text-color-primary) !important;
-  box-sizing: border-box !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-  -webkit-appearance: none;
-}
-#add-sale-form .form-group input:focus,
-#add-sale-form .form-group select:focus,
-#add-sale-form .form-group textarea:focus {
-  outline: none !important;
-  border-color: var(--color-orange-accent) !important;
-  box-shadow: 0 0 0 3px rgba(251,133,0,0.12) !important;
-}
-
-/* Checkboxes minimalistas */
-#add-sale-form .form-group-checkbox {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  padding: 10px 14px !important;
-  background-color: var(--bg-content-alt) !important;
-  border: 1px solid var(--border-color-dark) !important;
-  border-radius: 8px !important;
-  cursor: pointer !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
-}
-#add-sale-form .form-group-checkbox:hover {
-  border-color: var(--color-orange-accent) !important;
-}
-#add-sale-form .form-group-checkbox input[type="checkbox"] {
-  width: 16px !important;
-  height: 16px !important;
-  accent-color: var(--color-orange-accent) !important;
-  cursor: pointer !important;
-  margin: 0 !important;
-}
-#add-sale-form .form-group-checkbox label {
-  font-size: 0.88rem !important;
-  font-weight: 500 !important;
-  color: var(--text-color-primary) !important;
-  cursor: pointer !important;
-  margin: 0 !important;
-}
+/* form-group antiguo removido */
 
 /* Botón guardar */
 .form-actions {

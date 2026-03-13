@@ -1,7 +1,7 @@
 // script.js
 console.log("script.js: Empezando a ejecutar.");
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwFJeZvznq1HYq4DH61FRsJQGXA_S8kvhAkgN23exELblm3Wn6qqeeEY4XUBANGPH-5/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzb9CgZZtbsl-KOPPrsmVVdOfu31cxUQYSGlkIP83Hhyktk38zUNrRp7UKC6i8qvJ3/exec';
 const GOOGLE_FORM_URL_HOGAR = "https://docs.google.com/forms/d/e/1FAIpQLSfUnRFmauKoiSii1g9rBSRFmMwmb79ImhVW9U80zY3ABU04aA/viewform?embedded=true";
 const GOOGLE_FORM_URL_MOVIL = "https://docs.google.com/forms/d/e/1FAIpQLSexD3YnCTfjZcxbZkUp4684hTLL_UxcprWOtBTTZPOGB1N-eA/viewform?embedded=true";
 

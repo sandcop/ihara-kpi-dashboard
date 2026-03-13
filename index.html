@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"> <!-- data-theme será añadido por JS --> 
+<html lang="es"> <!-- data-theme será añadido por JS -->
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -380,18 +380,38 @@
           <section id="prospectos-content" class="section-hidden" style="display: none;"><h2>Gestión de Prospectos</h2><form id="prospecto-form"><h3>Añadir Nuevo Prospecto</h3><div class="form-group"><label for="prospecto-nombre">Nombre:</label><input type="text" id="prospecto-nombre" name="nombre" required></div><div class="form-group"><label for="prospecto-rut">RUT:</label><input type="text" id="prospecto-rut" name="rut" placeholder="Ej: 12345678-9"></div><div class="form-group"><label for="prospecto-telefono">Teléfono:</label><input type="tel" id="prospecto-telefono" name="telefono"></div><div class="form-group"><label for="prospecto-email">Email:</label><input type="email" id="prospecto-email" name="email"></div><div class="form-group"><label for="prospecto-notas">Notas:</label><textarea id="prospecto-notas" name="notas" rows="3"></textarea></div><div class="form-actions"><button type="submit" id="guardar-prospecto-btn">Guardar Prospecto</button><span id="prospecto-loader" class="form-loader" style="display: none;">Guardando...</span></div><div id="prospecto-mensaje" class="mensaje-estado"></div></form><div id="prospectos-lista-container" style="margin-top: 40px; display: none;"><h3>Prospectos Registrados</h3><div id="prospectos-lista-loader" class="loader">Cargando lista...</div><div id="prospectos-lista-error"></div><div id="prospectos-lista-tabla"></div></div></section>
           
           <section id="asistente-ai-content" class="section-hidden" style="display: none;">
-            <h2>Asistente de Ventas AI</h2>
-            <p>Pídele a la IA que te ayude a redactar mensajes, preparar argumentos de venta o resolver dudas de clientes.</p>
+            <div class="ai-hero">
+              <h2 class="ai-hero-title">¿En qué te ayudo hoy?</h2>
+              <p class="ai-hero-sub">Redacta mensajes, prepara argumentos de venta o resuelve dudas de clientes.</p>
+            </div>
+
             <div class="ai-assistant-container">
               <div id="ai-chat-log" class="ai-chat-log"></div>
-              <div id="ai-loader" class="loader" style="display: none; margin: 15px auto;">La IA está pensando...</div>
-              <div class="form-group" style="margin-top: 20px;">
-                <label for="ai-prompt">Tu mensaje:</label>
-                <textarea id="ai-prompt" rows="3" placeholder="Ej: Redacta un mensaje de WhatsApp para un cliente..."></textarea>
+              <div id="ai-loader" class="loader ai-loader-inline" style="display: none;">
+                <span class="ai-thinking-dot"></span>
+                <span class="ai-thinking-dot"></span>
+                <span class="ai-thinking-dot"></span>
               </div>
-              <div class="form-actions">
-                <button id="ai-generate-btn" class="btn-principal">Enviar Mensaje</button>
-                <button id="ai-new-chat-btn" class="btn-secundario">Nuevo Chat</button>
+
+              <!-- Sugerencias rápidas -->
+              <div class="ai-suggestions" id="ai-suggestions">
+                <button class="ai-suggestion-chip" data-prompt="Redacta un mensaje de WhatsApp para contactar a un prospecto de fibra óptica hogar">📡 Mensaje FO hogar</button>
+                <button class="ai-suggestion-chip" data-prompt="Dame argumentos para convencer a un cliente de portar su línea móvil a Movistar">📱 Argumentos portabilidad</button>
+                <button class="ai-suggestion-chip" data-prompt="¿Cómo responder a un cliente que dice que Movistar es caro?">💬 Objeción de precio</button>
+                <button class="ai-suggestion-chip" data-prompt="Redacta un mensaje de seguimiento para un cliente que no ha respondido en 3 días">🔄 Seguimiento cliente</button>
+              </div>
+
+              <!-- Input box estilo Prebuilt UI -->
+              <div class="ai-input-box">
+                <textarea id="ai-prompt" class="ai-textarea" rows="3" placeholder="Escribe tu mensaje aquí..."></textarea>
+                <div class="ai-input-actions">
+                  <button id="ai-new-chat-btn" class="ai-action-btn ai-btn-clear" title="Nuevo chat" aria-label="Nuevo chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                  </button>
+                  <button id="ai-generate-btn" class="ai-action-btn ai-btn-send" title="Enviar" aria-label="Enviar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
           </section>

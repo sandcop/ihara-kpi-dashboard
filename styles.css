@@ -2421,3 +2421,72 @@ button[onclick*="admin"],
 .ai-btn-send {
   background: #fb8500;
 }
+
+/* ===== IHARA - SELECTOR DE INTERACCIÓN ===== */
+.ihara-selector {
+  background: var(--bg-content-alt);
+  border: 1px solid var(--border-color-dark);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 4px 0;
+  max-width: 85%;
+}
+.ihara-selector-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-color-headings);
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ihara-checks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.ihara-check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-content);
+  border: 1.5px solid var(--border-color-dark);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-color-primary);
+  transition: border-color 0.2s, background-color 0.2s;
+  user-select: none;
+}
+.ihara-check-item:hover {
+  border-color: var(--color-orange-accent);
+}
+.ihara-check-item input[type="checkbox"] {
+  accent-color: var(--color-orange-accent);
+  width: 15px; height: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ihara-check-item:has(input:checked) {
+  border-color: var(--color-orange-accent);
+  background: rgba(251,133,0,0.08);
+  color: var(--color-orange-accent);
+  font-weight: 600;
+}
+.ihara-selector-btn {
+  background: var(--color-orange-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.15s;
+  width: 100%;
+}
+.ihara-selector-btn:hover {
+  background: #d97500;
+  transform: translateY(-1px);
+}

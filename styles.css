@@ -2374,20 +2374,22 @@ button[onclick*="admin"],
 
 /* Input box */
 .ai-input-box {
-  background: #1a1a2e;
+  background: var(--bg-content-alt);
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--border-color-dark);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-[data-theme="light"] .ai-input-box {
-  background: #1e1e2e;
+.ai-input-box:focus-within {
+  border-color: var(--color-orange-accent);
+  box-shadow: 0 0 0 3px rgba(251,133,0,0.1);
 }
 .ai-textarea {
   width: 100%;
   box-sizing: border-box;
   padding: 14px 14px 0;
   background: transparent;
-  color: #e0e0e0;
+  color: var(--text-color-primary);
   border: none;
   outline: none;
   resize: none;
@@ -2395,7 +2397,7 @@ button[onclick*="admin"],
   line-height: 1.5;
   font-family: inherit;
 }
-.ai-textarea::placeholder { color: rgba(255,255,255,0.3); }
+.ai-textarea::placeholder { color: var(--text-color-secondary); opacity: 0.6; }
 
 .ai-input-actions {
   display: flex;
@@ -2407,19 +2409,29 @@ button[onclick*="admin"],
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px; height: 28px;
+  width: 30px; height: 30px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.15s;
 }
-.ai-action-btn:hover { opacity: 0.85; transform: scale(1.05); }
+.ai-action-btn:hover { opacity: 0.9; transform: scale(1.08); }
 .ai-btn-clear {
-  background: rgba(255,255,255,0.15);
-  color: #ccd5e2;
+  background: var(--bg-content);
+  border: 1px solid var(--border-color-dark);
+  color: var(--text-color-secondary);
+}
+.ai-btn-clear svg { stroke: var(--text-color-secondary); }
+.ai-btn-clear:hover {
+  border-color: var(--color-orange-accent);
+  color: var(--color-orange-accent);
 }
 .ai-btn-send {
-  background: #fb8500;
+  background: var(--color-orange-accent);
+  box-shadow: 0 3px 10px rgba(251,133,0,0.35);
+}
+.ai-btn-send:hover {
+  box-shadow: 0 5px 14px rgba(251,133,0,0.5);
 }
 
 /* ===== IHARA - SELECTOR DE INTERACCIÓN ===== */

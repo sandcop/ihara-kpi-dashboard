@@ -480,7 +480,112 @@ function handleHashChange() { const hash = window.location.hash.substring(1); co
 function appendMessageToLog(text, role) { if (!aiChatLog) return; const messageDiv = document.createElement('div'); messageDiv.className = `chat-message ${role}-message`; if (role === 'user') { messageDiv.textContent = text; } else { const cursor = document.createElement('span'); cursor.className = 'typing-cursor'; messageDiv.appendChild(cursor); } aiChatLog.appendChild(messageDiv); aiChatLog.scrollTop = aiChatLog.scrollHeight; if (role === 'ai') { typewriterEffect(messageDiv, text, 15); } }
 function typewriterEffect(container, text, speed) { let i = 0; container.textContent = ''; const cursor = document.createElement('span'); cursor.className = 'typing-cursor'; container.appendChild(cursor); function type() { if (i < text.length) { cursor.insertAdjacentText('beforebegin', text.charAt(i)); i++; aiChatLog.scrollTop = aiChatLog.scrollHeight; setTimeout(type, speed); } else { container.removeChild(cursor); } } type(); }
 function startNewAIChat() { chatHistory = []; if (aiChatLog) { aiChatLog.innerHTML = ''; appendMessageToLog("¡Hola, Manu! Soy tu asistente de ventas. ¿En qué te puedo ayudar hoy?", 'ai'); } showToast("Nuevo chat iniciado.", "info"); }
-async function askGemini() { if (!aiPrompt || !aiLoader || !aiChatLog || !aiGenerateBtn) { console.error("Faltan elementos del DOM para el Asistente AI."); return; } const promptText = aiPrompt.value.trim(); if (!promptText) { showToast("Por favor, escribe un mensaje.", "warning"); return; } appendMessageToLog(promptText, 'user'); aiPrompt.value = ''; chatHistory.push({ role: 'user', parts: [{ text: promptText }] }); aiLoader.classList.add('visible'); aiGenerateBtn.disabled = true; try { const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', cache: 'no-cache', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'askGemini', prompt: promptText, history: chatHistory }) }); if (!response.ok) { throw new Error(`Error de red: ${response.statusText}`); } const result = await response.json(); aiLoader.classList.remove('visible'); if (result.success && result.text) { appendMessageToLog(result.text, 'ai'); chatHistory.push({ role: 'model', parts: [{ text: result.text }] }); } else { throw new Error(result.error || "La IA devolvió un error desconocido."); } } catch (error) { aiLoader.classList.remove('visible'); console.error("Error al llamar a la IA:", error); const errorMessage = `Hubo un error al procesar tu solicitud: ${error.message}`; appendMessageToLog(errorMessage, 'ai'); } finally { aiGenerateBtn.disabled = false; aiPrompt.focus(); } }
+// ===== IHARA - GENERADOR DE INTERACCIONES =====
+const FRASES_INTERACCION = [
+  'voy a hacer una venta', 'necesito una interaccion', 'necesito una interacción',
+  'genera una interaccion', 'genera una interacción', 'redactar interaccion',
+  'redactar interacción', 'interaccion de venta', 'interacción de venta',
+  'nueva venta', 'registrar interaccion', 'hacer una venta'
+];
+
+function detectaFraseInteraccion(texto) {
+  const t = texto.toLowerCase().trim();
+  return FRASES_INTERACCION.some(f => t.includes(f));
+}
+
+function mostrarSelectorInteraccion() {
+  if (!aiChatLog) return;
+
+  // Mensaje de Ihara
+  appendMessageToLog('¡Perfecto! Marca los tipos de venta que incluye esta interacción y te ayudo a redactarla 👇', 'ai');
+
+  // Crear el componente de casillas
+  const selectorDiv = document.createElement('div');
+  selectorDiv.className = 'ihara-selector';
+  selectorDiv.id = 'ihara-tipo-selector';
+  selectorDiv.innerHTML = `
+    <p class="ihara-selector-title">¿Qué tipo(s) de venta incluye?</p>
+    <div class="ihara-checks">
+      <label class="ihara-check-item"><input type="checkbox" value="movil"> 📱 Venta Móvil</label>
+      <label class="ihara-check-item"><input type="checkbox" value="fibra"> 🌐 Venta Fibra Óptica</label>
+      <label class="ihara-check-item"><input type="checkbox" value="equipo"> 📦 Venta Equipo / Smartphone</label>
+      <label class="ihara-check-item"><input type="checkbox" value="seguro_total"> 🛡️ Seguro Total</label>
+      <label class="ihara-check-item"><input type="checkbox" value="antidano"> 🔧 Antidaño</label>
+      <label class="ihara-check-item"><input type="checkbox" value="cambio_plan"> 🔄 Cambio de Plan</label>
+    </div>
+    <button class="ihara-selector-btn" id="ihara-confirmar-tipos">Continuar →</button>
+  `;
+  aiChatLog.appendChild(selectorDiv);
+  aiChatLog.scrollTop = aiChatLog.scrollHeight;
+
+  // Evento del botón confirmar
+  document.getElementById('ihara-confirmar-tipos').addEventListener('click', () => {
+    const checks = selectorDiv.querySelectorAll('input[type=checkbox]:checked');
+    const tipos = Array.from(checks).map(c => c.value);
+    if (tipos.length === 0) {
+      showToast('Marca al menos un tipo de venta', 'warning');
+      return;
+    }
+    selectorDiv.remove();
+    solicitarDatosInteraccion(tipos);
+  });
+}
+
+function solicitarDatosInteraccion(tipos) {
+  const labels = {
+    movil: 'Venta Móvil', fibra: 'Venta Fibra Óptica',
+    equipo: 'Venta Equipo', seguro_total: 'Seguro Total',
+    antidano: 'Antidaño', cambio_plan: 'Cambio de Plan'
+  };
+  const tiposTexto = tipos.map(t => labels[t]).join(', ');
+
+  // Construir prompt detallado para Ihara
+  const promptDatos = `El usuario quiere redactar una interacción de venta. Tipos seleccionados: ${tiposTexto}.
+
+Por favor, pídele a Manu los datos necesarios para redactar la interacción, uno por uno o en una lista clara. 
+
+Datos que necesitas según los tipos:
+${tipos.includes('movil') ? '- MÓVIL: nombre cliente, RUT, número teléfono, tipo de venta (portabilidad/alta/migración), plan contratado, código plan, precio real, precio oferta, duración oferta, número de orden, vendedor' : ''}
+${tipos.includes('fibra') ? '- FIBRA: nombre cliente, RUT, número contacto, velocidad plan (ej: 600 megas simétricos), precio real, precio oferta, duración oferta, número de orden, vendedor, fecha instalación si la hay' : ''}
+${tipos.includes('equipo') ? '- EQUIPO: modelo smartphone, modalidad (cuotas/contado/subsidio), precio, número cuotas si aplica' : ''}
+${tipos.includes('seguro_total') ? '- SEGURO TOTAL: precio mensual del seguro' : ''}
+${tipos.includes('antidano') ? '- ANTIDAÑO: equipo cubierto, precio mensual' : ''}
+${tipos.includes('cambio_plan') ? '- CAMBIO DE PLAN: plan anterior, plan nuevo, precio nuevo, motivo si lo hay' : ''}
+
+Una vez que Manu te dé todos los datos, genera el texto de interacción en formato claro y profesional, listo para copiar al sistema interno. El texto debe ser en tercera persona, detallado y específico.`;
+
+  // Mostrar en el chat lo que el usuario "envió"
+  appendMessageToLog(`Tipos seleccionados: ${tiposTexto}`, 'user');
+  chatHistory.push({ role: 'user', parts: [{ text: promptDatos }] });
+
+  // Llamar a Ihara con este contexto
+  if (aiLoader) aiLoader.style.display = 'flex';
+  if (aiGenerateBtn) aiGenerateBtn.disabled = true;
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST', cache: 'no-cache',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'askGemini', prompt: promptDatos, history: chatHistory.slice(0,-1) })
+  })
+  .then(r => r.json())
+  .then(result => {
+    if (aiLoader) aiLoader.style.display = 'none';
+    if (aiGenerateBtn) aiGenerateBtn.disabled = false;
+    if (result.success && result.text) {
+      appendMessageToLog(result.text, 'ai');
+      chatHistory.push({ role: 'model', parts: [{ text: result.text }] });
+    }
+  })
+  .catch(err => {
+    if (aiLoader) aiLoader.style.display = 'none';
+    if (aiGenerateBtn) aiGenerateBtn.disabled = false;
+    appendMessageToLog('Hubo un error al conectar con Ihara. Intenta de nuevo.', 'ai');
+  });
+}
+
+async function askGemini() { if (!aiPrompt || !aiLoader || !aiChatLog || !aiGenerateBtn) { console.error("Faltan elementos del DOM para el Asistente AI."); return; } const promptText = aiPrompt.value.trim(); if (!promptText) { showToast("Por favor, escribe un mensaje.", "warning"); return; }
+  if (detectaFraseInteraccion(promptText)) { appendMessageToLog(promptText, 'user'); aiPrompt.value = ''; mostrarSelectorInteraccion(); return; }
+  appendMessageToLog(promptText, 'user'); aiPrompt.value = ''; chatHistory.push({ role: 'user', parts: [{ text: promptText }] }); aiLoader.style.display = 'flex'; aiGenerateBtn.disabled = true; try { const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', cache: 'no-cache', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'askGemini', prompt: promptText, history: chatHistory }) }); if (!response.ok) { throw new Error(`Error de red: ${response.statusText}`); } const result = await response.json(); aiLoader.style.display = 'none'; if (result.success && result.text) { appendMessageToLog(result.text, 'ai'); chatHistory.push({ role: 'model', parts: [{ text: result.text }] }); } else { throw new Error(result.error || "La IA devolvió un error desconocido."); } } catch (error) { aiLoader.style.display = 'none'; console.error("Error al llamar a la IA:", error); const errorMessage = `Hubo un error al procesar tu solicitud: ${error.message}`; appendMessageToLog(errorMessage, 'ai'); } finally { aiGenerateBtn.disabled = false; aiPrompt.focus(); } }
 const mensajesEstimulantes = ["¡Sigue así, Manu! Cada paso cuenta.", "¡Tu esfuerzo de hoy construye el éxito de mañana!", "Recuerda tu 'por qué'. ¡Ellos te inspiran!"];
 function getMensajeKPI(data) { if (data && data.datos && data.datos.length > 0) { const kpiVoz = data.datos.find(k => k.kpi && k.kpi.toUpperCase() === 'VOZ'); if (kpiVoz && parseFloat(kpiVoz.total) < (parseFloat(kpiVoz.valor100) * 0.5) ) { return "¡Ánimo con las ventas de Voz, Manu! Tú puedes."; } } return mensajesEstimulantes[Math.floor(Math.random() * mensajesEstimulantes.length)]; }
 function startPeriodicNotifications() { const mostrarNotificacion = () => { let msg = (kpiDataGlobal && kpiDataGlobal.datos) ? getMensajeKPI(kpiDataGlobal) : mensajesEstimulantes[Math.floor(Math.random() * mensajesEstimulantes.length)]; showToast(msg, 'info', 8000); }; const intervaloMs = 59 * 60 * 1000; if (notificationInterval) clearInterval(notificationInterval); notificationInterval = setInterval(mostrarNotificacion, intervaloMs); console.log(`Notificaciones periódicas iniciadas.`); }

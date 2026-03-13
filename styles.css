@@ -2490,3 +2490,71 @@ button[onclick*="admin"],
   background: #d97500;
   transform: translateY(-1px);
 }
+
+/* ===== IHARA - FORMULARIO INLINE ===== */
+.ihara-form {
+  background: var(--bg-content-alt);
+  border: 1px solid var(--border-color-dark);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 4px 0;
+  max-width: 92%;
+}
+.ihara-form-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-color-headings);
+  margin: 0 0 14px;
+}
+.ihara-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.ihara-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ihara-form-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-orange-accent);
+  border-bottom: 1px solid var(--border-color-dark);
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+.ihara-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ihara-field-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.ihara-field-input {
+  background: var(--bg-content);
+  border: 1px solid var(--border-color-dark);
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 0.88rem;
+  color: var(--text-color-primary);
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+.ihara-field-input:focus {
+  border-color: var(--color-orange-accent);
+  box-shadow: 0 0 0 2px rgba(251,133,0,0.1);
+}
+.ihara-field-input::placeholder {
+  color: var(--text-color-secondary);
+  opacity: 0.6;
+}

@@ -1466,13 +1466,20 @@ a.whatsapp-button-footer .wtext { display: none; }
 #loader, #prospectos-lista-loader, #resultados-ventas-loader,
 #remuneracion-loader-tabla-ppm, #remuneracion-loader-tabla-entradas,
 #kpis-fijos-loader, #simulacion-loader, #grafico-pesos-loader,
-#ai-loader, #add-sale-loader, #kpi-details-loader,
+#add-sale-loader, #kpi-details-loader,
 #flash-offers-add-loader, #flash-offers-management-loader {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
   min-height: 60px !important;
   gap: 0 !important;
+}
+/* ai-loader usa display inline controlado por JS */
+#ai-loader {
+  justify-content: flex-start;
+  align-items: center;
+  min-height: unset;
+  gap: 6px;
 }
 #loader::after, #prospectos-lista-loader::after, #resultados-ventas-loader::after,
 #remuneracion-loader-tabla-ppm::after, #remuneracion-loader-tabla-entradas::after,
@@ -2324,15 +2331,11 @@ button[onclick*="admin"],
 
 /* Loader dots */
 .ai-loader-inline {
-  display: none;
   gap: 6px;
   align-items: center;
   justify-content: flex-start;
   padding: 4px 8px;
   min-height: unset !important;
-}
-.ai-loader-inline.visible {
-  display: flex !important;
 }
 .ai-thinking-dot {
   width: 8px; height: 8px;

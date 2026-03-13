@@ -8,7 +8,7 @@ const GOOGLE_FORM_URL_MOVIL = "https://docs.google.com/forms/d/e/1FAIpQLSexD3YnC
 // ¡¡ADVERTENCIA DE SEGURIDAD CRÍTICA!!
 // Esta contraseña (Movistar2025) está hardcodeada y visible en el código fuente del frontend.
 // CUALQUIER persona que inspeccione el código puede verla y usarla para registrar ventas.
-// Esto es un riesgo de seguridad MUY ALTO. Se recomienda ENCARECIDAMENTE cambiar este.
+// Esto es un riesgo de seguridad MUY ALTO. Se recomienda ENCARECIDAMENTE cambiar este
 // sistema de autenticación a uno basado en tokens gestionados por el backend, o al menos
 // usar una validación de contraseña mucho más robusta que NO exponga la clave en el cliente.
 const CORRECT_PASSWORD_B64 = btoa("Movistar2025");
@@ -480,7 +480,7 @@ function handleHashChange() { const hash = window.location.hash.substring(1); co
 function appendMessageToLog(text, role) { if (!aiChatLog) return; const messageDiv = document.createElement('div'); messageDiv.className = `chat-message ${role}-message`; if (role === 'user') { messageDiv.textContent = text; } else { const cursor = document.createElement('span'); cursor.className = 'typing-cursor'; messageDiv.appendChild(cursor); } aiChatLog.appendChild(messageDiv); aiChatLog.scrollTop = aiChatLog.scrollHeight; if (role === 'ai') { typewriterEffect(messageDiv, text, 15); } }
 function typewriterEffect(container, text, speed) { let i = 0; container.textContent = ''; const cursor = document.createElement('span'); cursor.className = 'typing-cursor'; container.appendChild(cursor); function type() { if (i < text.length) { cursor.insertAdjacentText('beforebegin', text.charAt(i)); i++; aiChatLog.scrollTop = aiChatLog.scrollHeight; setTimeout(type, speed); } else { container.removeChild(cursor); } } type(); }
 function startNewAIChat() { chatHistory = []; if (aiChatLog) { aiChatLog.innerHTML = ''; appendMessageToLog("¡Hola, Manu! Soy tu asistente de ventas. ¿En qué te puedo ayudar hoy?", 'ai'); } showToast("Nuevo chat iniciado.", "info"); }
-async function askGemini() { if (!aiPrompt || !aiLoader || !aiChatLog || !aiGenerateBtn) { console.error("Faltan elementos del DOM para el Asistente AI."); return; } const promptText = aiPrompt.value.trim(); if (!promptText) { showToast("Por favor, escribe un mensaje.", "warning"); return; } appendMessageToLog(promptText, 'user'); aiPrompt.value = ''; chatHistory.push({ role: 'user', parts: [{ text: promptText }] }); aiLoader.style.display = 'flex'; aiGenerateBtn.disabled = true; try { const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', cache: 'no-cache', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'askGemini', prompt: promptText, history: chatHistory }) }); if (!response.ok) { throw new Error(`Error de red: ${response.statusText}`); } const result = await response.json(); aiLoader.style.display = 'none'; if (result.success && result.text) { appendMessageToLog(result.text, 'ai'); chatHistory.push({ role: 'model', parts: [{ text: result.text }] }); } else { throw new Error(result.error || "La IA devolvió un error desconocido."); } } catch (error) { aiLoader.style.display = 'none'; console.error("Error al llamar a la IA:", error); const errorMessage = `Hubo un error al procesar tu solicitud: ${error.message}`; appendMessageToLog(errorMessage, 'ai'); } finally { aiGenerateBtn.disabled = false; aiPrompt.focus(); } }
+async function askGemini() { if (!aiPrompt || !aiLoader || !aiChatLog || !aiGenerateBtn) { console.error("Faltan elementos del DOM para el Asistente AI."); return; } const promptText = aiPrompt.value.trim(); if (!promptText) { showToast("Por favor, escribe un mensaje.", "warning"); return; } appendMessageToLog(promptText, 'user'); aiPrompt.value = ''; chatHistory.push({ role: 'user', parts: [{ text: promptText }] }); aiLoader.classList.add('visible'); aiGenerateBtn.disabled = true; try { const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', cache: 'no-cache', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'askGemini', prompt: promptText, history: chatHistory }) }); if (!response.ok) { throw new Error(`Error de red: ${response.statusText}`); } const result = await response.json(); aiLoader.classList.remove('visible'); if (result.success && result.text) { appendMessageToLog(result.text, 'ai'); chatHistory.push({ role: 'model', parts: [{ text: result.text }] }); } else { throw new Error(result.error || "La IA devolvió un error desconocido."); } } catch (error) { aiLoader.classList.remove('visible'); console.error("Error al llamar a la IA:", error); const errorMessage = `Hubo un error al procesar tu solicitud: ${error.message}`; appendMessageToLog(errorMessage, 'ai'); } finally { aiGenerateBtn.disabled = false; aiPrompt.focus(); } }
 const mensajesEstimulantes = ["¡Sigue así, Manu! Cada paso cuenta.", "¡Tu esfuerzo de hoy construye el éxito de mañana!", "Recuerda tu 'por qué'. ¡Ellos te inspiran!"];
 function getMensajeKPI(data) { if (data && data.datos && data.datos.length > 0) { const kpiVoz = data.datos.find(k => k.kpi && k.kpi.toUpperCase() === 'VOZ'); if (kpiVoz && parseFloat(kpiVoz.total) < (parseFloat(kpiVoz.valor100) * 0.5) ) { return "¡Ánimo con las ventas de Voz, Manu! Tú puedes."; } } return mensajesEstimulantes[Math.floor(Math.random() * mensajesEstimulantes.length)]; }
 function startPeriodicNotifications() { const mostrarNotificacion = () => { let msg = (kpiDataGlobal && kpiDataGlobal.datos) ? getMensajeKPI(kpiDataGlobal) : mensajesEstimulantes[Math.floor(Math.random() * mensajesEstimulantes.length)]; showToast(msg, 'info', 8000); }; const intervaloMs = 59 * 60 * 1000; if (notificationInterval) clearInterval(notificationInterval); notificationInterval = setInterval(mostrarNotificacion, intervaloMs); console.log(`Notificaciones periódicas iniciadas.`); }
@@ -1078,6 +1078,28 @@ document.addEventListener('DOMContentLoaded', () => {
         aiLoader = document.getElementById('ai-loader');
         aiChatLog = document.getElementById('ai-chat-log');
         aiNewChatBtn = document.getElementById('ai-new-chat-btn');
+
+        // Chips de sugerencias
+        document.querySelectorAll('.ai-suggestion-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                if (aiPrompt) {
+                    aiPrompt.value = chip.dataset.prompt;
+                    aiPrompt.focus();
+                    const suggestions = document.getElementById('ai-suggestions');
+                    if (suggestions) suggestions.style.display = 'none';
+                }
+            });
+        });
+
+        // Enter para enviar (Shift+Enter = nueva línea)
+        if (aiPrompt) {
+            aiPrompt.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (aiGenerateBtn) aiGenerateBtn.click();
+                }
+            });
+        }
     }
 
     // Referencias a elementos específicos del formulario de Agregar Venta

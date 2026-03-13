@@ -2257,10 +2257,13 @@ button[onclick*="admin"],
   padding: 32px 16px 20px;
 }
 .ai-hero-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--text-color-headings);
-  margin: 0 0 8px;
+  font-size: 1.8rem !important;
+  font-weight: 700 !important;
+  color: var(--text-color-headings) !important;
+  margin: 0 0 8px !important;
+  display: block !important;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
 }
 .ai-hero-sub {
   font-size: 0.92rem;

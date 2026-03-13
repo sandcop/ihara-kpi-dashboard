@@ -532,54 +532,128 @@ function mostrarSelectorInteraccion() {
 }
 
 function solicitarDatosInteraccion(tipos) {
-  const labels = {
-    movil: 'Venta Móvil', fibra: 'Venta Fibra Óptica',
-    equipo: 'Venta Equipo', seguro_total: 'Seguro Total',
-    antidano: 'Antidaño', cambio_plan: 'Cambio de Plan'
+  if (!aiChatLog) return;
+
+  // Campos según tipo
+  const campos = {
+    movil: [
+      { id: 'cli_nombre', label: 'Nombre cliente', placeholder: 'Juan Pérez' },
+      { id: 'cli_rut', label: 'RUT', placeholder: '12.345.678-9' },
+      { id: 'cli_telefono', label: 'N° teléfono', placeholder: '569XXXXXXXX' },
+      { id: 'tipo_venta', label: 'Tipo venta', placeholder: 'Portabilidad / Alta / Migración' },
+      { id: 'plan_nombre', label: 'Plan contratado', placeholder: 'Ej: Plan 30GB' },
+      { id: 'plan_codigo', label: 'Código plan', placeholder: 'Ej: COD_3NA' },
+      { id: 'precio_real', label: 'Precio real', placeholder: 'Ej: 19.990' },
+      { id: 'precio_oferta', label: 'Precio oferta', placeholder: 'Ej: 14.990' },
+      { id: 'duracion_oferta', label: 'Duración oferta', placeholder: 'Ej: 6 meses' },
+      { id: 'num_orden', label: 'N° orden', placeholder: 'Ej: 123456' },
+    ],
+    fibra: [
+      { id: 'cli_nombre', label: 'Nombre cliente', placeholder: 'Juan Pérez' },
+      { id: 'cli_rut', label: 'RUT', placeholder: '12.345.678-9' },
+      { id: 'cli_telefono', label: 'N° contacto', placeholder: '569XXXXXXXX' },
+      { id: 'fo_velocidad', label: 'Velocidad plan', placeholder: 'Ej: 600 megas simétricos' },
+      { id: 'precio_real', label: 'Precio real', placeholder: 'Ej: 21.990' },
+      { id: 'precio_oferta', label: 'Precio oferta', placeholder: 'Ej: 16.990' },
+      { id: 'duracion_oferta', label: 'Duración oferta', placeholder: 'Ej: 6 meses' },
+      { id: 'num_orden', label: 'N° orden', placeholder: 'Ej: 123456' },
+    ],
+    equipo: [
+      { id: 'equipo_modelo', label: 'Modelo smartphone', placeholder: 'Ej: Samsung Galaxy A55' },
+      { id: 'equipo_modalidad', label: 'Modalidad', placeholder: 'Cuotas / Contado / Subsidio' },
+      { id: 'equipo_precio', label: 'Precio equipo', placeholder: 'Ej: 399.990' },
+      { id: 'equipo_cuotas', label: 'N° cuotas (si aplica)', placeholder: 'Ej: 24' },
+    ],
+    seguro_total: [
+      { id: 'seguro_precio', label: 'Precio mensual seguro', placeholder: 'Ej: 4.990' },
+    ],
+    antidano: [
+      { id: 'antidano_equipo', label: 'Equipo cubierto', placeholder: 'Ej: Samsung Galaxy A55' },
+      { id: 'antidano_precio', label: 'Precio mensual', placeholder: 'Ej: 2.990' },
+    ],
+    cambio_plan: [
+      { id: 'plan_anterior', label: 'Plan anterior', placeholder: 'Ej: Plan 15GB' },
+      { id: 'plan_nuevo', label: 'Plan nuevo', placeholder: 'Ej: Plan 30GB' },
+      { id: 'precio_nuevo', label: 'Precio nuevo', placeholder: 'Ej: 19.990' },
+    ],
   };
-  const tiposTexto = tipos.map(t => labels[t]).join(', ');
 
-  // Construir prompt detallado para Ihara
-  const promptDatos = `El usuario quiere redactar una interacción de venta. Tipos seleccionados: ${tiposTexto}.
+  const labels = { movil:'Venta Móvil', fibra:'Venta Fibra Óptica', equipo:'Venta Equipo', seguro_total:'Seguro Total', antidano:'Antidaño', cambio_plan:'Cambio de Plan' };
 
-Por favor, pídele a Manu los datos necesarios para redactar la interacción, uno por uno o en una lista clara. 
+  // Construir formulario inline
+  let fieldsHTML = '';
+  const camposUsados = [];
+  tipos.forEach(tipo => {
+    if (!campos[tipo]) return;
+    fieldsHTML += `<div class="ihara-form-section"><span class="ihara-form-section-title">${labels[tipo]}</span>`;
+    campos[tipo].forEach(campo => {
+      // Evitar duplicar campos comunes (nombre, rut, telefono, orden)
+      if (!camposUsados.includes(campo.id)) {
+        camposUsados.push(campo.id);
+        fieldsHTML += `<div class="ihara-form-field">
+          <label class="ihara-field-label">${campo.label}</label>
+          <input class="ihara-field-input" id="ifield_${campo.id}" type="text" placeholder="${campo.placeholder}">
+        </div>`;
+      }
+    });
+    fieldsHTML += '</div>';
+  });
 
-Datos que necesitas según los tipos:
-${tipos.includes('movil') ? '- MÓVIL: nombre cliente, RUT, número teléfono, tipo de venta (portabilidad/alta/migración), plan contratado, código plan, precio real, precio oferta, duración oferta, número de orden, vendedor' : ''}
-${tipos.includes('fibra') ? '- FIBRA: nombre cliente, RUT, número contacto, velocidad plan (ej: 600 megas simétricos), precio real, precio oferta, duración oferta, número de orden, vendedor, fecha instalación si la hay' : ''}
-${tipos.includes('equipo') ? '- EQUIPO: modelo smartphone, modalidad (cuotas/contado/subsidio), precio, número cuotas si aplica' : ''}
-${tipos.includes('seguro_total') ? '- SEGURO TOTAL: precio mensual del seguro' : ''}
-${tipos.includes('antidano') ? '- ANTIDAÑO: equipo cubierto, precio mensual' : ''}
-${tipos.includes('cambio_plan') ? '- CAMBIO DE PLAN: plan anterior, plan nuevo, precio nuevo, motivo si lo hay' : ''}
+  const formDiv = document.createElement('div');
+  formDiv.className = 'ihara-form';
+  formDiv.innerHTML = `
+    <p class="ihara-form-title">📋 Completa los datos y genero la interacción al tiro</p>
+    <div class="ihara-form-fields">${fieldsHTML}</div>
+    <button class="ihara-selector-btn" id="ihara-generar-btn">⚡ Generar interacción</button>
+  `;
+  aiChatLog.appendChild(formDiv);
+  aiChatLog.scrollTop = aiChatLog.scrollHeight;
 
-Una vez que Manu te dé todos los datos, genera el texto de interacción en formato claro y profesional, listo para copiar al sistema interno. El texto debe ser en tercera persona, detallado y específico.`;
+  document.getElementById('ihara-generar-btn').addEventListener('click', () => {
+    // Recopilar datos
+    const datos = {};
+    camposUsados.forEach(id => {
+      const el = document.getElementById('ifield_' + id);
+      if (el) datos[id] = el.value.trim();
+    });
 
-  // Mostrar en el chat lo que el usuario "envió"
-  appendMessageToLog(`Tipos seleccionados: ${tiposTexto}`, 'user');
-  chatHistory.push({ role: 'user', parts: [{ text: promptDatos }] });
+    // Construir prompt directo para generar la interacción
+    const tiposTexto = tipos.map(t => labels[t]).join(' + ');
+    let promptFinal = `Genera el texto de interacción para sistema interno con estos datos. Vendedor: ate_manroj. Tipos: ${tiposTexto}.
 
-  // Llamar a Ihara con este contexto
-  if (aiLoader) aiLoader.style.display = 'flex';
-  if (aiGenerateBtn) aiGenerateBtn.disabled = true;
+DATOS:
+`;
+    Object.entries(datos).forEach(([k, v]) => { if (v) promptFinal += `- ${k}: ${v}
+`; });
+    promptFinal += `
+GENERA el texto de interacción directamente, sin preguntar nada más. Formato profesional, tercera persona, listo para copiar. Sé concisa y directa.`;
 
-  fetch(APPS_SCRIPT_URL, {
-    method: 'POST', cache: 'no-cache',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action: 'askGemini', prompt: promptDatos, history: chatHistory.slice(0,-1) })
-  })
-  .then(r => r.json())
-  .then(result => {
-    if (aiLoader) aiLoader.style.display = 'none';
-    if (aiGenerateBtn) aiGenerateBtn.disabled = false;
-    if (result.success && result.text) {
-      appendMessageToLog(result.text, 'ai');
-      chatHistory.push({ role: 'model', parts: [{ text: result.text }] });
-    }
-  })
-  .catch(err => {
-    if (aiLoader) aiLoader.style.display = 'none';
-    if (aiGenerateBtn) aiGenerateBtn.disabled = false;
-    appendMessageToLog('Hubo un error al conectar con Ihara. Intenta de nuevo.', 'ai');
+    formDiv.remove();
+    appendMessageToLog(`Generando interacción: ${tiposTexto}`, 'user');
+    chatHistory.push({ role: 'user', parts: [{ text: promptFinal }] });
+
+    if (aiLoader) aiLoader.style.display = 'flex';
+    if (aiGenerateBtn) aiGenerateBtn.disabled = true;
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST', cache: 'no-cache',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'askGemini', prompt: promptFinal, history: chatHistory.slice(0,-1) })
+    })
+    .then(r => r.json())
+    .then(result => {
+      if (aiLoader) aiLoader.style.display = 'none';
+      if (aiGenerateBtn) aiGenerateBtn.disabled = false;
+      if (result.success && result.text) {
+        appendMessageToLog(result.text, 'ai');
+        chatHistory.push({ role: 'model', parts: [{ text: result.text }] });
+      }
+    })
+    .catch(() => {
+      if (aiLoader) aiLoader.style.display = 'none';
+      if (aiGenerateBtn) aiGenerateBtn.disabled = false;
+      appendMessageToLog('Error al conectar con Ihara.', 'ai');
+    });
   });
 }
 

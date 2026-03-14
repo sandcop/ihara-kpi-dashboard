@@ -202,14 +202,113 @@ body.login-overlay-active, body.sidebar-left-open { overflow: hidden; }
 .datetime-container { color: var(--sidebar-left-text); opacity: 0.8; }
 
 /* ===== Navegación Vertical (Naranja) ===== */
-.vertical-navbar { width: var(--vertical-nav-width-desktop); background-color: var(--vertical-nav-bg); display: flex; flex-direction: column; align-items: center; padding-top: 20px; position: fixed; left: var(--sidebar-left-width-desktop); top: 0; height: 100vh; z-index: 1050; transition: background-color 0.3s ease; }
-.vnav-item { display: flex; align-items: center; justify-content: center; width: 100%; padding: 12px 0; margin-bottom: 5px; color: var(--vertical-nav-icon); text-decoration: none; position: relative; transition: background-color 0.2s ease; }
-.vnav-item:hover, .vnav-item.active { background-color: var(--vertical-nav-active-bg); }
-.vnav-item:hover .vnav-icon, .vnav-item.active .vnav-icon { filter: invert(70%) sepia(83%) saturate(3455%) hue-rotate(358deg) brightness(101%) contrast(101%); }
+/* ===== BARRA NAVEGACIÓN VERTICAL - REDISEÑO ===== */
+.vertical-navbar {
+  width: var(--vertical-nav-width-desktop);
+  background: linear-gradient(180deg, #fb8500 0%, #e07600 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  position: fixed;
+  left: var(--sidebar-left-width-desktop);
+  top: 0;
+  height: 100vh;
+  z-index: 1050;
+  transition: background 0.3s ease;
+  box-shadow: 4px 0 20px rgba(251,133,0,0.25);
+  gap: 4px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.vertical-navbar::-webkit-scrollbar { display: none; }
+
+.vnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  position: relative;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+}
+.vnav-item:hover {
+  background-color: rgba(0,0,0,0.18) !important;
+  transform: scale(1.12) !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  color: #fff;
+}
+.vnav-item.active {
+  background-color: rgba(2,48,71,0.85) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  color: #fb8500 !important;
+}
+.vnav-item:hover .vnav-icon,
+.vnav-item.active .vnav-icon {
+  filter: brightness(0) invert(1) !important;
+  transform: scale(1.1);
+}
+.vnav-item.active .vnav-icon {
+  filter: invert(70%) sepia(83%) saturate(3455%) hue-rotate(358deg) brightness(101%) contrast(101%) !important;
+}
+
 .vnav-icon-wrapper { display: inline-flex; }
-.vnav-icon { width: 26px; height: 26px; filter: brightness(0) invert(1); transition: filter 0.2s ease; }
-.vnav-text { visibility: hidden; opacity: 0; position: absolute; left: 105%; top: 50%; transform: translateY(-50%); background-color: var(--vertical-nav-tooltip-bg); color: var(--vertical-nav-tooltip-text); padding: 6px 12px; border-radius: 4px; font-size: 0.85em; white-space: nowrap; z-index: 10; pointer-events: none; transition: opacity 0.2s ease, visibility 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-.vnav-item:hover .vnav-text { visibility: visible; opacity: 1; }
+.vnav-icon {
+  width: 22px;
+  height: 22px;
+  filter: brightness(0) invert(1);
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+/* Tooltip rediseñado */
+.vnav-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-6px);
+  background-color: #023047;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  letter-spacing: 0.03em;
+}
+.vnav-text::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-right-color: #023047;
+}
+.vnav-item:hover .vnav-text {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Separador visual a mitad de la barra */
+.vnav-separator {
+  width: 36px;
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+  margin: 4px 0;
+  flex-shrink: 0;
+}
 .mobile-nav-links { display: none; margin-top: 20px; }
 .mobile-nav-links a { display: flex; align-items: center; padding: 12px 10px; color: var(--sidebar-left-text); text-decoration: none; border-radius: 4px; margin-bottom: 5px; font-size: 1em; }
 .mobile-nav-links a:hover, .mobile-nav-links a.active { background-color: var(--sidebar-left-border); color: var(--sidebar-left-bg); }
@@ -1278,20 +1377,7 @@ a.whatsapp-button-footer .wtext { display: none; }
   opacity: 1;
 }
 
-/* --- ICONOS BARRA VERTICAL (vnav) --- */
-.vnav-item {
-  transition: background-color 0.2s ease, transform 0.2s ease !important;
-}
-.vnav-item:hover {
-  transform: scale(1.15) !important;
-}
-.vnav-icon {
-  transition: filter 0.2s ease, transform 0.2s ease !important;
-}
-.vnav-item:hover .vnav-icon,
-.vnav-item.active .vnav-icon {
-  transform: scale(1.1);
-}
+/* --- ICONOS BARRA VERTICAL (vnav) - heredado del rediseño principal --- */
 
 /* --- CHECKBOXES --- */
 .checkbox-btn {

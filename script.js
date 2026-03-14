@@ -1152,14 +1152,21 @@ function openFlashOfferFullscreen(imageUrl) {
         document.body.appendChild(overlay);
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay || e.target.id === 'flash-offer-fullscreen-close') {
+                overlay.style.display = 'none';
                 overlay.classList.remove('visible');
             }
         });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') overlay.classList.remove('visible');
+            if (e.key === 'Escape') {
+                overlay.style.display = 'none';
+                overlay.classList.remove('visible');
+            }
         });
     }
     document.getElementById('flash-offer-fullscreen-img').src = imageUrl;
+    overlay.style.display = 'flex';
+    // Forzar reflow para que la animación funcione
+    overlay.offsetHeight;
     overlay.classList.add('visible');
 }
 

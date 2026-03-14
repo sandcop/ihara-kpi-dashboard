@@ -2899,3 +2899,39 @@ a.whatsapp-button-footer .wtext { display: none; }
   .galeria-thumbs { grid-template-columns: repeat(3, 1fr); gap: 7px; }
   .galeria-main-wrap { aspect-ratio: 4/3; }
 }
+
+/* ===== WHATSAPP FLOTANTE ===== */
+.whatsapp-floating {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+  background-color: #25d366 !important;
+  box-shadow: 0 4px 16px rgba(37,211,102,0.5) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1500 !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  text-decoration: none !important;
+}
+.whatsapp-floating:hover {
+  transform: scale(1.12) !important;
+  box-shadow: 0 6px 22px rgba(37,211,102,0.65) !important;
+}
+
+/* Barra inferior — solo contenedor vacío para mantener el padding del layout */
+.fixed-bottom-bar {
+  height: var(--bottom-bar-height) !important;
+  background: transparent !important;
+  border-top: none !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+/* Toggle en sidebar — centrado */
+#theme-toggle-btn-footer {
+  cursor: pointer;
+}

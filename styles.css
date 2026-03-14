@@ -2656,3 +2656,126 @@ button[onclick*="admin"],
   color: var(--text-color-secondary);
   opacity: 0.6;
 }
+
+/* ===== BARRA INFERIOR - REDISEÑO COHERENTE ===== */
+.fixed-bottom-bar {
+  background: var(--bottom-bar-bg);
+  border-top: 1px solid var(--bottom-bar-border);
+  box-shadow: var(--bottom-bar-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 28px;
+  gap: 16px;
+}
+
+/* Botón inicio */
+.bottom-bar-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background: var(--bg-content-alt) !important;
+  border: 1.5px solid var(--border-color-dark) !important;
+  color: var(--bottom-bar-icon) !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease !important;
+  text-decoration: none !important;
+  padding: 0 !important;
+}
+.bottom-bar-btn svg {
+  stroke: var(--bottom-bar-icon);
+  transition: stroke 0.2s ease;
+}
+.bottom-bar-btn:hover {
+  background: var(--color-orange-accent) !important;
+  border-color: var(--color-orange-accent) !important;
+  transform: scale(1.1) !important;
+  color: #fff !important;
+}
+.bottom-bar-btn:hover svg {
+  stroke: #fff !important;
+}
+
+/* Toggle — ya está bien, solo asegurar alineación */
+#theme-toggle-btn-footer {
+  flex-shrink: 0;
+}
+
+/* WhatsApp — coherente con el círculo del inicio */
+.fixed-bottom-bar a.whatsapp-button-footer,
+a.whatsapp-button-footer {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background-color: #25d366 !important;
+  box-shadow: 0 3px 10px rgba(37,211,102,0.35) !important;
+  text-decoration: none !important;
+  color: white !important;
+  padding: 0 !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  border: none !important;
+  font-size: inherit !important;
+}
+.fixed-bottom-bar a.whatsapp-button-footer:hover,
+a.whatsapp-button-footer:hover {
+  transform: scale(1.12) !important;
+  box-shadow: 0 5px 16px rgba(37,211,102,0.5) !important;
+}
+a.whatsapp-button-footer svg { fill: white !important; }
+a.whatsapp-button-footer .wtext { display: none; }
+
+/* ===== FLASH OFFER - OVERLAY FULLSCREEN ===== */
+#flash-offer-fullscreen-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+#flash-offer-fullscreen-overlay.visible {
+  display: flex;
+  opacity: 1;
+}
+#flash-offer-fullscreen-img {
+  max-width: 92vw;
+  max-height: 88vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: fo-zoom-in 0.25s ease;
+}
+@keyframes fo-zoom-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+#flash-offer-fullscreen-close {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  font-size: 1.8em;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  z-index: 10000;
+}
+#flash-offer-fullscreen-close:hover {
+  background: rgba(255,255,255,0.3);
+  transform: rotate(90deg);
+}

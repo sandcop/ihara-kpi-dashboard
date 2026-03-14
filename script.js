@@ -1420,6 +1420,135 @@ document.addEventListener('DOMContentLoaded', () => {
     // Iniciar notificaciones periódicas
     if (toastContainer && typeof startPeriodicNotifications === 'function') { startPeriodicNotifications(); }
     
+    // Inicializar galería familiar
+    inicializarGaleria();
+    
     console.log("script.js: Inicialización completa.");
     
 });
+
+// ===== GALERÍA FAMILIAR =====
+const GALERIA_FOLDER = 'galeria_familiar/';
+const FIREBASE_BUCKET_GALERIA = 'seguimiento-ventas-manuel.firebasestorage.app';
+let galeriaFotos = []; // [{url, fileName}]
+let galeriaIndexActivo = 0;
+
+async function inicializarGaleria() {
+  const uploadBtn = document.getElementById('galeria-upload-btn');
+  const fileInput = document.getElementById('galeria-file-input');
+  const deleteBtn = document.getElementById('galeria-delete-btn');
+  if (!uploadBtn || !fileInput) return;
+
+  // Cargar fotos desde Firebase
+  await cargarFotosGaleria();
+
+  // Subir foto
+  uploadBtn.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const pwd = prompt('Contraseña de administrador:');
+    if (!pwd) return;
+    if (btoa(pwd) !== CORRECT_PASSWORD_B64) { showToast('Contraseña incorrecta.', 'error'); return; }
+    await subirFotoGaleria(file);
+    fileInput.value = '';
+  });
+
+  // Eliminar foto activa
+  deleteBtn.addEventListener('click', async () => {
+    if (galeriaFotos.length === 0) return;
+    const pwd = prompt('Contraseña de administrador:');
+    if (!pwd) return;
+    if (btoa(pwd) !== CORRECT_PASSWORD_B64) { showToast('Contraseña incorrecta.', 'error'); return; }
+    await eliminarFotoGaleria(galeriaFotos[galeriaIndexActivo].fileName);
+  });
+}
+
+async function cargarFotosGaleria() {
+  const thumbsEl = document.getElementById('galeria-thumbs');
+  const emptyEl = document.getElementById('galeria-empty-state');
+  const mainImg = document.getElementById('galeria-main-img');
+  const deleteBtn = document.getElementById('galeria-delete-btn');
+  if (!thumbsEl) return;
+
+  // Skeletons mientras carga
+  thumbsEl.innerHTML = Array(4).fill('<div class="galeria-thumb-skeleton"></div>').join('');
+
+  try {
+    const listUrl = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_BUCKET_GALERIA}/o?prefix=${encodeURIComponent(GALERIA_FOLDER)}&delimiter=/`;
+    const res = await fetch(listUrl);
+    const data = await res.json();
+    const items = (data.items || []).filter(i => !i.name.endsWith('/'));
+
+    galeriaFotos = items.map(i => ({
+      fileName: i.name,
+      url: `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_BUCKET_GALERIA}/o/${encodeURIComponent(i.name)}?alt=media`
+    }));
+
+    thumbsEl.innerHTML = '';
+
+    if (galeriaFotos.length === 0) {
+      emptyEl.style.display = 'flex';
+      mainImg.classList.remove('loaded');
+      if (deleteBtn) deleteBtn.style.display = 'none';
+      return;
+    }
+
+    emptyEl.style.display = 'none';
+    galeriaFotos.forEach((foto, idx) => {
+      const img = document.createElement('img');
+      img.src = foto.url;
+      img.alt = `Foto ${idx + 1}`;
+      img.className = 'galeria-thumb' + (idx === 0 ? ' active' : '');
+      img.addEventListener('click', () => setFotoActiva(idx));
+      thumbsEl.appendChild(img);
+    });
+
+    setFotoActiva(0);
+
+  } catch(e) {
+    thumbsEl.innerHTML = '';
+    showToast('Error cargando galería.', 'error');
+  }
+}
+
+function setFotoActiva(idx) {
+  const mainImg = document.getElementById('galeria-main-img');
+  const deleteBtn = document.getElementById('galeria-delete-btn');
+  const thumbs = document.querySelectorAll('.galeria-thumb');
+  galeriaIndexActivo = idx;
+  mainImg.src = galeriaFotos[idx].url;
+  mainImg.classList.add('loaded');
+  if (deleteBtn) deleteBtn.style.display = 'flex';
+  thumbs.forEach((t, i) => t.classList.toggle('active', i === idx));
+
+  // Click en imagen principal = fullscreen
+  mainImg.onclick = () => openFlashOfferFullscreen(galeriaFotos[idx].url);
+}
+
+async function subirFotoGaleria(file) {
+  showToast('Subiendo foto...', 'info');
+  try {
+    const ext = file.name.split('.').pop();
+    const fileName = `${GALERIA_FOLDER}foto_${Date.now()}.${ext}`;
+    const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_BUCKET_GALERIA}/o/${encodeURIComponent(fileName)}?uploadType=media`;
+    const res = await fetch(uploadUrl, { method: 'POST', headers: { 'Content-Type': file.type }, body: file });
+    if (!res.ok) throw new Error('Error al subir');
+    showToast('¡Foto subida!', 'success');
+    await cargarFotosGaleria();
+  } catch(e) {
+    showToast('Error al subir la foto.', 'error');
+  }
+}
+
+async function eliminarFotoGaleria(fileName) {
+  try {
+    const deleteUrl = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_BUCKET_GALERIA}/o/${encodeURIComponent(fileName)}`;
+    const res = await fetch(deleteUrl, { method: 'DELETE' });
+    if (!res.ok && res.status !== 204) throw new Error('Error al eliminar');
+    showToast('Foto eliminada.', 'success');
+    await cargarFotosGaleria();
+  } catch(e) {
+    showToast('Error al eliminar la foto.', 'error');
+  }
+}
